@@ -2,14 +2,7 @@
 <resources>
     <string name="app_name">Poliesportivo</string>
     <string name="action_settings">Configuração</string>
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Senha (Opicional)</string>
-    <string name="error_field_required">Este campo é obrigatório</string>
-    <string name="error_incorrect_password">Esta senha está incorreta</string>
-    <string name="error_invalid_email">Este endereço de e-mail é inválido</string>
-    <string name="error_invalid_password">Esta senha é muito curta</string>
-    <string name="permission_rationale">\"As permissões de contatos são necessárias para fornecer preenchimentos de e-mail\".</string>
-    <string name="action_sign_in">Entrar</string>
-    <string name="title_activity_login">Login</string>
     <string name="title_activity_calendario">Calendário</string>
+    <string name="name">Name</string>
+    <string name="cadastre">Cadastro</string>
 </resources>
