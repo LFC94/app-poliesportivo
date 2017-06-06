@@ -4,4 +4,7 @@
     <string name="title_activity_calendario">Calendar</string>
     <string name="name">Name</string>
     <string name="cadastre">Cadastre</string>
+    <string name="permission_denied">Permission Denied</string>
+    <string name="message_permission_denied">To use this app you need to accept the permission:</string>
+    <string name="confirm">Confirm</string>
 </resources>

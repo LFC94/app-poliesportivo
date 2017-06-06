@@ -3,12 +3,13 @@ package com.lfcaplicativos.poliesportivo;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -16,14 +17,15 @@ import android.widget.ImageView;
 
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
+import com.lfcaplicativos.poliesportivo.Uteis.Permissao;
 
 import java.io.InputStream;
-
 public class Login extends AppCompatActivity {
 
     private EditText editCodArea, editName, editTelefone;
     private ImageView imageLogo;
     private View mProgressView, mLoginFormView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +55,7 @@ public class Login extends AppCompatActivity {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
@@ -83,7 +83,6 @@ public class Login extends AppCompatActivity {
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
-
 
     private class DownloadImage extends AsyncTask<String, Void, Bitmap> {
         ImageView bmImage;
@@ -115,4 +114,17 @@ public class Login extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        for (int i = 0; i < grantResults.length; i++) {
+            int resultado = grantResults[i];
+            if (resultado == PackageManager.PERMISSION_DENIED) {
+                Permissao.alertaValidacaoPemissao(this, permissions[i]);
+            }
+        }
+    }
+
 }
