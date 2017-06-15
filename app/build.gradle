@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "com.lfcaplicativos.poliesportivo"
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -32,7 +32,8 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:design:25.3.1'
     compile 'com.roomorama:caldroid:3.0.1' //Calendario
-    compile 'com.google.firebase:firebase-database:9.6.1' //FireBase DataBase
+    compile 'com.google.firebase:firebase-database:11.0.0' //FireBase DataBase
+    compile 'com.google.firebase:firebase-auth:11.0.0' //FireBase Authentication
 
     compile 'com.github.rtoshiro.mflibrary:mflibrary:1.0.0'//Mascara edit
     testCompile 'junit:junit:4.12'

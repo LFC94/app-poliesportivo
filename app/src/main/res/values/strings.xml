@@ -7,4 +7,9 @@
     <string name="permission_denied">Permission Denied</string>
     <string name="message_permission_denied">To use this app you need to accept the permission:</string>
     <string name="confirm">Confirm</string>
+    <string name="phone_invalid">Invalid phone number.</string>
+    <string name="next">Next</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="message_verify_phone">Poliesportivo will send an SMS message to verify your phone number. Enter your area code and phone number.</string>
+    <string name="ddd_invalid">Invalid area code</string>
 </resources>

@@ -1,10 +1,9 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/Layout_Login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -14,82 +13,85 @@
 
     <ProgressBar
         android:id="@+id/Progress_Login"
-        style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="8dp"
+        android:layout_centerHorizontal="true"
         android:visibility="gone" />
 
     <ScrollView
-        android:id="@+id/Scroll_Login"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/Layout_Login_Scroll"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_Login_Messagem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="@string/message_verify_phone"
+                android:textAlignment="center"
+                android:layout_alignParentTop="true"
+                android:textAppearance="@android:style/TextAppearance.Medium" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/text_Login_Messagem"
+                android:layout_marginTop="15dp"
+                android:gravity="center"
+                android:id="@+id/relativeLayout">
+
+                <EditText
+                    android:id="@+id/edit_Login_CodArea"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:hint="DDD"
+                    android:inputType="number"
+                    android:ems="10"
+                    android:textAlignment="center" />
+
+                <EditText
+                    android:id="@+id/edit_Login_Telefone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="3dp"
+                    android:ems="10"
+                    android:layout_toEndOf="@+id/edit_Login_CodArea"
+                    android:layout_toRightOf="@+id/edit_Login_CodArea"
+                    android:hint="@string/phone_number"
+                    android:inputType="number" />
+            </RelativeLayout>
+
 
             <ImageView
                 android:id="@+id/image_Login_Logo"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter" />
-
-            <LinearLayout
-                android:id="@+id/Layout_Login_Dados"
-                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_above="@+id/button_Login_Login"
+                android:layout_below="@+id/relativeLayout"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/logo" />
 
-                <AutoCompleteTextView
-                    android:id="@+id/edit_Login_Nome"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
-                    android:hint="Digite seu nome."
-                    android:singleLine="true" />
+            <Button
+                android:id="@+id/button_Login_Login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_weight="1"
+                android:onClick="onClick"
+                android:text="@string/next" />
 
-                <LinearLayout
-                    android:id="@+id/Layout_Login_Telefone"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <EditText
-                        android:id="@+id/edit_Login_CodArea"
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content"
-                        android:layout_alignBottom="@+id/edit_Login_CodPais"
-                        android:layout_toEndOf="@+id/edit_Login_CodPais"
-                        android:layout_toRightOf="@+id/edit_Login_CodPais"
-                        android:ems="10"
-                        android:gravity="center"
-                        android:hint="11"
-                        android:inputType="number" />
-
-                    <EditText
-                        android:id="@+id/edit_Login_Telefone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ems="10"
-                        android:hint="99585-5253"
-                        android:inputType="number" />
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/button_Login_Login"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/colorPrimaryDark"
-                    android:text="@string/cadastre" />
-
-            </LinearLayout>
-
-        </LinearLayout>
+        </RelativeLayout>
     </ScrollView>
 
-</LinearLayout>
+</RelativeLayout>

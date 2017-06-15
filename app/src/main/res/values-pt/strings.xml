@@ -8,4 +8,9 @@
     <string name="permission_denied">Permissão Negada</string>
     <string name="message_permission_denied">Para utilizar este aplicativo, você precisa aceitar a permissão:</string>
     <string name="confirm">Confirmar</string>
+    <string name="phone_invalid">Número de telefone inválido.</string>
+    <string name="next">Avançar</string>
+    <string name="phone_number">Numéro Telefone</string>
+    <string name="message_verify_phone">O Poliesportivo enviará uma mensagem SMS para verificar seu número de telefone. Digite seu código de área e número de telefone.</string>
+    <string name="ddd_invalid">Código de área inválida</string>
 </resources>
