@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -32,9 +33,10 @@ import com.lfcaplicativos.poliesportivo.Uteis.Permissao;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
+import static com.lfcaplicativos.poliesportivo.Uteis.Validacao.validateDDDNumber;
 import static com.lfcaplicativos.poliesportivo.Uteis.Validacao.validatePhoneNumber;
 
-public class Login extends AppCompatActivity implements View.OnClickListener {
+public class Login extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener {
     private static final String TAG = "PhoneAuthActivity";
 
     FirebaseAuth mAuth;
@@ -65,6 +67,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         editCodArea.addTextChangedListener(maskCodArea);
         editTelefone.addTextChangedListener(maskTelefone);
 
+        editCodArea.setOnKeyListener(this);
+        editTelefone.setOnKeyListener(this);
+
         showProgress(true, viewProgress, viewLayout);
         new DownloadImage(imageLogo, R.drawable.logo).execute("http://lfcsistemas.esy.es/poliesportivo/LFC1.png");
 
@@ -86,12 +91,28 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             public void onCodeSent(String verificationId,
                                    PhoneAuthProvider.ForceResendingToken token) {
                 Log.d(TAG, "onCodeSent:" + verificationId + " Token: " + token);
-
-
             }
         };
+    }
 
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
 
+        if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                (keyCode == KeyEvent.KEYCODE_ENTER)) {
+
+            switch (v.getId()) {
+                case R.id.edit_Login_CodArea:
+                    if (validateDDDNumber(editCodArea, getString(R.string.ddd_invalid)))
+                        editTelefone.requestFocus();
+
+                    break;
+                case R.id.edit_Login_Telefone:
+                    onClick(findViewById(R.id.button_Login_Login));
+                    break;
+            }
+        }
+        return false;
     }
 
     @Override

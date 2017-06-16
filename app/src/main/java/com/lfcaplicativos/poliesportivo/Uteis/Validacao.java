@@ -10,8 +10,8 @@ import android.widget.EditText;
 public class Validacao {
 
     public static boolean validateDDDNumber(EditText editDDDNumber, String smErro) {
-        String telefone = editDDDNumber.getText().toString();
-        if (TextUtils.isEmpty(telefone)) {
+        String sddd = editDDDNumber.getText().toString();
+        if (TextUtils.isEmpty(sddd)|| sddd.trim().length()<2) {
             editDDDNumber.setError(smErro);
             editDDDNumber.requestFocus();
             return false;
