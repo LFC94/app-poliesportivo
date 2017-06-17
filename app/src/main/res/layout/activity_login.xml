@@ -40,32 +40,28 @@
                 android:textAppearance="@android:style/TextAppearance.Medium" />
 
             <RelativeLayout
-                android:layout_width="match_parent"
+                android:id="@+id/relativeLayout"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
                 android:layout_below="@+id/text_Login_Messagem"
-                android:layout_marginTop="15dp"
-                android:gravity="center"
-                android:id="@+id/relativeLayout">
+                android:layout_centerHorizontal="true">
 
                 <EditText
                     android:id="@+id/edit_Login_CodArea"
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
+                    android:ems="10"
                     android:hint="DDD"
                     android:inputType="number"
-                    android:ems="10"
                     android:textAlignment="center" />
 
                 <EditText
                     android:id="@+id/edit_Login_Telefone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
-                    android:ems="10"
                     android:layout_toEndOf="@+id/edit_Login_CodArea"
                     android:layout_toRightOf="@+id/edit_Login_CodArea"
+                    android:ems="10"
                     android:hint="@string/phone_number"
                     android:inputType="number" />
             </RelativeLayout>
@@ -87,7 +83,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:layout_weight="1"
                 android:onClick="onClick"
                 android:text="@string/next" />
 

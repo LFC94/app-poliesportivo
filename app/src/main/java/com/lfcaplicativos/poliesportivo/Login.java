@@ -11,6 +11,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -39,6 +41,8 @@ import static com.lfcaplicativos.poliesportivo.Uteis.Validacao.validatePhoneNumb
 public class Login extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener {
     private static final String TAG = "PhoneAuthActivity";
 
+    private boolean isUpdating;
+
     FirebaseAuth mAuth;
     FirebaseUser user;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
@@ -58,20 +62,46 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         editCodArea = (EditText) findViewById(R.id.edit_Login_CodArea);
         editTelefone = (EditText) findViewById(R.id.edit_Login_Telefone);
 
-        SimpleMaskFormatter simpleMaskCodArea = new SimpleMaskFormatter("NN");
+        // SimpleMaskFormatter simpleMaskCodArea = new SimpleMaskFormatter("NN");
         SimpleMaskFormatter simpleMaskTelefone = new SimpleMaskFormatter("NNNNN-NNNN");
 
-        MaskTextWatcher maskCodArea = new MaskTextWatcher(editCodArea, simpleMaskCodArea);
+        // MaskTextWatcher maskCodArea = new MaskTextWatcher(editCodArea, simpleMaskCodArea);
         MaskTextWatcher maskTelefone = new MaskTextWatcher(editTelefone, simpleMaskTelefone);
-
-        editCodArea.addTextChangedListener(maskCodArea);
         editTelefone.addTextChangedListener(maskTelefone);
+        editCodArea.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String current = s.toString();
+                if (isUpdating) {
+                    isUpdating = false;
+                    return;
+                }
+                String number = current.replaceAll("[^0-9]*", "");
+                isUpdating = true;
+                editCodArea.setText(number);
+                editCodArea.setSelection(number.length());
+                if (number.length() == 2) {
+                    if (validateDDDNumber(editCodArea, getString(R.string.ddd_invalid))) {
+                        editCodArea.clearFocus();
+                        editTelefone.requestFocus();
+                    }
+                }
+            }
+        });
 
         editCodArea.setOnKeyListener(this);
         editTelefone.setOnKeyListener(this);
 
         showProgress(true, viewProgress, viewLayout);
-        new DownloadImage(imageLogo, R.drawable.logo).execute("http://lfcsistemas.esy.es/poliesportivo/LFC1.png");
+        new DownloadImage(imageLogo, R.drawable.logo).execute("http://lfcsistemas.esy.es/poliesportivo/LFC.png");
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -98,9 +128,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
 
-        if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                (keyCode == KeyEvent.KEYCODE_ENTER)) {
-
+        if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
             switch (v.getId()) {
                 case R.id.edit_Login_CodArea:
                     if (validateDDDNumber(editCodArea, getString(R.string.ddd_invalid)))
@@ -111,6 +139,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                     onClick(findViewById(R.id.button_Login_Login));
                     break;
             }
+            return true;
         }
         return false;
     }
@@ -129,7 +158,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show, final View mProgressView, final View mLoginFormView) {
+    private void showProgress(final boolean show, final View mProgressView,
+                              final View mLoginFormView) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
@@ -192,7 +222,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         for (int i = 0; i < grantResults.length; i++) {
