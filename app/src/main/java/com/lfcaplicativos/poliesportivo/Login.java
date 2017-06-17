@@ -3,16 +3,21 @@ package com.lfcaplicativos.poliesportivo;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -61,7 +66,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         imageLogo = (ImageView) findViewById(R.id.image_Login_Logo);
         editCodArea = (EditText) findViewById(R.id.edit_Login_CodArea);
         editTelefone = (EditText) findViewById(R.id.edit_Login_Telefone);
-
+        findViewById(R.id.button_Login_Login).setFocusable(false);
         // SimpleMaskFormatter simpleMaskCodArea = new SimpleMaskFormatter("NN");
         SimpleMaskFormatter simpleMaskTelefone = new SimpleMaskFormatter("NNNNN-NNNN");
 
@@ -88,7 +93,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                 isUpdating = true;
                 editCodArea.setText(number);
                 editCodArea.setSelection(number.length());
-                if (number.length() == 2) {
+                if (number.length() >= 2) {
                     if (validateDDDNumber(editCodArea, getString(R.string.ddd_invalid))) {
                         editCodArea.clearFocus();
                         editTelefone.requestFocus();
@@ -123,23 +128,38 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                 Log.d(TAG, "onCodeSent:" + verificationId + " Token: " + token);
             }
         };
+
+
+        editCodArea.requestFocus();
     }
 
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
 
-        if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-            switch (v.getId()) {
-                case R.id.edit_Login_CodArea:
-                    if (validateDDDNumber(editCodArea, getString(R.string.ddd_invalid)))
-                        editTelefone.requestFocus();
+        if ((event.getAction() == KeyEvent.ACTION_DOWN)) {
+            if(keyCode == KeyEvent.KEYCODE_ENTER) {
+                switch (v.getId()) {
+                    case R.id.edit_Login_CodArea:
+                        if (validateDDDNumber(editCodArea, getString(R.string.ddd_invalid)))
+                            editTelefone.requestFocus();
+                        break;
+                    case R.id.edit_Login_Telefone:
+                        onClick(findViewById(R.id.button_Login_Login));
+                        break;
+                }
+            }else if(keyCode == 67){
+                switch (v.getId()) {
+                    case R.id.edit_Login_CodArea:
+                        //
+                        break;
+                    case R.id.edit_Login_Telefone:
+                        if (editTelefone.length()<=1){
+                            editCodArea.requestFocus();
+                        }
+                        break;
+                }
 
-                    break;
-                case R.id.edit_Login_Telefone:
-                    onClick(findViewById(R.id.button_Login_Login));
-                    break;
             }
-            return true;
         }
         return false;
     }
@@ -148,9 +168,30 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_Login_Login:
-                if (validatePhoneNumber(editCodArea, getString(R.string.ddd_invalid)) && validatePhoneNumber(editTelefone, getString(R.string.phone_invalid))) {
-                    String telefone = "+55" + editCodArea.getText().toString() + editTelefone.getText().toString().replace("-", "");
-                    startPhoneNumberVerification(telefone);
+                if (validateDDDNumber(editCodArea, getString(R.string.ddd_invalid)) && validatePhoneNumber(editTelefone, getString(R.string.phone_invalid))) {
+                    String sMensagem;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle(getString(R.string.msg_verificaremos_numero));
+                    sMensagem = editCodArea.getText().toString() + " " + editTelefone.getText().toString();
+                    int bFim = sMensagem.length();
+                    sMensagem += "\n\n" + getString(R.string.msg_number_correto_edit);
+
+                    SpannableString spanString = new SpannableString(sMensagem);
+                    spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, bFim, 0);
+                    builder.setMessage(spanString);
+
+                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            String telefone = "+55" + editCodArea.getText().toString() + editTelefone.getText().toString().replace("-", "");
+                            startPhoneNumberVerification(telefone);
+                        }
+                    });
+                    builder.setNegativeButton(R.string.edit, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            editCodArea.requestFocus();
+                        }
+                    });
+                    builder.create().show();
                 }
 
                 break;

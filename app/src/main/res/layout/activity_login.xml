@@ -53,6 +53,7 @@
                     android:ems="10"
                     android:hint="DDD"
                     android:inputType="number"
+                    android:maxLength="2"
                     android:textAlignment="center" />
 
                 <EditText
