@@ -16,4 +16,8 @@
     <string name="msg_verificaremos_numero">We\'ll check the phone number</string>
     <string name="msg_number_correto_edit">Is this number correct or do you want to edit?</string>
     <string name="edit">Edit</string>
+    <string name="verify">Verify</string>
+    <string name="msg_aguarda_sms">Waiting to automatically detect an SMS sent to</string>
+    <string name="wrong_number">Wrong number?</string>
+    <string name="invalid_code">Invalid code</string>
 </resources>

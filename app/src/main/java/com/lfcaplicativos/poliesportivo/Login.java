@@ -16,6 +16,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.StyleSpan;
 import android.util.Log;
@@ -23,6 +24,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
@@ -47,13 +49,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     private static final String TAG = "PhoneAuthActivity";
 
     private boolean isUpdating;
+    private String sVerificaId, sTelefoneVerificacao;
+    private PhoneAuthProvider.ForceResendingToken mResendToken;
 
     FirebaseAuth mAuth;
     FirebaseUser user;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
     private ImageView imageLogo;
-    private EditText editCodArea, editTelefone;
+    private EditText editCodArea, editTelefone, editCodeVerifica;
+    private TextView textMsg_Verifica_Fone;
     View viewProgress, viewLayout;
 
     @Override
@@ -120,17 +125,17 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
             @Override
             public void onVerificationFailed(FirebaseException e) {
                 Log.w(TAG, "onVerificationFailed", e);
+
             }
 
             @Override
             public void onCodeSent(String verificationId,
                                    PhoneAuthProvider.ForceResendingToken token) {
                 Log.d(TAG, "onCodeSent:" + verificationId + " Token: " + token);
+                sVerificaId = verificationId;
+                mResendToken = token;
             }
         };
-
-
-        editCodArea.requestFocus();
     }
 
     @Override
@@ -182,8 +187,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
                     builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            String telefone = "+55" + editCodArea.getText().toString() + editTelefone.getText().toString().replace("-", "");
-                            startPhoneNumberVerification(telefone);
+                            sTelefoneVerificacao = "+55" + editCodArea.getText().toString() + editTelefone.getText().toString().replace("-", "");
+                            startPhoneNumberVerification(sTelefoneVerificacao);
+                            chamarTelaVerificacao();
                         }
                     });
                     builder.setNegativeButton(R.string.edit, new DialogInterface.OnClickListener() {
@@ -194,6 +200,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                     builder.create().show();
                 }
 
+                break;
+            case R.id.button_Verificacao_Verifica:
+                verificaCode();
                 break;
         }
     }
@@ -259,6 +268,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
             if (result == null) {
                 bmImage.setImageResource(imagem);
             }
+
         }
     }
 
@@ -285,10 +295,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
                             user = task.getResult().getUser();
 
+
+
                         } else {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-
+                                editCodeVerifica.setError(getString(R.string.invalid_code));
                             }
                         }
                     }
@@ -306,5 +318,89 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
 
     }
+
+    private void resendVerificationCode(String phoneNumber,
+                                        PhoneAuthProvider.ForceResendingToken token) {
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                phoneNumber,        // Phone number to verify
+                60,                 // Timeout duration
+                TimeUnit.SECONDS,   // Unit of timeout
+                this,               // Activity (for callback binding)
+                mCallbacks,         // OnVerificationStateChangedCallbacks
+                token);             // ForceResendingToken from callbacks
+    }
+
+    private void chamarTelaVerificacao(){
+        setContentView(R.layout.activity_validacao_telefone);
+        String sTitulo = getString(R.string.verify) + " ";
+        int iIni = sTitulo.length();
+        sTitulo += sTelefoneVerificacao;
+        SpannableString spanString = new SpannableString(sTitulo);
+        spanString.setSpan(new StyleSpan(Typeface.BOLD), iIni, sTitulo.length(), 0);
+        setTitle(spanString);
+        textMsg_Verifica_Fone = (TextView) findViewById(R.id.text_Validacao_Msg_aguardando_SMS);
+
+        String sMensagem = getString(R.string.msg_verificaremos_numero)+" ";
+        iIni = sMensagem.length();
+        sMensagem += sTelefoneVerificacao;
+        SpannableString spanString2 = new SpannableString(sMensagem);
+        spanString2.setSpan(new StyleSpan(Typeface.BOLD), iIni, sMensagem.length(), 0);
+        textMsg_Verifica_Fone.setText(spanString2);
+
+        editCodeVerifica = (EditText) findViewById(R.id.edit_Validacao_CodeVerif);
+
+        editCodeVerifica.clearFocus();
+
+        editCodeVerifica.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+                if (isUpdating) {
+                    isUpdating = false;
+                    return;
+                }
+
+                String code = editable.toString().trim();
+                String number = code.replaceAll("[^0-9]*", "");
+                isUpdating = true;
+                editCodeVerifica.setText(number);
+                editCodeVerifica.setSelection(number.length());
+                if (number.length() == 6){
+                    verificaCode();
+                }
+            }
+        });
+
+    }
+
+    public void verificaCode(){
+       String code = editCodeVerifica.getText().toString().trim().replaceAll("[^0-9]*", "");;
+
+        if (TextUtils.isEmpty(code)){
+            editCodeVerifica.setError(getString(R.string.invalid_code));
+            editCodeVerifica.requestFocus();
+            return;
+        }
+        verifyPhoneNumberWithCode(sVerificaId, code);
+
+    }
+
+    private void verifyPhoneNumberWithCode(String verificationId, String code) {
+        // [START verify_with_code]
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
+        // [END verify_with_code]
+        signInWithPhoneAuthCredential(credential);
+    }
+
 
 }

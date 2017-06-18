@@ -17,4 +17,8 @@
     <string name="msg_verificaremos_numero">Nos verificaremos o número do telefone</string>
     <string name="msg_number_correto_edit">Este número está correto ou deseja editar?</string>
     <string name="edit">Editar</string>
+    <string name="verify">Verificar</string>
+    <string name="msg_aguarda_sms">Aguardando para detectar automáticamente um SMS enviado para</string>
+    <string name="wrong_number">Número errado?</string>
+    <string name="invalid_code">Código inválido</string>
 </resources>

@@ -84,7 +84,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
+                android:background="@color/colorButtonNormal"
                 android:onClick="onClick"
+                android:ems="10"
                 android:text="@string/next" />
 
         </RelativeLayout>
