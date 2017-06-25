@@ -3,6 +3,7 @@ package com.lfcaplicativos.poliesportivo;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -11,6 +12,7 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -38,39 +40,48 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.lfcaplicativos.poliesportivo.Uteis.Permissao;
+import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
 
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
+import static com.lfcaplicativos.poliesportivo.Uteis.Validacao.formatacaoTelefone;
 import static com.lfcaplicativos.poliesportivo.Uteis.Validacao.validateDDDNumber;
 import static com.lfcaplicativos.poliesportivo.Uteis.Validacao.validatePhoneNumber;
 
 public class Login extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener {
     private static final String TAG = "PhoneAuthActivity";
 
-    private boolean isUpdating;
+    private boolean isUpdating, isReenviarCodigo;
     private String sVerificaId, sTelefoneVerificacao;
-    private PhoneAuthProvider.ForceResendingToken mResendToken;
 
+    CountDownTimer countTimerReenvia;
+
+    private PhoneAuthProvider.ForceResendingToken mResendToken;
     FirebaseAuth mAuth;
     FirebaseUser user;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
+    Preferencias preferencias;
     private ImageView imageLogo;
     private EditText editCodArea, editTelefone, editCodeVerifica;
-    private TextView textMsg_Verifica_Fone;
+    private TextView textMsg_Verifica_Fone, textReenvioCodigo;
     View viewProgress, viewLayout;
+    Dialog dialogTelaVerificacao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        preferencias = new Preferencias(this);
+
         viewProgress = findViewById(R.id.Progress_Login);
         viewLayout = findViewById(R.id.Layout_Login_Scroll);
         imageLogo = (ImageView) findViewById(R.id.image_Login_Logo);
         editCodArea = (EditText) findViewById(R.id.edit_Login_CodArea);
         editTelefone = (EditText) findViewById(R.id.edit_Login_Telefone);
+
         findViewById(R.id.button_Login_Login).setFocusable(false);
         // SimpleMaskFormatter simpleMaskCodArea = new SimpleMaskFormatter("NN");
         SimpleMaskFormatter simpleMaskTelefone = new SimpleMaskFormatter("NNNNN-NNNN");
@@ -204,6 +215,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
             case R.id.button_Verificacao_Verifica:
                 verificaCode();
                 break;
+            case R.id.text_Validacao_NumErrado:
+                isReenviarCodigo = false;
+                countTimerReenvia.cancel();
+                dialogTelaVerificacao.cancel();
+                break;
+
         }
     }
 
@@ -238,7 +255,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
-
 
     private class DownloadImage extends AsyncTask<String, Void, Bitmap> {
         ImageView bmImage;
@@ -285,22 +301,22 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         }
     }
 
-    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+    private void signInWithPhoneAuthCredential(final PhoneAuthCredential credential) {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "signInWithCredential:success");
-
+                            isReenviarCodigo = false;
+                            countTimerReenvia.cancel();
+                            preferencias.CadastraUsuarioPreferencias(null,sTelefoneVerificacao,credential.toString());
                             user = task.getResult().getUser();
-
-
 
                         } else {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                editCodeVerifica.setError(getString(R.string.invalid_code));
+
                             }
                         }
                     }
@@ -331,23 +347,51 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     }
 
     private void chamarTelaVerificacao(){
-        setContentView(R.layout.activity_validacao_telefone);
+//        setContentView(R.layout.activity_validacao_telefone);
+
+        dialogTelaVerificacao = new Dialog(this);
+        dialogTelaVerificacao.setContentView(R.layout.activity_validacao_telefone);
+
         String sTitulo = getString(R.string.verify) + " ";
         int iIni = sTitulo.length();
-        sTitulo += sTelefoneVerificacao;
+        sTitulo +=formatacaoTelefone(sTelefoneVerificacao);
         SpannableString spanString = new SpannableString(sTitulo);
         spanString.setSpan(new StyleSpan(Typeface.BOLD), iIni, sTitulo.length(), 0);
-        setTitle(spanString);
-        textMsg_Verifica_Fone = (TextView) findViewById(R.id.text_Validacao_Msg_aguardando_SMS);
+        dialogTelaVerificacao.setTitle(spanString);
+
+        textMsg_Verifica_Fone = (TextView) dialogTelaVerificacao.findViewById(R.id.text_Validacao_Msg_aguardando_SMS);
 
         String sMensagem = getString(R.string.msg_verificaremos_numero)+" ";
         iIni = sMensagem.length();
-        sMensagem += sTelefoneVerificacao;
+        sMensagem += formatacaoTelefone(sTelefoneVerificacao);
         SpannableString spanString2 = new SpannableString(sMensagem);
         spanString2.setSpan(new StyleSpan(Typeface.BOLD), iIni, sMensagem.length(), 0);
         textMsg_Verifica_Fone.setText(spanString2);
 
-        editCodeVerifica = (EditText) findViewById(R.id.edit_Validacao_CodeVerif);
+        isReenviarCodigo = true;
+        textReenvioCodigo = (TextView) dialogTelaVerificacao.findViewById(R.id.text_Validacao_Cronometro);
+
+        countTimerReenvia = new CountDownTimer(120000, 1000) {
+            @Override
+            public void onTick(long l) {
+                int segundos = (int) ( l / 1000 ) % 60;      // se não precisar de segundos, basta remover esta linha.
+                int minutos  = (int) ( l / 60000 ) % 60;     // 60000   = 60 * 1000
+                textReenvioCodigo.setText(String.format( "%02d:%02d", minutos,segundos ));
+
+
+            }
+
+            @Override
+            public void onFinish() {
+                if(isReenviarCodigo) {
+                    resendVerificationCode(sTelefoneVerificacao, mResendToken);
+                    chamarTelaVerificacao();
+                }
+            }
+        }.start();
+
+
+        editCodeVerifica = (EditText) dialogTelaVerificacao.findViewById(R.id.edit_Validacao_CodeVerif);
 
         editCodeVerifica.clearFocus();
 
@@ -381,6 +425,15 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
             }
         });
 
+        dialogTelaVerificacao.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                isReenviarCodigo = false;
+                countTimerReenvia.cancel();
+                dialogTelaVerificacao.cancel();
+            }
+        });
+        dialogTelaVerificacao.show();
     }
 
     public void verificaCode(){

@@ -20,4 +20,6 @@
     <string name="msg_aguarda_sms">Waiting to automatically detect an SMS sent to</string>
     <string name="wrong_number">Wrong number?</string>
     <string name="invalid_code">Invalid code</string>
+    <string name="enterCode">Enter the 6-digit code</string>
+    <string name="reenviarCodigo">Resend code in</string>
 </resources>

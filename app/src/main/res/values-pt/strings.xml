@@ -21,4 +21,6 @@
     <string name="msg_aguarda_sms">Aguardando para detectar automáticamente um SMS enviado para</string>
     <string name="wrong_number">Número errado?</string>
     <string name="invalid_code">Código inválido</string>
+    <string name="enterCode">Digite o código de 6 digitos</string>
+    <string name="reenviarCodigo">Reenviar código em</string>
 </resources>

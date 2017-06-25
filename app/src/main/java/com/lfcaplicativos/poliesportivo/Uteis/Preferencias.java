@@ -19,8 +19,7 @@ public class Preferencias {
     private final String Arquivo = "PoliesportivoPreferences";
     private final String CHAVE_NOME = "NOME";
     private final String CHAVE_TELEFONE = "TELEFONE";
-    private final String CHAVE_TOKEN = "TOKEN";
-    private final String CHAVE_CONFIRMADO = "CONFIRMADO";
+    private final String CHAVE_CREDENCIAL = "CREDENCIAL";
 
 
     public Preferencias(Context context) {
@@ -29,11 +28,10 @@ public class Preferencias {
         editor = sharedPreferences.edit();
     }
 
-    public void CadastraUsuarioPreferencias(String Nome, String Telefone, String Token) {
+    public void CadastraUsuarioPreferencias(String Nome, String Telefone, String Credencial) {
         editor.putString(CHAVE_NOME, Nome);
         editor.putString(CHAVE_TELEFONE, Telefone);
-        editor.putString(CHAVE_TOKEN, Token);
-        editor.putBoolean(CHAVE_CONFIRMADO, false);
+        editor.putString(CHAVE_CREDENCIAL, Credencial);
         editor.commit();
     }
 
@@ -42,8 +40,7 @@ public class Preferencias {
 
         Retorno.put(CHAVE_NOME, sharedPreferences.getString(CHAVE_NOME, null));
         Retorno.put(CHAVE_TELEFONE, sharedPreferences.getString(CHAVE_TELEFONE, null));
-        Retorno.put(CHAVE_TOKEN, sharedPreferences.getString(CHAVE_TOKEN, null));
-        Retorno.put(CHAVE_TOKEN, sharedPreferences.getBoolean(CHAVE_CONFIRMADO, false) ? "T" : "F");
+        Retorno.put(CHAVE_CREDENCIAL, sharedPreferences.getString(CHAVE_CREDENCIAL, null));
 
         return Retorno;
     }

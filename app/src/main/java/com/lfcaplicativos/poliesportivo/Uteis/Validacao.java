@@ -39,4 +39,15 @@ public class Validacao {
         }
         return true;
     }
+
+    public static String formatacaoTelefone(String telefone){
+
+        String telefoneformatado = telefone;
+        telefoneformatado = telefoneformatado.replaceAll("[^0-9]", "");
+        telefoneformatado = telefoneformatado.trim();
+        telefoneformatado ="("+telefoneformatado.substring(2,4)+") "+telefoneformatado.substring(4,telefoneformatado.length()-4)+"-"+telefoneformatado.substring(telefoneformatado.length()-4,telefoneformatado.length());
+
+
+        return telefoneformatado;
+    }
 }
