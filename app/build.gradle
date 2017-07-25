@@ -17,6 +17,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE-FIREBASE.txt'
+        exclude 'META-INF/NOTICE'
+    }
 }
 
 dependencies {
@@ -34,6 +39,7 @@ dependencies {
     compile 'com.roomorama:caldroid:3.0.1' //Calendario
     compile 'com.google.firebase:firebase-database:11.0.0' //FireBase DataBase
     compile 'com.google.firebase:firebase-auth:11.0.0' //FireBase Authentication
+    compile 'com.firebase:firebase-client-android:2.5.2+'
 
     compile 'com.github.rtoshiro.mflibrary:mflibrary:1.0.0'//Mascara edit
     testCompile 'junit:junit:4.12'

@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,6 +29,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.firebase.client.Firebase;
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,6 +43,7 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.lfcaplicativos.poliesportivo.Uteis.Permissao;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
+import com.lfcaplicativos.poliesportivo.application.ConfiguracaoFirebase;
 
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +56,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     private static final String TAG = "PhoneAuthActivity";
 
     private boolean isUpdating, isReenviarCodigo;
-    private String sVerificaId, sTelefoneVerificacao;
+    private String sVerificaId, sTelefoneVerificacao, sCodigoVerificacao;
 
     CountDownTimer countTimerReenvia;
 
@@ -76,6 +79,15 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
         preferencias = new Preferencias(this);
 
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String Uid = user.getUid();
+
+            Firebase firebase = ConfiguracaoFirebase.getFirebase();
+
+            ChamarTelaCalendario();
+
+        }
         viewProgress = findViewById(R.id.Progress_Login);
         viewLayout = findViewById(R.id.Layout_Login_Scroll);
         imageLogo = (ImageView) findViewById(R.id.image_Login_Logo);
@@ -147,6 +159,14 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                 mResendToken = token;
             }
         };
+
+
+        if (preferencias.getCODEVERIFICACAO() != null && !preferencias.getCODEVERIFICACAO().trim().isEmpty()) {
+
+            verifyPhoneNumberWithCode(preferencias.getIDVERIFICACAO(), preferencias.getCODEVERIFICACAO());
+        }
+
+
     }
 
     @Override
@@ -223,6 +243,19 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
         }
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if (currentUser != null) {
+            startPhoneNumberVerification(preferencias.getTELEFONE());
+        }
+        // [END_EXCLUDE]
+    }
+
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show, final View mProgressView,
@@ -310,9 +343,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                             Log.d(TAG, "signInWithCredential:success");
                             isReenviarCodigo = false;
                             countTimerReenvia.cancel();
-                            preferencias.CadastraUsuarioPreferencias(null,sTelefoneVerificacao,credential.toString());
+                            preferencias.CadastraUsuarioPreferencias(null, sTelefoneVerificacao, sVerificaId, sCodigoVerificacao);
                             user = task.getResult().getUser();
-
+                            ChamarTelaCalendario();
                         } else {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
@@ -349,7 +382,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     private void chamarTelaVerificacao(){
 //        setContentView(R.layout.activity_validacao_telefone);
 
-        dialogTelaVerificacao = new Dialog(this);
+        dialogTelaVerificacao = new Dialog(this, R.style.FullTela);
         dialogTelaVerificacao.setContentView(R.layout.activity_validacao_telefone);
 
         String sTitulo = getString(R.string.verify) + " ";
@@ -433,6 +466,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                 dialogTelaVerificacao.cancel();
             }
         });
+
         dialogTelaVerificacao.show();
     }
 
@@ -444,7 +478,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
             editCodeVerifica.requestFocus();
             return;
         }
-        verifyPhoneNumberWithCode(sVerificaId, code);
+        sCodigoVerificacao = code;
+        verifyPhoneNumberWithCode(sVerificaId, sCodigoVerificacao);
 
     }
 
@@ -453,6 +488,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
         // [END verify_with_code]
         signInWithPhoneAuthCredential(credential);
+    }
+
+
+    private void ChamarTelaCalendario() {
+        Intent intent = new Intent(Login.this, Calendario.class);
+        startActivity(intent);
     }
 
 
