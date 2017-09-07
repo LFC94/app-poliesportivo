@@ -471,12 +471,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     }
 
     private void ChamarTelaCalendario() {
-        mUser = mAuth.getCurrentUser();
+        Intent intent;
+        String nome = preferencias.RetornaUsuarioPreferencias().get(String.valueOf(Chaves.CHAVE_NOME));
 
-
-
-        Intent intent = new Intent(Login.this, Calendario.class);
+        if (nome != null && !nome.trim().isEmpty()) {
+            intent = new Intent(Login.this, Calendario.class);
+        } else {
+            intent = new Intent(Login.this, Usuario.class);
+        }
         startActivity(intent);
+        this.finish();
     }
 
     public void GravarUsuarioFire() {

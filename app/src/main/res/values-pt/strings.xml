@@ -23,4 +23,9 @@
     <string name="invalid_code">Código inválido</string>
     <string name="enterCode">Digite o código de 6 digitos</string>
     <string name="reenviarCodigo">Reenviar código em</string>
+    <string name="title_activity_usuario">Dados Usuário</string>
+    <string name="state">Estado</string>
+    <string name="city">Cidade</string>
+    <string name="loading">Carregando</string>
+    <string name="notName">Nome não informado</string>
 </resources>

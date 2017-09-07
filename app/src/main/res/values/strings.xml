@@ -22,4 +22,9 @@
     <string name="invalid_code">Invalid code</string>
     <string name="enterCode">Enter the 6-digit code</string>
     <string name="reenviarCodigo">Resend code in</string>
+    <string name="title_activity_usuario">User Info</string>
+    <string name="state">State</string>
+    <string name="city">City</string>
+    <string name="loading">Loading</string>
+    <string name="notName">Name not reported</string>
 </resources>

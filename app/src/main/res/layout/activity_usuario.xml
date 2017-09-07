@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/Layout_Login"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.lfcaplicativos.poliesportivo.Usuario">
+
+    <TextView
+        android:id="@+id/text_Usuario_Nome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/name"
+        android:textAppearance="@android:style/TextAppearance.Medium" />
+
+    <EditText
+        android:id="@+id/edit_Usuario_Nome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/text_Usuario_Nome"
+        android:ems="20"
+        android:inputType="textCapWords|textPersonName" />
+
+    <TextView
+        android:id="@+id/text_Usuario_Estado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/edit_Usuario_Nome"
+        android:layout_marginTop="15dp"
+        android:text="@string/state"
+        android:textAppearance="@android:style/TextAppearance.Medium" />
+
+    <Spinner
+        android:id="@+id/spinner_Usuario_Estado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/text_Usuario_Estado"
+        android:minWidth="250dp"
+        android:spinnerMode="dialog" />
+
+    <TextView
+        android:id="@+id/text_Usuario_Cidade"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/spinner_Usuario_Estado"
+        android:layout_marginTop="15dp"
+        android:text="@string/city"
+        android:textAppearance="@android:style/TextAppearance.Medium" />
+
+    <Spinner
+        android:id="@+id/spinner_Usuario_Cidade"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/text_Usuario_Cidade"
+        android:layout_marginTop="0dp"
+        android:minWidth="500dp"
+        android:spinnerMode="dialog" />
+
+    <Button
+        android:id="@+id/button_Usuario_Confirma"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@color/colorButtonNormal"
+        android:ems="10"
+        android:onClick="onClick"
+        android:text="@string/confirm" />
+
+</RelativeLayout>

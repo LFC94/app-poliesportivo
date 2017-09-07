@@ -33,10 +33,29 @@ public class Preferencias {
 
     public void setNOME(String Nome) {
         editor.putString(Chaves.CHAVE_NOME, Nome);
+        editor.commit();
+    }
+
+    public void setESTADO(String Estado) {
+        editor.putString(Chaves.CHAVE_ESTADO, Estado);
+        editor.commit();
+    }
+
+    public void setCIDADE(String Cidade) {
+        editor.putString(Chaves.CHAVE_CIDADE, Cidade);
+        editor.commit();
     }
 
     public String getNOME() {
         return sharedPreferences.getString(Chaves.CHAVE_NOME, null);
+    }
+
+    public String getESTADO() {
+        return sharedPreferences.getString(Chaves.CHAVE_ESTADO, null);
+    }
+
+    public String getCIDADE() {
+        return sharedPreferences.getString(Chaves.CHAVE_CIDADE, null);
     }
 
     public String getTELEFONE() {
@@ -53,6 +72,8 @@ public class Preferencias {
         Retorno.put(Chaves.CHAVE_NOME, sharedPreferences.getString(Chaves.CHAVE_NOME, null));
         Retorno.put(Chaves.CHAVE_TELEFONE, sharedPreferences.getString(Chaves.CHAVE_TELEFONE, null));
         Retorno.put(Chaves.CHAVE_ID, sharedPreferences.getString(Chaves.CHAVE_ID, null));
+        Retorno.put(Chaves.CHAVE_ESTADO, sharedPreferences.getString(Chaves.CHAVE_ESTADO, null));
+        Retorno.put(Chaves.CHAVE_CIDADE, sharedPreferences.getString(Chaves.CHAVE_CIDADE, null));
 
         return Retorno;
     }
