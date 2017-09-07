@@ -12,10 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".application.CustomApplication">
+        android:name=".Config.CustomApplication">
         <activity
             android:name=".Calendario"
             android:label="@string/title_activity_calendario" />
+
         <activity android:name=".Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,4 +1,4 @@
-package com.lfcaplicativos.poliesportivo.application;
+package com.lfcaplicativos.poliesportivo.Config;
 
 
 import android.app.Application;

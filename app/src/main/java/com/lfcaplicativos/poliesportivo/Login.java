@@ -29,7 +29,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.firebase.client.Firebase;
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,9 +40,12 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.lfcaplicativos.poliesportivo.Config.Base64Custom;
+import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
+import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
 import com.lfcaplicativos.poliesportivo.Uteis.Permissao;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
-import com.lfcaplicativos.poliesportivo.application.ConfiguracaoFirebase;
 
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
@@ -56,13 +58,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     private static final String TAG = "PhoneAuthActivity";
 
     private boolean isUpdating, isReenviarCodigo;
-    private String sVerificaId, sTelefoneVerificacao, sCodigoVerificacao;
+    private String sVerificaId, sTelefoneVerificacao;
 
     CountDownTimer countTimerReenvia;
 
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     FirebaseAuth mAuth;
-    FirebaseUser user;
+    FirebaseUser mUser;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
     Preferencias preferencias;
@@ -79,15 +81,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
         preferencias = new Preferencias(this);
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            String Uid = user.getUid();
-
-            Firebase firebase = ConfiguracaoFirebase.getFirebase();
-
-            ChamarTelaCalendario();
-
-        }
         viewProgress = findViewById(R.id.Progress_Login);
         viewLayout = findViewById(R.id.Layout_Login_Scroll);
         imageLogo = (ImageView) findViewById(R.id.image_Login_Logo);
@@ -136,7 +129,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         showProgress(true, viewProgress, viewLayout);
         new DownloadImage(imageLogo, R.drawable.logo).execute("http://lfcsistemas.esy.es/poliesportivo/LFC.png");
 
-        mAuth = FirebaseAuth.getInstance();
+        mAuth = ConfiguracaoFirebase.getFirebaseAuth();
 
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
@@ -160,12 +153,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
             }
         };
 
-
-        if (preferencias.getCODEVERIFICACAO() != null && !preferencias.getCODEVERIFICACAO().trim().isEmpty()) {
-
-            verifyPhoneNumberWithCode(preferencias.getIDVERIFICACAO(), preferencias.getCODEVERIFICACAO());
+        mUser = mAuth.getCurrentUser();
+        if (mUser != null) {
+            ChamarTelaCalendario();
         }
-
 
     }
 
@@ -243,19 +234,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
         }
     }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-
-        if (currentUser != null) {
-            startPhoneNumberVerification(preferencias.getTELEFONE());
-        }
-        // [END_EXCLUDE]
-    }
-
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show, final View mProgressView,
@@ -343,8 +321,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                             Log.d(TAG, "signInWithCredential:success");
                             isReenviarCodigo = false;
                             countTimerReenvia.cancel();
-                            preferencias.CadastraUsuarioPreferencias(null, sTelefoneVerificacao, sVerificaId, sCodigoVerificacao);
-                            user = task.getResult().getUser();
+                            String sId = Base64Custom.CodificarBase64(sTelefoneVerificacao);
+                            preferencias.CadastraUsuarioPreferencias(sTelefoneVerificacao, sId);
+                            mUser = mAuth.getCurrentUser();
+                            GravarUsuarioFire();
                             ChamarTelaCalendario();
                         } else {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -478,8 +458,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
             editCodeVerifica.requestFocus();
             return;
         }
-        sCodigoVerificacao = code;
-        verifyPhoneNumberWithCode(sVerificaId, sCodigoVerificacao);
+        ;
+        verifyPhoneNumberWithCode(sVerificaId, code);
 
     }
 
@@ -490,11 +470,18 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         signInWithPhoneAuthCredential(credential);
     }
 
-
     private void ChamarTelaCalendario() {
+        mUser = mAuth.getCurrentUser();
+
+
+
         Intent intent = new Intent(Login.this, Calendario.class);
         startActivity(intent);
     }
 
+    public void GravarUsuarioFire() {
+        DatabaseReference referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase();
+        referenciaFire.child(Chaves.CHAVE_USUARIO).child(preferencias.RetornaUsuarioPreferencias().get(String.valueOf(Chaves.CHAVE_ID))).setValue(preferencias.RetornaUsuarioPreferencias());
+    }
 
 }

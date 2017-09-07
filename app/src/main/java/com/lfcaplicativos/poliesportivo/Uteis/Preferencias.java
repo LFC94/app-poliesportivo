@@ -17,10 +17,7 @@ public class Preferencias {
     private SharedPreferences.Editor editor;
 
     private final String Arquivo = "PoliesportivoPreferences";
-    private final String CHAVE_NOME = "NOME";
-    private final String CHAVE_TELEFONE = "TELEFONE";
-    private final String CHAVE_IDVERIFICACAO = "IDVERIFICACAO";
-    private final String CHAVE_CODEVERIFICACAO = "CODEVERIFICACAO";
+
 
     public Preferencias(Context context) {
         this.context = context;
@@ -28,42 +25,34 @@ public class Preferencias {
         editor = sharedPreferences.edit();
     }
 
-    public void CadastraUsuarioPreferencias(String Nome, String Telefone, String verificationId, String codeverication) {
-        editor.putString(CHAVE_NOME, Nome);
-        editor.putString(CHAVE_TELEFONE, Telefone);
-        editor.putString(CHAVE_IDVERIFICACAO, verificationId);
-        editor.putString(CHAVE_CODEVERIFICACAO, codeverication);
+    public void CadastraUsuarioPreferencias(String Telefone, String Id) {
+        editor.putString(Chaves.CHAVE_TELEFONE, Telefone);
+        editor.putString(Chaves.CHAVE_ID, Id);
         editor.commit();
     }
 
+    public void setNOME(String Nome) {
+        editor.putString(Chaves.CHAVE_NOME, Nome);
+    }
 
     public String getNOME() {
-
-        return sharedPreferences.getString(CHAVE_NOME, null);
-
+        return sharedPreferences.getString(Chaves.CHAVE_NOME, null);
     }
 
     public String getTELEFONE() {
-
-        return sharedPreferences.getString(CHAVE_TELEFONE, null);
+        return sharedPreferences.getString(Chaves.CHAVE_TELEFONE, null);
     }
 
-    public String getIDVERIFICACAO() {
-
-        return sharedPreferences.getString(CHAVE_IDVERIFICACAO, null);
-    }
-
-    public String getCODEVERIFICACAO() {
-
-        return sharedPreferences.getString(CHAVE_CODEVERIFICACAO, null);
+    public String getID() {
+        return sharedPreferences.getString(Chaves.CHAVE_ID, null);
     }
 
     public HashMap<String, String> RetornaUsuarioPreferencias() {
         HashMap<String, String> Retorno = new HashMap<>();
 
-        Retorno.put(CHAVE_NOME, sharedPreferences.getString(CHAVE_NOME, null));
-        Retorno.put(CHAVE_TELEFONE, sharedPreferences.getString(CHAVE_TELEFONE, null));
-        Retorno.put(CHAVE_IDVERIFICACAO, sharedPreferences.getString(CHAVE_IDVERIFICACAO, null));
+        Retorno.put(Chaves.CHAVE_NOME, sharedPreferences.getString(Chaves.CHAVE_NOME, null));
+        Retorno.put(Chaves.CHAVE_TELEFONE, sharedPreferences.getString(Chaves.CHAVE_TELEFONE, null));
+        Retorno.put(Chaves.CHAVE_ID, sharedPreferences.getString(Chaves.CHAVE_ID, null));
 
         return Retorno;
     }
