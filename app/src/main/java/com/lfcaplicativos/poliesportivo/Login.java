@@ -7,10 +7,8 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -32,6 +30,8 @@ import android.widget.TextView;
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
@@ -40,14 +40,19 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.lfcaplicativos.poliesportivo.Config.Base64Custom;
 import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
 import com.lfcaplicativos.poliesportivo.Uteis.Permissao;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
+import com.squareup.picasso.Picasso;
 
-import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 import static com.lfcaplicativos.poliesportivo.Uteis.Validacao.formatacaoTelefone;
@@ -60,19 +65,21 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     private boolean isUpdating, isReenviarCodigo;
     private String sVerificaId, sTelefoneVerificacao;
 
-    CountDownTimer countTimerReenvia;
+    private CountDownTimer countTimerReenvia;
 
     private PhoneAuthProvider.ForceResendingToken mResendToken;
-    FirebaseAuth mAuth;
-    FirebaseUser mUser;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
+    private FirebaseStorage storage;
+    private DatabaseReference referenciaFire;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
-    Preferencias preferencias;
+    private Preferencias preferencias;
     private ImageView imageLogo;
     private EditText editCodArea, editTelefone, editCodeVerifica;
     private TextView textMsg_Verifica_Fone, textReenvioCodigo;
-    View viewProgress, viewLayout;
-    Dialog dialogTelaVerificacao;
+    private View viewProgress, viewLayout;
+    private Dialog dialogTelaVerificacao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,10 +95,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         editTelefone = (EditText) findViewById(R.id.edit_Login_Telefone);
 
         findViewById(R.id.button_Login_Login).setFocusable(false);
-        // SimpleMaskFormatter simpleMaskCodArea = new SimpleMaskFormatter("NN");
         SimpleMaskFormatter simpleMaskTelefone = new SimpleMaskFormatter("NNNNN-NNNN");
 
-        // MaskTextWatcher maskCodArea = new MaskTextWatcher(editCodArea, simpleMaskCodArea);
+
         MaskTextWatcher maskTelefone = new MaskTextWatcher(editTelefone, simpleMaskTelefone);
         editTelefone.addTextChangedListener(maskTelefone);
         editCodArea.addTextChangedListener(new TextWatcher() {
@@ -127,7 +133,21 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         editTelefone.setOnKeyListener(this);
 
         showProgress(true, viewProgress, viewLayout);
-        new DownloadImage(imageLogo, R.drawable.logo).execute("http://lfcsistemas.esy.es/poliesportivo/LFC.png");
+
+        storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference().child("Logos/LFC.png");
+        storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Picasso.with(getApplicationContext()).load(uri.toString()).into(imageLogo);
+                showProgress(false, viewProgress, viewLayout);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                showProgress(false, viewProgress, viewLayout);
+            }
+        });
 
         mAuth = ConfiguracaoFirebase.getFirebaseAuth();
 
@@ -155,7 +175,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
         mUser = mAuth.getCurrentUser();
         if (mUser != null) {
-            ChamarTelaCalendario();
+            ChamarTelaCalendario(false);
         }
 
     }
@@ -164,7 +184,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     public boolean onKey(View v, int keyCode, KeyEvent event) {
 
         if ((event.getAction() == KeyEvent.ACTION_DOWN)) {
-            if(keyCode == KeyEvent.KEYCODE_ENTER) {
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
                 switch (v.getId()) {
                     case R.id.edit_Login_CodArea:
                         if (validateDDDNumber(editCodArea, getString(R.string.ddd_invalid)))
@@ -174,13 +194,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                         onClick(findViewById(R.id.button_Login_Login));
                         break;
                 }
-            }else if(keyCode == 67){
+            } else if (keyCode == 67) {
                 switch (v.getId()) {
                     case R.id.edit_Login_CodArea:
                         //
                         break;
                     case R.id.edit_Login_Telefone:
-                        if (editTelefone.length()<=1){
+                        if (editTelefone.length() <= 1) {
                             editCodArea.requestFocus();
                         }
                         break;
@@ -267,38 +287,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         }
     }
 
-    private class DownloadImage extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-        int imagem;
-
-        public DownloadImage(ImageView bmImage, int imagem) {
-            this.bmImage = bmImage;
-            this.imagem = imagem;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            showProgress(false, viewProgress, viewLayout);
-            bmImage.setImageBitmap(result);
-            if (result == null) {
-                bmImage.setImageResource(imagem);
-            }
-
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
@@ -322,10 +310,28 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                             isReenviarCodigo = false;
                             countTimerReenvia.cancel();
                             String sId = Base64Custom.CodificarBase64(sTelefoneVerificacao);
-                            preferencias.CadastraUsuarioPreferencias(sTelefoneVerificacao, sId);
-                            mUser = mAuth.getCurrentUser();
-                            GravarUsuarioFire();
-                            ChamarTelaCalendario();
+
+                            preferencias.CadastraUsuarioPreferencias("", sTelefoneVerificacao, sId, "", "");
+                            referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_USUARIO).child(sId);
+                            referenciaFire.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot dados : dataSnapshot.getChildren()) {
+                                        String chave = dados.getKey(), valor = dados.getValue().toString();
+                                        preferencias.setPreferencias(chave, valor);
+                                    }
+                                    GravarUsuarioFire();
+                                    ChamarTelaCalendario(true);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    GravarUsuarioFire();
+                                    ChamarTelaCalendario(true);
+                                }
+                            });
+
+
                         } else {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
@@ -359,7 +365,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                 token);             // ForceResendingToken from callbacks
     }
 
-    private void chamarTelaVerificacao(){
+    private void chamarTelaVerificacao() {
 //        setContentView(R.layout.activity_validacao_telefone);
 
         dialogTelaVerificacao = new Dialog(this, R.style.FullTela);
@@ -367,14 +373,14 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
         String sTitulo = getString(R.string.verify) + " ";
         int iIni = sTitulo.length();
-        sTitulo +=formatacaoTelefone(sTelefoneVerificacao);
+        sTitulo += formatacaoTelefone(sTelefoneVerificacao);
         SpannableString spanString = new SpannableString(sTitulo);
         spanString.setSpan(new StyleSpan(Typeface.BOLD), iIni, sTitulo.length(), 0);
         dialogTelaVerificacao.setTitle(spanString);
 
         textMsg_Verifica_Fone = (TextView) dialogTelaVerificacao.findViewById(R.id.text_Validacao_Msg_aguardando_SMS);
 
-        String sMensagem = getString(R.string.msg_verificaremos_numero)+" ";
+        String sMensagem = getString(R.string.msg_verificaremos_numero) + " ";
         iIni = sMensagem.length();
         sMensagem += formatacaoTelefone(sTelefoneVerificacao);
         SpannableString spanString2 = new SpannableString(sMensagem);
@@ -387,16 +393,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         countTimerReenvia = new CountDownTimer(120000, 1000) {
             @Override
             public void onTick(long l) {
-                int segundos = (int) ( l / 1000 ) % 60;      // se não precisar de segundos, basta remover esta linha.
-                int minutos  = (int) ( l / 60000 ) % 60;     // 60000   = 60 * 1000
-                textReenvioCodigo.setText(String.format( "%02d:%02d", minutos,segundos ));
+                int segundos = (int) (l / 1000) % 60;      // se não precisar de segundos, basta remover esta linha.
+                int minutos = (int) (l / 60000) % 60;     // 60000   = 60 * 1000
+                textReenvioCodigo.setText(String.format("%02d:%02d", minutos, segundos));
 
 
             }
 
             @Override
             public void onFinish() {
-                if(isReenviarCodigo) {
+                if (isReenviarCodigo) {
                     resendVerificationCode(sTelefoneVerificacao, mResendToken);
                     chamarTelaVerificacao();
                 }
@@ -432,7 +438,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                 isUpdating = true;
                 editCodeVerifica.setText(number);
                 editCodeVerifica.setSelection(number.length());
-                if (number.length() == 6){
+                if (number.length() == 6) {
                     verificaCode();
                 }
             }
@@ -450,10 +456,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         dialogTelaVerificacao.show();
     }
 
-    public void verificaCode(){
-       String code = editCodeVerifica.getText().toString().trim().replaceAll("[^0-9]*", "");;
+    public void verificaCode() {
+        String code = editCodeVerifica.getText().toString().trim().replaceAll("[^0-9]*", "");
+        ;
 
-        if (TextUtils.isEmpty(code)){
+        if (TextUtils.isEmpty(code)) {
             editCodeVerifica.setError(getString(R.string.invalid_code));
             editCodeVerifica.requestFocus();
             return;
@@ -470,22 +477,23 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         signInWithPhoneAuthCredential(credential);
     }
 
-    private void ChamarTelaCalendario() {
+    private void ChamarTelaCalendario(boolean primeira_vez) {
         Intent intent;
-        String nome = preferencias.RetornaUsuarioPreferencias().get(String.valueOf(Chaves.CHAVE_NOME));
 
-        if (nome != null && !nome.trim().isEmpty()) {
-            intent = new Intent(Login.this, Calendario.class);
-        } else {
+
+        if (primeira_vez) {
             intent = new Intent(Login.this, Usuario.class);
+
+        } else {
+            intent = new Intent(Login.this, Calendario.class);
         }
         startActivity(intent);
         this.finish();
     }
 
     public void GravarUsuarioFire() {
-        DatabaseReference referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase();
-        referenciaFire.child(Chaves.CHAVE_USUARIO).child(preferencias.RetornaUsuarioPreferencias().get(String.valueOf(Chaves.CHAVE_ID))).setValue(preferencias.RetornaUsuarioPreferencias());
+        referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase();
+        referenciaFire.child(Chaves.CHAVE_USUARIO).child(preferencias.getSPreferencias(Chaves.CHAVE_ID)).setValue(preferencias.RetornaUsuarioPreferencias(false));
     }
 
 }

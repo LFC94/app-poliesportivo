@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -12,7 +13,11 @@ import android.widget.Spinner;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
 import com.lfcaplicativos.poliesportivo.Objetos.Cidade;
 import com.lfcaplicativos.poliesportivo.Objetos.Estado;
@@ -39,9 +44,11 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
     private ArrayList<Cidade> cidades;
 
     private Preferencias preferencias;
+    private DatabaseReference referenciaConfiguraca;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
 
-    FirebaseAuth mAuth;
-    FirebaseUser mUser;
+    private boolean prim_uf = true, prim_cid = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,41 +67,76 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
         cidades = new ArrayList<Cidade>();
         cidadelist = new ArrayList<String>();
 
-        mProgressDialog = ProgressDialog.show(Usuario.this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.state) + "...", true);
-        new Thread(new Runnable() {
+        referenciaConfiguraca = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_CONFIGURACAO);
+
+        referenciaConfiguraca.addValueEventListener(new ValueEventListener() {
             @Override
-            public void run() {
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 try {
-                    String sJson = ConexaoHTTP.getJSONFromAPI(Chaves.ULR_geonames + "3469034");
-                    jsonobject = new JSONObject(sJson);
-                    jsonarray = jsonobject.getJSONArray("geonames");
-                    estadolist.clear();
-                    estados.clear();
-                    for (int i = 0; i < jsonarray.length(); i++) {
-                        jsonobject = jsonarray.getJSONObject(i);
 
-                        Estado estado = new Estado();
-                        estado.setIdPais(3469034);
-                        estado.setIdUF(jsonobject.optInt("geonameId"));
-                        estado.setNome(jsonobject.optString("name"));
-                        estados.add(estado);
-
-                        estadolist.add(jsonobject.optString("name"));
+                    for (DataSnapshot dados : dataSnapshot.getChildren()) {
+                        String chave = dados.getKey(), valor = dados.getValue().toString();
+                        preferencias.setPreferencias(chave, valor);
                     }
-                    runOnUiThread(new Runnable() {
+                    if (preferencias.getNOME() != null)
+                        edit_Usuario_Nome.setText(preferencias.getNOME());
+
+                    mProgressDialog = ProgressDialog.show(Usuario.this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.state) + "...", true);
+                    new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    estadolist));
-                        }
-                    });
-                } catch (Exception e) {
+                            try {
+                                String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_ULR_ESTADO));
+                                jsonobject = new JSONObject(sJson);
+                                jsonarray = jsonobject.getJSONArray("estado");
+                                estadolist.clear();
+                                estados.clear();
+                                for (int i = 0; i < jsonarray.length(); i++) {
+                                    jsonobject = jsonarray.getJSONObject(i);
 
+                                    Estado estado = new Estado();
+                                    estado.setIdPais(55);
+                                    estado.setIdUF(jsonobject.optInt("id"));
+                                    estado.setSigla(jsonobject.optString("uf"));
+                                    estado.setNome(jsonobject.optString("nome"));
+                                    estados.add(estado);
+
+                                    estadolist.add(jsonobject.optString("uf").trim() + " - " + jsonobject.optString("nome"));
+                                }
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
+                                                android.R.layout.simple_spinner_dropdown_item,
+                                                estadolist));
+                                        if (prim_uf) {
+                                            prim_uf = false;
+                                            if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
+                                                for (int i = 0; i < estados.size(); i++) {
+                                                    if (estados.get(i).getNome().equals(preferencias.getESTADO()))
+                                                        spinner_Usuario_Estado.setSelection(i);
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                });
+                            } catch (Exception e) {
+                                Log.e("ESTADO", "ERRO: " + e.getMessage());
+                            }
+                            mProgressDialog.cancel();
+                        }
+                    }).start();
+                } catch (Exception e) {
+                    Log.e("ESTADO", "ERRO: " + e.getMessage());
                 }
-                mProgressDialog.cancel();
             }
-        }).start();
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("ERRO", "DatabaseError:" + databaseError.getMessage());
+            }
+        });
 
         spinner_Usuario_Estado.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -103,7 +145,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                                        View arg1, int position, long arg3) {
                 // TODO Auto-generated method stub
 
-                CarregarCidade(estados.get(position).getIdUF());
+                CarregarCidade(estados.get(position).getSigla());
 
             }
 
@@ -116,28 +158,39 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
     }
 
 
-    public void CarregarCidade(final int idEstado) {
+    public void CarregarCidade(final String UFEstado) {
+
+        if (UFEstado.trim().isEmpty()) {
+            spinner_Usuario_Estado.requestFocus();
+            return;
+        }
+
         mProgressDialog = ProgressDialog.show(Usuario.this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.city) + "...", true);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    String sJson = ConexaoHTTP.getJSONFromAPI(Chaves.ULR_geonames + String.valueOf(idEstado));
+                    String url = preferencias.getSPreferencias(Chaves.CHAVE_ULR_CIDADE);
+                    if (preferencias.getSPreferencias(Chaves.CHAVE_ULR_CIDADE_PARAMETERS) != null && !preferencias.getSPreferencias(Chaves.CHAVE_ULR_CIDADE_PARAMETERS).trim().isEmpty()) {
+                        url += "?" + preferencias.getSPreferencias(Chaves.CHAVE_ULR_CIDADE_PARAMETERS) + "='" + UFEstado + "'";
+                    }
+
+                    String sJson = ConexaoHTTP.getJSONFromAPI(url);
                     jsonobject = new JSONObject(sJson);
-                    jsonarray = jsonobject.getJSONArray("geonames");
+                    jsonarray = jsonobject.getJSONArray("cidade");
                     cidadelist.clear();
                     cidades.clear();
                     for (int i = 0; i < jsonarray.length(); i++) {
                         jsonobject = jsonarray.getJSONObject(i);
 
                         Cidade cidade = new Cidade();
-                        cidade.setIdPais(3469034);
-                        cidade.setIdUF(idEstado);
-                        cidade.setIdUF(jsonobject.optInt("geonameId"));
-                        cidade.setNome(jsonobject.optString("name"));
+                        cidade.setIdPais(55);
+                        cidade.setIdUF(jsonobject.optInt("iduf"));
+                        cidade.setIdCidade(jsonobject.optInt("id"));
+                        cidade.setNome(jsonobject.optString("nome"));
                         cidades.add(cidade);
 
-                        cidadelist.add(jsonobject.optString("name"));
+                        cidadelist.add(jsonobject.optString("nome"));
                     }
                     runOnUiThread(new Runnable() {
                         @Override
@@ -145,6 +198,15 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                             spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
                                     android.R.layout.simple_spinner_dropdown_item,
                                     cidadelist));
+                            if (!prim_uf && prim_cid) {
+                                prim_cid = false;
+                                if (preferencias.getCIDADE() != null && !preferencias.getCIDADE().trim().isEmpty()) {
+                                    for (int i = 0; i < cidades.size(); i++) {
+                                        if (cidades.get(i).getNome().equals(preferencias.getCIDADE()))
+                                            spinner_Usuario_Cidade.setSelection(i);
+                                    }
+                                }
+                            }
                         }
                     });
                 } catch (Exception e) {
@@ -165,11 +227,15 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                 return;
             }
             preferencias.setNOME(edit_Usuario_Nome.getText().toString().trim());
-            preferencias.setCIDADE(spinner_Usuario_Cidade.getSelectedItem().toString());
-            preferencias.setESTADO(spinner_Usuario_Estado.getSelectedItem().toString());
+            preferencias.setCIDADE(cidades.get(spinner_Usuario_Cidade.getSelectedItemPosition()).getNome());
+            preferencias.setESTADO(estados.get(spinner_Usuario_Estado.getSelectedItemPosition()).getNome());
 
             DatabaseReference referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase();
-            referenciaFire.child(Chaves.CHAVE_USUARIO).child(preferencias.RetornaUsuarioPreferencias().get(String.valueOf(Chaves.CHAVE_ID))).setValue(preferencias.RetornaUsuarioPreferencias());
+            referenciaFire.child(Chaves.CHAVE_USUARIO).child(preferencias.getSPreferencias(Chaves.CHAVE_ID)).setValue(preferencias.RetornaUsuarioPreferencias(false));
+
+            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(preferencias.getNOME()).build();
+            mUser = mAuth.getCurrentUser();
+            mUser.updateProfile(profileUpdates);
             ChamarTelaCalendario();
         }
     }
