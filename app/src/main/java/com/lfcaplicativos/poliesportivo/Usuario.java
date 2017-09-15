@@ -8,8 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.Spinner;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,16 +22,18 @@ import com.lfcaplicativos.poliesportivo.Objetos.Estado;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
 import com.lfcaplicativos.poliesportivo.Uteis.ConexaoHTTP;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import fr.ganfra.materialspinner.MaterialSpinner;
+
 public class Usuario extends AppCompatActivity implements View.OnClickListener {
-    private EditText edit_Usuario_Nome;
-    private Spinner spinner_Usuario_Estado;
-    private Spinner spinner_Usuario_Cidade;
+    private MaterialEditText edit_Usuario_Nome;
+    private MaterialSpinner spinner_Usuario_Estado, spinner_Usuario_Cidade;
     private JSONObject jsonobject;
     private JSONArray jsonarray;
     private ProgressDialog mProgressDialog;
@@ -57,9 +57,9 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
         preferencias = new Preferencias(this);
         mAuth = ConfiguracaoFirebase.getFirebaseAuth();
 
-        edit_Usuario_Nome = (EditText) findViewById(R.id.edit_Usuario_Nome);
-        spinner_Usuario_Estado = (Spinner) findViewById(R.id.spinner_Usuario_Estado);
-        spinner_Usuario_Cidade = (Spinner) findViewById(R.id.spinner_Usuario_Cidade);
+        edit_Usuario_Nome = (MaterialEditText) findViewById(R.id.edit_Usuario_Nome);
+        spinner_Usuario_Estado = (MaterialSpinner) findViewById(R.id.spinner_Usuario_Estado);
+        spinner_Usuario_Cidade = (MaterialSpinner) findViewById(R.id.spinner_Usuario_Cidade);
 
         estados = new ArrayList<Estado>();
         estadolist = new ArrayList<String>();
@@ -81,52 +81,8 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                     if (preferencias.getNOME() != null)
                         edit_Usuario_Nome.setText(preferencias.getNOME());
 
-                    mProgressDialog = ProgressDialog.show(Usuario.this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.state) + "...", true);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_ULR_ESTADO));
-                                jsonobject = new JSONObject(sJson);
-                                jsonarray = jsonobject.getJSONArray("estado");
-                                estadolist.clear();
-                                estados.clear();
-                                for (int i = 0; i < jsonarray.length(); i++) {
-                                    jsonobject = jsonarray.getJSONObject(i);
+                    CarregarEstado();
 
-                                    Estado estado = new Estado();
-                                    estado.setIdPais(55);
-                                    estado.setIdUF(jsonobject.optInt("id"));
-                                    estado.setSigla(jsonobject.optString("uf"));
-                                    estado.setNome(jsonobject.optString("nome"));
-                                    estados.add(estado);
-
-                                    estadolist.add(jsonobject.optString("uf").trim() + " - " + jsonobject.optString("nome"));
-                                }
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
-                                                android.R.layout.simple_spinner_dropdown_item,
-                                                estadolist));
-                                        if (prim_uf) {
-                                            prim_uf = false;
-                                            if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
-                                                for (int i = 0; i < estados.size(); i++) {
-                                                    if (estados.get(i).getNome().equals(preferencias.getESTADO()))
-                                                        spinner_Usuario_Estado.setSelection(i);
-                                                }
-                                            }
-                                        }
-
-                                    }
-                                });
-                            } catch (Exception e) {
-                                Log.e("ESTADO", "ERRO: " + e.getMessage());
-                            }
-                            mProgressDialog.cancel();
-                        }
-                    }).start();
                 } catch (Exception e) {
                     Log.e("ESTADO", "ERRO: " + e.getMessage());
                 }
@@ -144,9 +100,16 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
             public void onItemSelected(AdapterView<?> arg0,
                                        View arg1, int position, long arg3) {
                 // TODO Auto-generated method stub
-
-                CarregarCidade(estados.get(position).getSigla());
-
+                if (position >= 0) {
+                    CarregarCidade(estados.get(position).getSigla());
+                } else {
+                    spinner_Usuario_Estado.setError(R.string.notstate);
+                    spinner_Usuario_Estado.requestFocus();
+                    cidadelist.clear();
+                    spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
+                            android.R.layout.simple_spinner_dropdown_item,
+                            cidadelist));
+                }
             }
 
             @Override
@@ -157,11 +120,70 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
 
     }
 
+    public void CarregarEstado() {
+        mProgressDialog = ProgressDialog.show(Usuario.this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.state) + "...", true);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_ULR_ESTADO));
+                    jsonobject = new JSONObject(sJson);
+                    jsonarray = jsonobject.getJSONArray("estado");
+                    estadolist.clear();
+                    estados.clear();
+                    Estado estado = new Estado();
+                    estado.setIdPais(55);
+                    estado.setIdUF(0);
+                    estado.setSigla("");
+                    estado.setNome("");
+
+                    for (int i = 0; i < jsonarray.length(); i++) {
+                        jsonobject = jsonarray.getJSONObject(i);
+
+                        estado = new Estado();
+                        estado.setIdPais(55);
+                        estado.setIdUF(jsonobject.optInt("id"));
+                        estado.setSigla(jsonobject.optString("uf"));
+                        estado.setNome(jsonobject.optString("nome"));
+                        estados.add(estado);
+
+                        estadolist.add(jsonobject.optString("uf").trim() + " - " + jsonobject.optString("nome"));
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
+                                    android.R.layout.simple_spinner_dropdown_item,
+                                    estadolist));
+                            if (prim_uf) {
+                                prim_uf = false;
+                                if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
+                                    for (int i = 0; i < estados.size(); i++) {
+                                        if (estados.get(i).getNome().equals(preferencias.getESTADO()))
+                                            spinner_Usuario_Estado.setSelection(i + 1);
+                                    }
+                                }
+                            }
+
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e("ESTADO", "ERRO: " + e.getMessage());
+                }
+                mProgressDialog.cancel();
+            }
+        }).start();
+    }
 
     public void CarregarCidade(final String UFEstado) {
 
         if (UFEstado.trim().isEmpty()) {
+            spinner_Usuario_Estado.setError(R.string.notstate);
             spinner_Usuario_Estado.requestFocus();
+            cidadelist.clear();
+            spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    cidadelist));
             return;
         }
 
@@ -180,10 +202,17 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                     jsonarray = jsonobject.getJSONArray("cidade");
                     cidadelist.clear();
                     cidades.clear();
+
+                    Cidade cidade = new Cidade();
+                    cidade.setIdPais(0);
+                    cidade.setIdUF(0);
+                    cidade.setIdCidade(0);
+                    cidade.setNome("");
+
                     for (int i = 0; i < jsonarray.length(); i++) {
                         jsonobject = jsonarray.getJSONObject(i);
 
-                        Cidade cidade = new Cidade();
+                        cidade = new Cidade();
                         cidade.setIdPais(55);
                         cidade.setIdUF(jsonobject.optInt("iduf"));
                         cidade.setIdCidade(jsonobject.optInt("id"));
@@ -203,7 +232,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                                 if (preferencias.getCIDADE() != null && !preferencias.getCIDADE().trim().isEmpty()) {
                                     for (int i = 0; i < cidades.size(); i++) {
                                         if (cidades.get(i).getNome().equals(preferencias.getCIDADE()))
-                                            spinner_Usuario_Cidade.setSelection(i);
+                                            spinner_Usuario_Cidade.setSelection(i + 1);
                                     }
                                 }
                             }
@@ -226,9 +255,20 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                 edit_Usuario_Nome.requestFocus();
                 return;
             }
+
+            if (spinner_Usuario_Estado.getSelectedItemPosition() <= 0) {
+                spinner_Usuario_Estado.setError(R.string.notstate);
+                spinner_Usuario_Estado.requestFocus();
+                return;
+            }
+            if (spinner_Usuario_Cidade.getSelectedItemPosition() <= 0) {
+                spinner_Usuario_Cidade.setError(R.string.notcity);
+                spinner_Usuario_Cidade.requestFocus();
+                return;
+            }
             preferencias.setNOME(edit_Usuario_Nome.getText().toString().trim());
-            preferencias.setCIDADE(cidades.get(spinner_Usuario_Cidade.getSelectedItemPosition()).getNome());
-            preferencias.setESTADO(estados.get(spinner_Usuario_Estado.getSelectedItemPosition()).getNome());
+            preferencias.setCIDADE(cidades.get(spinner_Usuario_Cidade.getSelectedItemPosition() - 1).getNome());
+            preferencias.setESTADO(estados.get(spinner_Usuario_Estado.getSelectedItemPosition() - 1).getNome());
 
             DatabaseReference referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase();
             referenciaFire.child(Chaves.CHAVE_USUARIO).child(preferencias.getSPreferencias(Chaves.CHAVE_ID)).setValue(preferencias.RetornaUsuarioPreferencias(false));
@@ -237,6 +277,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
             mUser = mAuth.getCurrentUser();
             mUser.updateProfile(profileUpdates);
             ChamarTelaCalendario();
+            this.finish();
         }
     }
 

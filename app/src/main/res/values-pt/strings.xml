@@ -28,4 +28,6 @@
     <string name="city">Cidade</string>
     <string name="loading">Carregando</string>
     <string name="notName">Nome não informado</string>
+    <string name="notstate">Selecione o seu estado</string>
+    <string name="notcity">Selecione o seu cidade</string>
 </resources>

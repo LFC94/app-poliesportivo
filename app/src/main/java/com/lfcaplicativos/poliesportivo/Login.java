@@ -51,6 +51,7 @@ import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
 import com.lfcaplicativos.poliesportivo.Uteis.Permissao;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
+import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 
 import java.util.concurrent.TimeUnit;
@@ -76,7 +77,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
     private Preferencias preferencias;
     private ImageView imageLogo;
-    private EditText editCodArea, editTelefone, editCodeVerifica;
+    private EditText editCodArea, editTelefone;
+    private MaterialEditText editCodeVerifica;
     private TextView textMsg_Verifica_Fone, textReenvioCodigo;
     private View viewProgress, viewLayout;
     private Dialog dialogTelaVerificacao;
@@ -410,7 +412,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         }.start();
 
 
-        editCodeVerifica = (EditText) dialogTelaVerificacao.findViewById(R.id.edit_Validacao_CodeVerif);
+        editCodeVerifica = (MaterialEditText) dialogTelaVerificacao.findViewById(R.id.edit_Validacao_CodeVerif);
 
         editCodeVerifica.clearFocus();
 
