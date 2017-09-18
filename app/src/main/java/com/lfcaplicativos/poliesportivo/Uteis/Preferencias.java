@@ -133,6 +133,16 @@ public class Preferencias {
         return Retorno;
     }
 
+    public void setFOTO_PERFIL(String Foto_Perfil) {
+        editor.putString(Chaves.CHAVE_FOTO_PERFIL, Foto_Perfil);
+        editor.commit();
+    }
+
+    public String getFOTO_PERFIL() {
+        return sharedPreferences.getString(Chaves.CHAVE_FOTO_PERFIL, null);
+    }
+
+
     /************** CONFIGURACAO *************/
     public void ConfiguracaoPreferencias(String UrlEstado, String UrlEstadoPar, String UrlCidade, String UrlCidadePar) {
         editor.putString(Chaves.CHAVE_ULR_CIDADE, UrlCidade);

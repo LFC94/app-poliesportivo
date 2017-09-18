@@ -29,4 +29,6 @@
     <string name="notName">Name not reported</string>
     <string name="notstate">Select your state</string>
     <string name="notcity">Select your city</string>
+    <string name="selectPhoto">Select Profile Photo</string>
+    <string name="notConnect">Cannot connect to the internet</string>
 </resources>

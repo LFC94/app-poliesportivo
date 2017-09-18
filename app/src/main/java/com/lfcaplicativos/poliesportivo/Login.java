@@ -15,6 +15,7 @@ import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -22,6 +23,8 @@ import android.text.TextWatcher;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -88,6 +91,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(getTitle());
+        setSupportActionBar(toolbar);
+
         preferencias = new Preferencias(this);
 
         viewProgress = findViewById(R.id.Progress_Login);
@@ -96,7 +103,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         editCodArea = (EditText) findViewById(R.id.edit_Login_CodArea);
         editTelefone = (EditText) findViewById(R.id.edit_Login_Telefone);
 
-        findViewById(R.id.button_Login_Login).setFocusable(false);
         SimpleMaskFormatter simpleMaskTelefone = new SimpleMaskFormatter("NNNNN-NNNN");
 
 
@@ -137,7 +143,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         showProgress(true, viewProgress, viewLayout);
 
         storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference().child("Logos/LFC.png");
+        StorageReference storageRef = storage.getReference().child("Logos/Logo.png");
         storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -177,9 +183,32 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
         mUser = mAuth.getCurrentUser();
         if (mUser != null) {
-            ChamarTelaCalendario(false);
+            ChamarProximaTela(false);
         }
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_login, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.item_login_next) {
+            onClick(findViewById(R.id.item_login_next));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -216,7 +245,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.button_Login_Login:
+            case R.id.item_login_next:
                 if (validateDDDNumber(editCodArea, getString(R.string.ddd_invalid)) && validatePhoneNumber(editTelefone, getString(R.string.phone_invalid))) {
                     String sMensagem;
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -258,8 +287,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show, final View mProgressView,
-                              final View mLoginFormView) {
+    private void showProgress(final boolean show, final View mProgressView, final View mLoginFormView) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
@@ -290,8 +318,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                           int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         for (int i = 0; i < grantResults.length; i++) {
@@ -323,13 +350,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                                         preferencias.setPreferencias(chave, valor);
                                     }
                                     GravarUsuarioFire();
-                                    ChamarTelaCalendario(true);
+                                    ChamarProximaTela(true);
                                 }
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
                                     GravarUsuarioFire();
-                                    ChamarTelaCalendario(true);
+                                    ChamarProximaTela(true);
                                 }
                             });
 
@@ -356,8 +383,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
     }
 
-    private void resendVerificationCode(String phoneNumber,
-                                        PhoneAuthProvider.ForceResendingToken token) {
+    private void resendVerificationCode(String phoneNumber, PhoneAuthProvider.ForceResendingToken token) {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 phoneNumber,        // Phone number to verify
                 60,                 // Timeout duration
@@ -479,13 +505,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         signInWithPhoneAuthCredential(credential);
     }
 
-    private void ChamarTelaCalendario(boolean primeira_vez) {
+    private void ChamarProximaTela(boolean primeira_vez) {
         Intent intent;
-
 
         if (primeira_vez) {
             intent = new Intent(Login.this, Usuario.class);
-
+            intent.putExtra("novo", true);
+            startActivity(intent);
         } else {
             intent = new Intent(Login.this, Calendario.class);
         }

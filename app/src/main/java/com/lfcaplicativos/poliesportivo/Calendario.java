@@ -27,12 +27,12 @@ public class Calendario extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendario);
 
+
         user = FirebaseAuth.getInstance().getCurrentUser();
 
         final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
         caldroidFragment = new CaldroidFragment();
-
 
         if (savedInstanceState != null) {
             caldroidFragment.restoreStatesFromKey(savedInstanceState,
@@ -92,10 +92,8 @@ public class Calendario extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent;
-
-
                 intent = new Intent(Calendario.this, Usuario.class);
-
+                intent.putExtra("novo", false);
                 startActivity(intent);
             }
         });

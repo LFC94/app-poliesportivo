@@ -1,6 +1,10 @@
 package com.lfcaplicativos.poliesportivo.Uteis;
 
 
+import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,8 +46,10 @@ public class ConexaoHTTP {
             conexao.disconnect();
 
         } catch (MalformedURLException e) {
+            retorno = "{\"erro\":{\"codigo\":" + e.getLocalizedMessage() + ",\"mesagem\":\"" + e.getMessage() + "\" }}";
             e.printStackTrace();
         } catch (IOException e) {
+            retorno = "{\"erro\":{\"codigo\":" + e.getLocalizedMessage() + ",\"mesagem\":\"" + e.getMessage() + "\" }}";
             e.printStackTrace();
         }
 
@@ -68,4 +74,18 @@ public class ConexaoHTTP {
 
         return buffer.toString();
     }
+
+    public static boolean verificaConexao(Activity activity) {
+        boolean conectado;
+        ConnectivityManager conectivtyManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (conectivtyManager.getActiveNetworkInfo() != null
+                && conectivtyManager.getActiveNetworkInfo().isAvailable()
+                && conectivtyManager.getActiveNetworkInfo().isConnected()) {
+            conectado = true;
+        } else {
+            conectado = false;
+        }
+        return conectado;
+    }
+
 }

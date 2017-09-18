@@ -30,4 +30,6 @@
     <string name="notName">Nome não informado</string>
     <string name="notstate">Selecione o seu estado</string>
     <string name="notcity">Selecione o seu cidade</string>
+    <string name="selectPhoto">Selecione a Foto de Perfil</string>
+    <string name="notConnect">Não é possível se conectar à internet</string>
 </resources>
