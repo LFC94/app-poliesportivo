@@ -1,4 +1,4 @@
-package com.lfcaplicativos.poliesportivo;
+package com.lfcaplicativos.poliesportivo.Activity;
 
 import android.Manifest;
 import android.app.Activity;
@@ -35,6 +35,7 @@ import com.google.firebase.storage.UploadTask;
 import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
 import com.lfcaplicativos.poliesportivo.Objetos.Cidade;
 import com.lfcaplicativos.poliesportivo.Objetos.Estado;
+import com.lfcaplicativos.poliesportivo.R;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
 import com.lfcaplicativos.poliesportivo.Uteis.ConexaoHTTP;
 import com.lfcaplicativos.poliesportivo.Uteis.Permissao;

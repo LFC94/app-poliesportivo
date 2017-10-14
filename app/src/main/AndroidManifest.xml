@@ -15,7 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".Login">
+        <activity android:name=".Activity.Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,10 +23,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Calendario"
+            android:name=".Activity.Calendario"
             android:label="@string/title_activity_calendario" />
         <activity
-            android:name=".Usuario"
+            android:name=".Activity.Usuario"
             android:label="@string/title_activity_usuario" />
     </application>
 

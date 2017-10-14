@@ -1,4 +1,4 @@
-package com.lfcaplicativos.poliesportivo;
+package com.lfcaplicativos.poliesportivo.Activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -51,6 +51,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.lfcaplicativos.poliesportivo.Config.Base64Custom;
 import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
+import com.lfcaplicativos.poliesportivo.R;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
 import com.lfcaplicativos.poliesportivo.Uteis.Permissao;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;

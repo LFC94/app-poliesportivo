@@ -1,4 +1,4 @@
-package com.lfcaplicativos.poliesportivo;
+package com.lfcaplicativos.poliesportivo.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.lfcaplicativos.poliesportivo.R;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 
