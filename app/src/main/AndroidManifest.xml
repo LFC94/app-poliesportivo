@@ -23,11 +23,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activity.Calendario"
-            android:label="@string/title_activity_calendario" />
-        <activity
             android:name=".Activity.Usuario"
             android:label="@string/title_activity_usuario" />
+        <activity
+            android:name=".Activity.Principal"
+            android:label="@string/title_activity_principal"></activity>
     </application>
 
 </manifest>

@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -58,6 +59,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
     private MaterialSpinner spinner_Usuario_Estado, spinner_Usuario_Cidade;
     private ImageView image_Usuario_Foto;
     private TextView text_Usuario_Conexao;
+    private BottomNavigationView navigation;
 
     private Bitmap bitmapFotoPerfil = null;
     private JSONObject jsonobject;
@@ -97,7 +99,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChamarTelaCalendario();
+                ChamaTelaPrincipal();
             }
         });
 
@@ -148,6 +150,23 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
 
         ImagemPerfilUsuario(false);
 
+        navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                switch (item.getItemId()) {
+                    case R.id.navigation_home:
+                        ChamaTelaPrincipal();
+                    case R.id.navigation_dashboard:
+                    case R.id.navigation_usuario:
+                        break;
+                }
+                return true;
+            }
+        });
+        
+        
     }
 
     @Override
@@ -212,7 +231,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                 mUser = mAuth.getCurrentUser();
                 mUser.updateProfile(profileUpdates);
 
-                ChamarTelaCalendario();
+                ChamaTelaPrincipal();
                 this.finish();
                 break;
             case R.id.fab_Usuario_Foto:
@@ -386,17 +405,12 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
 
     }
 
-    private void ChamarTelaCalendario() {
-        if (loginNovo) {
-            Intent intent;
-            intent = new Intent(Usuario.this, Calendario.class);
-            startActivity(intent);
-        } else {
-            onBackPressed();
-        }
-        if (!acesso_banco) {
-            timer.cancel();
-        }
+    private void ChamaTelaPrincipal() {
+
+        Intent intent;
+        intent = new Intent(Usuario.this, Principal.class);
+        startActivity(intent);
+
         this.finish();
     }
 

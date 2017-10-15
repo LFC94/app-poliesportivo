@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">Poliesportivo</string>
     <string name="action_settings">Configuração</string>
-    <string name="title_activity_calendario">Calendário</string>
     <string name="name">Nome</string>
     <string name="cadastre">Cadastro</string>
     <string name="permission_denied">Permissão Negada</string>

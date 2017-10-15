@@ -21,6 +21,5 @@ public class Chaves {
     public static final String CHAVE_ULR_CIDADE = "URL_CIDADE";
     public static final String CHAVE_ULR_CIDADE_PARAMETERS = "URL_CIDADE_PARAMETERS";
 
-
     public static final int CHAVE_RESULT_PHOTO = 1;
 }

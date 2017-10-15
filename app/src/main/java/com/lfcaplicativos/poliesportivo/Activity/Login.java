@@ -514,7 +514,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
             intent.putExtra("novo", true);
             startActivity(intent);
         } else {
-            intent = new Intent(Login.this, Calendario.class);
+            intent = new Intent(Login.this, Principal.class);
         }
         startActivity(intent);
         this.finish();
