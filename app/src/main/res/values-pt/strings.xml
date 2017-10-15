@@ -4,7 +4,7 @@
     <string name="action_settings">Configuração</string>
     <string name="name">Nome</string>
     <string name="cadastre">Cadastro</string>
-    <string name="permission_denied">Permissão Negada</string>
+    <string name="permissao_negada">Permissão Negada</string>
     <string name="message_permission_denied">Para utilizar este aplicativo, você precisa aceitar a permissão:</string>
     <string name="confirm">Confirmar</string>
     <string name="phone_invalid">Número de telefone inválido.</string>

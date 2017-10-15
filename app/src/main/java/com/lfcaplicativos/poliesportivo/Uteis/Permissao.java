@@ -29,7 +29,7 @@ public class Permissao {
 
     public static void alertaValidacaoPemissao(final Activity activity, String permissao) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle(activity.getString(R.string.permission_denied));
+        builder.setTitle(activity.getString(R.string.permissao_negada));
         builder.setMessage(activity.getString(R.string.message_permission_denied) + permissao);
         builder.setIcon(android.R.drawable.ic_dialog_alert);
         builder.setNeutralButton(activity.getString(R.string.confirm), new DialogInterface.OnClickListener() {

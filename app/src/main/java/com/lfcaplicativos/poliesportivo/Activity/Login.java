@@ -223,7 +223,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                             editTelefone.requestFocus();
                         break;
                     case R.id.edit_Login_Telefone:
-                        onClick(findViewById(R.id.button_Login_Login));
+                        onClick(findViewById(R.id.item_login_next));
                         break;
                 }
             } else if (keyCode == 67) {
