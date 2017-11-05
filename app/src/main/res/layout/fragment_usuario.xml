@@ -1,0 +1,103 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- TODO: Update blank fragment layout -->
+    <RelativeLayout
+        android:id="@+id/Layout_Frame_Usuario"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/text_Usuario_Conexao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/appBarLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="2dp"
+            android:layout_weight="1"
+            android:background="#646464"
+            android:text="@string/notConnect"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/image_Usuario_Foto"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignEnd="@+id/spinner_Usuario_Estado"
+            android:layout_alignRight="@+id/spinner_Usuario_Estado"
+            android:layout_below="@+id/text_Usuario_Conexao"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter" />
+
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edit_Usuario_Nome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/image_Usuario_Foto"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:ems="20"
+            android:hint="@string/name"
+            android:inputType="textCapWords|textPersonName"
+            app:met_floatingLabel="highlight" />
+
+
+        <fr.ganfra.materialspinner.MaterialSpinner
+            android:id="@+id/spinner_Usuario_Estado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/edit_Usuario_Nome"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:minWidth="250dp"
+            app:ms_alignLabels="false"
+            app:ms_arrowSize="16dp"
+            app:ms_floatingLabelColor="@color/colorPrimary"
+            app:ms_floatingLabelText="@string/state"
+            app:ms_hint="@string/state" />
+
+        <fr.ganfra.materialspinner.MaterialSpinner
+            android:id="@+id/spinner_Usuario_Cidade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/spinner_Usuario_Estado"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="0dp"
+            android:minWidth="500dp"
+            app:ms_alignLabels="false"
+            app:ms_arrowSize="16dp"
+            app:ms_floatingLabelColor="@color/colorPrimary"
+            app:ms_floatingLabelText="@string/city"
+            app:ms_hint="@string/city" />
+
+        <android.support.design.widget.FloatingActionButton
+            tools:context="com.lfcaplicativos.poliesportivo.Activity.Principal"
+            android:id="@+id/fab_Usuario_Foto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/edit_Usuario_Nome"
+            android:layout_alignEnd="@+id/spinner_Usuario_Estado"
+            android:layout_alignRight="@+id/spinner_Usuario_Estado"
+            android:layout_gravity="bottom|end"
+            android:onClick="onClick"
+            app:backgroundTint="@color/colorButtonNormal"
+            app:srcCompat="@drawable/ic_add_a_photo" />
+
+
+    </RelativeLayout>
+</FrameLayout>

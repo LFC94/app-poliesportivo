@@ -508,14 +508,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
     private void ChamarProximaTela(boolean primeira_vez) {
         Intent intent;
-
-        if (primeira_vez) {
-            intent = new Intent(Login.this, Usuario.class);
-            intent.putExtra("novo", true);
-            startActivity(intent);
-        } else {
-            intent = new Intent(Login.this, Principal.class);
-        }
+        intent = new Intent(Login.this, Principal.class);
+        intent.putExtra("novo", primeira_vez);
         startActivity(intent);
         this.finish();
     }
