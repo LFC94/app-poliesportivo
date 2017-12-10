@@ -32,4 +32,7 @@
     <string name="selectPhoto">Selecione a Foto de Perfil</string>
     <string name="notConnect">Não é possível se conectar à internet</string>
     <string name="title_activity_principal">Principal</string>
+    <string name="logo">Logotipo</string>
+    <string name="search">Busca</string>
+    <string name="gymnasium">Ginásio</string>
 </resources>

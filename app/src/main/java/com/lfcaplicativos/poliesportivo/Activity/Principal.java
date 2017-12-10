@@ -58,7 +58,7 @@ public class Principal extends AppCompatActivity implements View.OnClickListener
                     switch (item.getItemId()) {
                         case R.id.navigation_home:
                             codigoNavegation = Chaves.CHAVE_NAVEGATIN_PRINCIPAL;
-                            chamerFragment(Fragment_Principal.newInstance());
+                            chamerFragment(Fragment_Principal.newInstance(Principal.this));
                             break;
                         case R.id.navigation_usuario:
                             codigoNavegation = Chaves.CHAVE_NAVEGATIN_USUARIO;
@@ -75,7 +75,7 @@ public class Principal extends AppCompatActivity implements View.OnClickListener
             if (novo) {
                 chamerFragment(Fragment_Usuario.newInstance(this));
             } else {
-                chamerFragment(Fragment_Principal.newInstance());
+                chamerFragment(Fragment_Principal.newInstance(this));
             }
         } catch (Exception e) {
             Log.e("Erro", e.getMessage());

@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
     <RelativeLayout
         android:id="@+id/Layout_Frame_Usuario"
         android:layout_width="match_parent"
@@ -14,7 +13,6 @@
             android:id="@+id/text_Usuario_Conexao"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/appBarLayout"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="2dp"
             android:layout_weight="1"

@@ -2,6 +2,7 @@ package com.lfcaplicativos.poliesportivo.Uteis;
 
 import com.lfcaplicativos.poliesportivo.Objetos.Cidade;
 import com.lfcaplicativos.poliesportivo.Objetos.Estado;
+import com.lfcaplicativos.poliesportivo.Objetos.Ginasios;
 
 import java.util.ArrayList;
 
@@ -20,11 +21,12 @@ public class Chaves {
     public static final String CHAVE_TELEFONE = "TELEFONE";
     public static final String CHAVE_ID = "ID";
     public static final String CHAVE_FOTO_PERFIL = "FOTO_PERFIL";
+    public static final String CHAVE_LOGOS_GINASIOS = "LOGOS_GINASIOS";
     public static final String CHAVE_CONFIGURACAO = "CONFIGURACAO";
     public static final String CHAVE_ULR_ESTADO = "URL_ESTADO";
-    public static final String CHAVE_ULR_ESTADO_PARAMETERS = "URL_ESTADO_PARAMETERS";
     public static final String CHAVE_ULR_CIDADE = "URL_CIDADE";
-    public static final String CHAVE_ULR_CIDADE_PARAMETERS = "URL_CIDADE_PARAMETERS";
+    public static final String CHAVE_ULR_GINASIO = "URL_GINASIOS";
+
 
     public static final int CHAVE_RESULT_PHOTO = 1;
 
@@ -36,4 +38,5 @@ public class Chaves {
     public static ArrayList<String> cidadelist_usuario;
     public static ArrayList<Estado> estados_usuario;
     public static ArrayList<Cidade> cidades_usuario;
+    public static ArrayList<Ginasios> ginasio_principal;
 }

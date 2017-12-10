@@ -41,7 +41,6 @@
                 android:onClick="onClick"
                 android:text="@string/wrong_number"
                 android:textAlignment="center"
-                android:textColor="@color/caldroid_holo_blue_light"
                 android:textStyle="bold" />
 
             <com.rengwuxian.materialedittext.MaterialEditText
@@ -79,7 +78,8 @@
                     android:id="@+id/text_Validacao_Cronometro"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAlignment="textEnd" />
+                    android:textAlignment="textEnd"
+                    android:gravity="end" />
 
             </LinearLayout>
 

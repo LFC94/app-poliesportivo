@@ -265,9 +265,8 @@ public class Fragment_Usuario extends Fragment {
                     Chaves.cidades_usuario = new ArrayList<Cidade>();
                     Chaves.cidadelist_usuario = new ArrayList<String>();
                     String url = preferencias.getSPreferencias(Chaves.CHAVE_ULR_CIDADE);
-                    if (preferencias.getSPreferencias(Chaves.CHAVE_ULR_CIDADE_PARAMETERS) != null && !preferencias.getSPreferencias(Chaves.CHAVE_ULR_CIDADE_PARAMETERS).trim().isEmpty()) {
-                        url += "?" + preferencias.getSPreferencias(Chaves.CHAVE_ULR_CIDADE_PARAMETERS) + "='" + UFEstado + "'";
-                    }
+                    url += "?UF='" + UFEstado + "'";
+
 
                     String sJson = ConexaoHTTP.getJSONFromAPI(url);
                     jsonobject = new JSONObject(sJson);

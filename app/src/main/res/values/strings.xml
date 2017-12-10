@@ -31,4 +31,7 @@
     <string name="selectPhoto">Select Profile Photo</string>
     <string name="notConnect">Cannot connect to the internet</string>
     <string name="title_activity_principal">Home</string>
+    <string name="logo">Logo</string>
+    <string name="search">Search</string>
+    <string name="gymnasium">Gymnasium</string>
 </resources>
