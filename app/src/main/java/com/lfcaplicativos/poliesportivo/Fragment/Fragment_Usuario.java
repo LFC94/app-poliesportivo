@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
@@ -18,8 +17,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -29,7 +26,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.lfcaplicativos.poliesportivo.Activity.Principal;
 import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
 import com.lfcaplicativos.poliesportivo.Objetos.Cidade;
@@ -121,7 +117,6 @@ public class Fragment_Usuario extends Fragment {
 
             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(preferencias.getNOME()).build();
 
-            GravarImagemFireBase(Principal.bitmapFotoPerfil);
 
             mUser = mAuth.getCurrentUser();
             mUser.updateProfile(profileUpdates);
@@ -334,40 +329,9 @@ public class Fragment_Usuario extends Fragment {
                 byte[] b = Base64.decode(preferencias.getFOTO_PERFIL(), Base64.DEFAULT);
                 Principal.bitmapFotoPerfil = BitmapFactory.decodeByteArray(b, 0, b.length);
                 image_Usuario_Foto.setImageBitmap(Principal.bitmapFotoPerfil);
-            } else {
-                storage = FirebaseStorage.getInstance();
-                String nomefoto_perfil = preferencias.getSPreferencias(Chaves.CHAVE_ID).replaceAll("[^a-zA-Z0-9]+", "").trim() + ".JPEG";
-                storageRef = storage.getReference().child(Chaves.CHAVE_FOTO_PERFIL).child(nomefoto_perfil);
-                final long ONE_MEGABYTE = 1024 * 1024;
-                storageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                    @Override
-                    public void onSuccess(byte[] bytes) {
-                        Principal.bitmapFotoPerfil = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        ImagemPerfilUsuario(true);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        Log.e("Erro", exception.getMessage());
-                    }
-                });
             }
         }
 
-    }
-
-    private void GravarImagemFireBase(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
-
-        UploadTask uploadTask = storageRef.putBytes(data);
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-            }
-        });
     }
 
     private void FalhaCarregarDados() {
@@ -437,9 +401,6 @@ public class Fragment_Usuario extends Fragment {
         spinner_Usuario_Estado.setEnabled(acesso_banco);
         spinner_Usuario_Cidade.setEnabled(acesso_banco);
         text_Usuario_Conexao.setVisibility(acesso_banco ? View.INVISIBLE : View.VISIBLE);
-        String nomefoto_perfil = preferencias.getSPreferencias(Chaves.CHAVE_ID).replaceAll("[^a-zA-Z0-9]+", "").trim() + ".JPEG";
-
-        storageRef = storage.getReference().child(Chaves.CHAVE_FOTO_PERFIL).child(nomefoto_perfil);
 
         referenciaConfiguracao = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_CONFIGURACAO);
 

@@ -21,7 +21,6 @@ public class Chaves {
     public static final String CHAVE_TELEFONE = "TELEFONE";
     public static final String CHAVE_ID = "ID";
     public static final String CHAVE_FOTO_PERFIL = "FOTO_PERFIL";
-    public static final String CHAVE_LOGOS_GINASIOS = "LOGOS_GINASIOS";
     public static final String CHAVE_CONFIGURACAO = "CONFIGURACAO";
     public static final String CHAVE_ULR_ESTADO = "URL_ESTADO";
     public static final String CHAVE_ULR_CIDADE = "URL_CIDADE";

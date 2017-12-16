@@ -5,16 +5,14 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -126,22 +124,8 @@ public class Fragment_Principal extends Fragment {
                         ginasios.setNomelogo(jsonobject.optString("nomelogo"));
 
                         if (ginasios.getNomelogo() != null && !ginasios.getNomelogo().trim().isEmpty()) {
-                            storage = FirebaseStorage.getInstance();
-                            storageRef = storage.getReference().child(Chaves.CHAVE_LOGOS_GINASIOS).child(ginasios.getNomelogo());
-
-                            final long ONE_MEGABYTE = 1024 * 1024;
-                            storageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                                @Override
-                                public void onSuccess(byte[] bytes) {
-                                    ginasios.setLogo(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
-
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    exception.printStackTrace();
-                                }
-                            });
+                            byte[] b = Base64.decode(ginasios.getNomelogo(), Base64.DEFAULT);
+                            ginasios.setLogo(BitmapFactory.decodeByteArray(b, 0, b.length));
                         }
                     }
                     Thread.sleep(1000);
