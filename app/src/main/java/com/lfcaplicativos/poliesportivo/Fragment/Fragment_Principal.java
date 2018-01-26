@@ -3,6 +3,7 @@ package com.lfcaplicativos.poliesportivo.Fragment;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.lfcaplicativos.poliesportivo.Activity.Ginasio;
 import com.lfcaplicativos.poliesportivo.Adapter.RecyclerPrincipal;
 import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
 import com.lfcaplicativos.poliesportivo.Objetos.Ginasios;
@@ -85,9 +87,19 @@ public class Fragment_Principal extends Fragment {
         } else {
             mAdapter = new RecyclerPrincipal(Chaves.ginasio_principal);
             recycler_Principal_Ginasio.setAdapter(mAdapter);
+            ((RecyclerPrincipal) mAdapter).setOnItemClickListener(new RecyclerPrincipal
+                    .MyClickListener() {
+                @Override
+                public void onItemClick(int position, View v) {
+                    ChamaGinasio(position);
+                }
+            });
         }
+
+
         return viewPrincipal;
     }
+
 
 
     private void CarregarGinasio() {
@@ -116,6 +128,8 @@ public class Fragment_Principal extends Fragment {
                         ginasios.setBairro(jsonobject.optString("bairro"));
                         ginasios.setCidade(jsonobject.optString("cidade"));
                         ginasios.setEstado(jsonobject.optString("estado"));
+                        ginasios.setLatitude(jsonobject.optDouble("lat"));
+                        ginasios.setLongitude(jsonobject.optDouble("lng"));
                         ginasios.setModalidade(jsonobject.optString("modalidade"));
                         ginasios.setPiso(jsonobject.optString("piso"));
                         ginasios.setNomelogo(jsonobject.optString("nomelogo"));
@@ -134,6 +148,13 @@ public class Fragment_Principal extends Fragment {
                         public void run() {
                             mAdapter = new RecyclerPrincipal(Chaves.ginasio_principal);
                             recycler_Principal_Ginasio.setAdapter(mAdapter);
+                            ((RecyclerPrincipal) mAdapter).setOnItemClickListener(new RecyclerPrincipal
+                                    .MyClickListener() {
+                                @Override
+                                public void onItemClick(int position, View v) {
+                                    ChamaGinasio(position);
+                                }
+                            });
                         }
                     });
                 } catch (Exception e) {
@@ -144,4 +165,11 @@ public class Fragment_Principal extends Fragment {
         }).start();
     }
 
+
+    public void ChamaGinasio(int position) {
+        Intent intent;
+        intent = new Intent(getActivity(), Ginasio.class);
+        intent.putExtra("position", position);
+        startActivity(intent);
+    }
 }

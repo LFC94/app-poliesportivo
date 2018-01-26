@@ -35,4 +35,11 @@
     <string name="logo">Logotipo</string>
     <string name="search">Busca</string>
     <string name="gymnasium">Ginásio</string>
+    <string name="map">Mapa</string>
+    <string name="title_activity_mapa_ginasio">Mapa do Ginásio</string>
+    <string name="gps_disabled">GPS desabilitado</string>
+    <string name="enable_gps">Ativar GPS</string>
+    <string name="yes">Sim</string>
+    <string name="no">Não</string>
+    <string name="current_location">Localização atual</string>
 </resources>

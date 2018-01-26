@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".Config.CustomApplication"
@@ -15,6 +17,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
         <activity android:name=".Activity.Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,7 +30,13 @@
         </activity>
         <activity
             android:name=".Activity.Principal"
-            android:label="@string/title_activity_principal"></activity>
+            android:label="@string/title_activity_principal" />
+        <activity
+            android:name=".Activity.Ginasio"
+            android:label="@string/gymnasium" />
+        <activity
+            android:name=".Activity.MapaGinasio"
+            android:label="@string/title_activity_mapa_ginasio"></activity>
     </application>
 
 </manifest>

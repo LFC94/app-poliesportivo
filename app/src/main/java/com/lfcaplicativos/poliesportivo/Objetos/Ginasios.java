@@ -1,7 +1,6 @@
 package com.lfcaplicativos.poliesportivo.Objetos;
 
 import android.graphics.Bitmap;
-import android.net.Uri;
 
 /**
  * Created by Lucas on 09/12/2017.
@@ -9,10 +8,11 @@ import android.net.Uri;
 
 public class Ginasios {
     private int codigo;
+    private double latitude, longitude;
     private String nome, fantasia, endereco, numero, bairro, cidade, estado, modalidade, nomelogo, piso;
     private Bitmap logo;
     private Boolean estacionamento, coberto;
-    private Uri logouri;
+
 
     public int getCodigo() {
         return codigo;
@@ -20,6 +20,22 @@ public class Ginasios {
 
     public void setCodigo(int codigo) {
         this.codigo = codigo;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     public String getNome() {
@@ -124,13 +140,5 @@ public class Ginasios {
 
     public void setCoberto(Boolean coberto) {
         this.coberto = coberto;
-    }
-
-    public Uri getLogouri() {
-        return logouri;
-    }
-
-    public void setLogouri(Uri logouri) {
-        this.logouri = logouri;
     }
 }

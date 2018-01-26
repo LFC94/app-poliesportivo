@@ -28,6 +28,7 @@ public class Chaves {
 
 
     public static final int CHAVE_RESULT_PHOTO = 1;
+    public static final int CHAVE_RESULT_LOCATION = 2;
 
     public static final int CHAVE_NAVEGATIN_USUARIO = 3;
     public static final int CHAVE_NAVEGATIN_PRINCIPAL = 0;

@@ -18,12 +18,13 @@ import java.util.ArrayList;
 
 public class RecyclerPrincipal extends RecyclerView.Adapter<RecyclerPrincipal.DataObjectHolder> {
     private ArrayList<Ginasios> mDataset;
-
+    private static MyClickListener myClickListener;
     public static class DataObjectHolder extends RecyclerView.ViewHolder
             implements View
             .OnClickListener {
         TextView text_CardPrincipal_Titulo, text_CardPrincipal_Endereco, text_CardPrincipal_Modalidade;
         ImageView image_CardPrincipal_Logo;
+
 
         public DataObjectHolder(View itemView) {
             super(itemView);
@@ -36,7 +37,7 @@ public class RecyclerPrincipal extends RecyclerView.Adapter<RecyclerPrincipal.Da
 
         @Override
         public void onClick(View v) {
-
+            myClickListener.onItemClick(getAdapterPosition(), v);
         }
     }
 
@@ -67,6 +68,11 @@ public class RecyclerPrincipal extends RecyclerView.Adapter<RecyclerPrincipal.Da
 
     }
 
+
+    public void setOnItemClickListener(MyClickListener myClickListener) {
+        this.myClickListener = myClickListener;
+    }
+
     public void addItem(Ginasios dataObj, int index) {
         mDataset.add(index, dataObj);
         notifyItemInserted(index);
@@ -80,5 +86,9 @@ public class RecyclerPrincipal extends RecyclerView.Adapter<RecyclerPrincipal.Da
     @Override
     public int getItemCount() {
         return mDataset.size();
+    }
+
+    public interface MyClickListener {
+        public void onItemClick(int position, View v);
     }
 }
