@@ -1,30 +1,45 @@
 package com.lfcaplicativos.poliesportivo.Activity;
 
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lfcaplicativos.poliesportivo.CalendarPager.DaysList;
+import com.lfcaplicativos.poliesportivo.CalendarPager.LinearLayoutPagerManager;
+import com.lfcaplicativos.poliesportivo.CalendarPager.MyCalendar;
+import com.lfcaplicativos.poliesportivo.CalendarPager.adapter.RVDaysWeek;
 import com.lfcaplicativos.poliesportivo.R;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-
-import devs.mulham.horizontalcalendar.HorizontalCalendar;
-import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 
 public class Ginasio extends AppCompatActivity implements View.OnClickListener {
 
     private int position = 0;
-    private HorizontalCalendar horizontalCalendar;
+    private MyCalendar calendar;
+    private ArrayList<DaysList> listDays;
+    private RVDaysWeek adapterDays;
+    private RecyclerView mRecyclerView;
+    private TextView txtMonthAndYear;
+    private Context context;
+    private int countGeneratedDays = 7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,38 +61,15 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
             Calendar endDate = Calendar.getInstance();
             endDate.add(Calendar.DAY_OF_MONTH, 7);
 
+            calendario();
 
-            final Calendar defaultSelectedDate = Calendar.getInstance();
 
-            horizontalCalendar = new HorizontalCalendar.Builder(this, R.id.calendarView)
-                    .range(startDate, endDate)
-                    .datesNumberOnScreen(5)
-                    .configure()
-                    .formatTopText("MMM yyyy")
-                    .formatMiddleText("dd")
-                    .formatBottomText("EEE")
-                    .textColor(Color.LTGRAY, Color.WHITE)
-                    .colorTextMiddle(Color.LTGRAY, Color.parseColor("#ffd54f"))
-                    .end()
-                    .defaultSelectedDate(defaultSelectedDate)
-                    .build();
-            horizontalCalendar.goToday(true);
-
-            Log.i("Default Date", DateFormat.format("EEE, MMM d, yyyy", defaultSelectedDate).toString());
-            Toast.makeText(Ginasio.this, DateFormat.format("EEE, MMM d, yyyy", defaultSelectedDate).toString(), Toast.LENGTH_SHORT).show();
-            horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
-                @Override
-                public void onDateSelected(Calendar date, int position) {
-                    String selectedDateStr = DateFormat.format("EEE, MMM d, yyyy", date).toString();
-                    Toast.makeText(Ginasio.this, selectedDateStr + " selected!", Toast.LENGTH_SHORT).show();
-                    Log.i("onDateSelected", selectedDateStr + " - Position = " + position);
-                }
-
-            });
+            Log.i("Default Date", DateFormat.format("EEE, MMM d, yyyy", startDate).toString());
+            Toast.makeText(Ginasio.this, DateFormat.format("EEE, MMM d, yyyy", startDate).toString(), Toast.LENGTH_SHORT).show();
 
 
         } catch (Exception e) {
-
+            Log.i("Erro: ", e.getMessage());
         }
     }
 
@@ -110,4 +102,114 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
             startActivity(intent);
         }
     }
+
+    @SuppressLint("ClickableViewAccessibility")
+    public void calendario() {
+        this.context = getBaseContext();
+        this.calendar = new MyCalendar(this.context);
+        this.listDays = this.calendar.getSevenDayAfterCurrentDate();
+        String monthYear = this.calendar.getMonthIn7Days(this.listDays.get(0).getFullDate());
+
+        final TextView findNext = (TextView) findViewById(R.id.iconApplyNext);
+        final TextView findPrev = (TextView) findViewById(R.id.iconApplyPrev);
+
+
+        Typeface fontFontAwesome = Typeface.createFromAsset(getAssets(), "fonts/fontawesome-webfont.ttf");
+        findNext.setTypeface(fontFontAwesome);
+        findPrev.setTypeface(fontFontAwesome);
+        ((TextView) findViewById(R.id.txtIconCalendar)).setTypeface(fontFontAwesome);
+
+        txtMonthAndYear = (TextView) findViewById(R.id.txtMonthAndYear);
+        txtMonthAndYear.setText(monthYear);
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.cardView);
+        this.adapterDays = new RVDaysWeek(this.context, this.listDays);
+        this.mRecyclerView.setAdapter(this.adapterDays);
+        this.mRecyclerView.setHasFixedSize(true);
+
+        final LinearLayoutPagerManager MyLayoutManager = new LinearLayoutPagerManager(getApplication(), LinearLayoutManager.HORIZONTAL, false, 7);
+
+        this.mRecyclerView.setHasFixedSize(true);
+        this.mRecyclerView.setLayoutManager(MyLayoutManager);
+        this.adapterDays.notifyDataSetChanged();
+
+        this.mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int firstVisiblePos = MyLayoutManager.findFirstVisibleItemPosition();
+                updateMontYear(firstVisiblePos);
+            }
+        });
+
+
+        findPrev.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        findPrev.setBackgroundColor(ContextCompat.getColor(context, R.color.c4));
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP: {
+                        findPrev.setBackgroundColor(ContextCompat.getColor(context, R.color.c1));
+                        break;
+                    }
+                }
+                return false;
+            }
+        });
+
+        findPrev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (countGeneratedDays > 7) {
+                    countGeneratedDays -= 7;
+                    updateMontYear(countGeneratedDays - 7);
+                    mRecyclerView.smoothScrollToPosition(countGeneratedDays - 7);
+                }
+            }
+        });
+
+        findNext.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        findNext.setBackgroundColor(ContextCompat.getColor(context, R.color.c4));
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP: {
+                        findNext.setBackgroundColor(ContextCompat.getColor(context, R.color.c1));
+                        break;
+                    }
+                }
+                return false;
+            }
+        });
+
+        findNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (countGeneratedDays == listDays.size()) {
+                    listDays = calendar.getMoreSevenDays(listDays.get(listDays.size() - 1).getFullDate());
+                    adapterDays.update(listDays);
+
+                    mRecyclerView.smoothScrollToPosition(adapterDays.getItemCount() - 1);
+                    updateMontYear(listDays.size() - 7);
+                    countGeneratedDays = listDays.size();
+                } else {
+                    countGeneratedDays += 7;
+                    updateMontYear(countGeneratedDays - 7);
+                    mRecyclerView.smoothScrollToPosition(countGeneratedDays - 1);
+                }
+            }
+        });
+    }
+
+    public void updateMontYear(int lengthList) {
+        String monthYear = calendar.getMonthIn7Days(listDays.get(lengthList).getFullDate());
+        txtMonthAndYear.setText(monthYear.toUpperCase());
+    }
+
 }

@@ -31,12 +31,7 @@
         android:orientation="vertical"
         android:padding="1dp">
 
-        <devs.mulham.horizontalcalendar.HorizontalCalendarView
-            android:id="@+id/calendarView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@color/colorPrimary"
-            app:textColorSelected="#FFFF" />
+        <include layout="@layout/calendar" />
     </LinearLayout>
 
 </RelativeLayout>

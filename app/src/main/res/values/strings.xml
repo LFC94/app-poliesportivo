@@ -1,4 +1,9 @@
 <resources>
+    <string name="icon_angle_right">&#xf105;</string>
+    <string name="icon_angle_left">&#xf104;</string>
+    <string name="icon_calendar">&#xf073;</string>
+    <string name="icon_angle_down">&#xf107;</string>
+
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDYRW6zI0pSVtpXmsdaxZSp5tQEvHsiAEE</string>
     <string name="app_name">Poliesportivo</string>
     <string name="action_settings">Settings</string>
