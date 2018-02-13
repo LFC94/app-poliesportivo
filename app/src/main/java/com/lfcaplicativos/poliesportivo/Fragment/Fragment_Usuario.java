@@ -185,7 +185,7 @@ public class Fragment_Usuario extends Fragment {
                 try {
                     Chaves.estados_usuario = new ArrayList<Estado>();
                     Chaves.estadolist_usuario = new ArrayList<String>();
-                    String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_ULR_ESTADO));
+                    String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_ESTADO));
                     jsonobject = new JSONObject(sJson);
                     jsonarray = jsonobject.getJSONArray("estado");
                     Chaves.estadolist_usuario.clear();
@@ -259,7 +259,7 @@ public class Fragment_Usuario extends Fragment {
                 try {
                     Chaves.cidades_usuario = new ArrayList<Cidade>();
                     Chaves.cidadelist_usuario = new ArrayList<String>();
-                    String url = preferencias.getSPreferencias(Chaves.CHAVE_ULR_CIDADE);
+                    String url = preferencias.getSPreferencias(Chaves.CHAVE_URL_CIDADE);
                     url += "?UF='" + UFEstado + "'";
 
 

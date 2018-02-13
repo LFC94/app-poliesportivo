@@ -42,4 +42,8 @@
     <string name="yes">Sim</string>
     <string name="no">Não</string>
     <string name="current_location">Localização atual</string>
+    <string name="available_times">Horários Disponíveis</string>
+    <string name="available">Disponíveis</string>
+    <string name="unavailable">Indisponíveis</string>
+    <string name="my">Meu</string>
 </resources>

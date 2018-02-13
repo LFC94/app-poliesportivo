@@ -1,12 +1,9 @@
 package com.lfcaplicativos.poliesportivo.Activity;
 
 
-import android.annotation.SuppressLint;
-import android.content.Context;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,32 +12,37 @@ import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.lfcaplicativos.poliesportivo.CalendarPager.DaysList;
-import com.lfcaplicativos.poliesportivo.CalendarPager.LinearLayoutPagerManager;
-import com.lfcaplicativos.poliesportivo.CalendarPager.MyCalendar;
-import com.lfcaplicativos.poliesportivo.CalendarPager.adapter.RVDaysWeek;
+import com.lfcaplicativos.poliesportivo.Adapter.RecyclerGinasio;
+import com.lfcaplicativos.poliesportivo.Adapter.RecyclerPrincipal;
+import com.lfcaplicativos.poliesportivo.Objetos.Horarios;
 import com.lfcaplicativos.poliesportivo.R;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
+import com.lfcaplicativos.poliesportivo.Uteis.ConexaoHTTP;
+import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import devs.mulham.horizontalcalendar.HorizontalCalendar;
+import devs.mulham.horizontalcalendar.HorizontalCalendarView;
+import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
+
 public class Ginasio extends AppCompatActivity implements View.OnClickListener {
 
     private int position = 0;
-    private MyCalendar calendar;
-    private ArrayList<DaysList> listDays;
-    private RVDaysWeek adapterDays;
-    private RecyclerView mRecyclerView;
-    private TextView txtMonthAndYear;
-    private Context context;
-    private int countGeneratedDays = 7;
+    private RecyclerView recyclerGinasioHoraio;
+    private RecyclerView.Adapter mAdapter;
+    private Preferencias preferencias;
 
+    private JSONObject jsonobject, jsonobject1, jsonobject2;
+    private JSONArray jsonarrayHorario, jsonarrayHorarios;
+    private ProgressDialog mProgressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,22 +53,47 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
             if (args != null) {
                 args.putInt("position", position);
             }
-
+            preferencias = new Preferencias(this);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             toolbar.setTitle(Chaves.ginasio_principal.get(position).getNome());
             setSupportActionBar(toolbar);
 
+            recyclerGinasioHoraio = (RecyclerView) findViewById(R.id.recyclerGinasioHoraio);
+            recyclerGinasioHoraio.setHasFixedSize(true);
+            recyclerGinasioHoraio.setLayoutManager(new LinearLayoutManager(this));
 
             Calendar startDate = Calendar.getInstance();
             Calendar endDate = Calendar.getInstance();
             endDate.add(Calendar.DAY_OF_MONTH, 7);
 
-            calendario();
+            HorizontalCalendar horizontalCalendar = new HorizontalCalendar.Builder(this, R.id.calendarGinasio)
+                    .range(startDate, endDate)
+                    .datesNumberOnScreen(5)
+                    .build();
 
+            horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
+                @Override
+                public void onDateSelected(Calendar date, int position) {
+
+                    carregarHorario(date);
+                    Toast.makeText(Ginasio.this, String.valueOf(date.get(Calendar.DAY_OF_WEEK)) + " - " + DateFormat.format("EEE, MMM d, yyyy", date).toString(), Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onCalendarScroll(HorizontalCalendarView calendarView,
+                                             int dx, int dy) {
+
+                }
+
+                @Override
+                public boolean onDateLongClicked(Calendar date, int position) {
+                    return true;
+                }
+            });
 
             Log.i("Default Date", DateFormat.format("EEE, MMM d, yyyy", startDate).toString());
             Toast.makeText(Ginasio.this, DateFormat.format("EEE, MMM d, yyyy", startDate).toString(), Toast.LENGTH_SHORT).show();
-
+            carregarHorario(startDate);
 
         } catch (Exception e) {
             Log.i("Erro: ", e.getMessage());
@@ -103,113 +130,78 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private void calendario() {
-        this.context = getBaseContext();
-        this.calendar = new MyCalendar(this.context);
-        this.listDays = this.calendar.getSevenDayAfterCurrentDate();
-        String monthYear = this.calendar.getMonthIn7Days(this.listDays.get(0).getFullDate());
 
-        final TextView findNext = (TextView) findViewById(R.id.iconApplyNext);
-        final TextView findPrev = (TextView) findViewById(R.id.iconApplyPrev);
+    private void carregarHorario(final Calendar data) {
 
-
-        Typeface fontFontAwesome = Typeface.createFromAsset(getAssets(), "fonts/fontawesome-webfont.ttf");
-        findNext.setTypeface(fontFontAwesome);
-        findPrev.setTypeface(fontFontAwesome);
-        ((TextView) findViewById(R.id.txtIconCalendar)).setTypeface(fontFontAwesome);
-
-        txtMonthAndYear = (TextView) findViewById(R.id.txtMonthAndYear);
-        txtMonthAndYear.setText(monthYear);
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.cardView);
-        this.adapterDays = new RVDaysWeek(this.context, this.listDays);
-        this.mRecyclerView.setAdapter(this.adapterDays);
-        this.mRecyclerView.setHasFixedSize(true);
-
-        final LinearLayoutPagerManager MyLayoutManager = new LinearLayoutPagerManager(getApplication(), LinearLayoutManager.HORIZONTAL, false, 7);
-
-        this.mRecyclerView.setHasFixedSize(true);
-        this.mRecyclerView.setLayoutManager(MyLayoutManager);
-        this.adapterDays.notifyDataSetChanged();
-
-        this.mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        final int dia = data.get(Calendar.DAY_OF_WEEK);
+        mProgressDialog = ProgressDialog.show(this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.available_times) + "...", true);
+        new Thread(new Runnable() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                int firstVisiblePos = MyLayoutManager.findFirstVisibleItemPosition();
-                updateMontYear(firstVisiblePos);
-            }
-        });
+            public void run() {
+                try {
+                    Chaves.horarios_ginasio = new ArrayList<Horarios>();
 
+                    String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_HORARIOS) + "?DATA='" + DateFormat.format("yyyy-MM-dd", data) + "'&DIA=" + String.valueOf(dia));
+                    jsonobject = new JSONObject(sJson);
+                    jsonarrayHorario = jsonobject.getJSONArray("horario");
 
-        findPrev.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN: {
-                        findPrev.setBackgroundColor(ContextCompat.getColor(context, R.color.c4));
-                        break;
+                    jsonobject1 = jsonarrayHorario.getJSONObject(0);
+
+                    jsonarrayHorarios = jsonobject1.getJSONArray("horarios");
+                    for (int i = 0; i < jsonarrayHorarios.length(); i++) {
+                        jsonobject = jsonarrayHorarios.getJSONObject(i);
+
+                        final Horarios horarios = new Horarios();
+                        Chaves.horarios_ginasio.add(horarios);
+                        horarios.setCodigo(jsonobject.optInt("id"));
+                        horarios.setHoraInicial(jsonobject.optString("hora_ini"));
+                        horarios.setHoraFinal(jsonobject.optString("hora_fin"));
+                        horarios.setStratus(0);
+                        horarios.setTextoStatus(getString(R.string.available));
                     }
-                    case MotionEvent.ACTION_UP: {
-                        findPrev.setBackgroundColor(ContextCompat.getColor(context, R.color.c1));
-                        break;
+
+                    jsonobject2 = jsonarrayHorario.getJSONObject(1);
+
+                    jsonarrayHorarios = jsonobject2.getJSONArray("horario_marcado");
+                    for (int i = 0; i < jsonarrayHorarios.length(); i++) {
+                        jsonobject = jsonarrayHorarios.getJSONObject(i);
+
+
+                        int x = Chaves.horarios_ginasio.size();
+                        for (int j = 0; j < x; j++) {
+                            if (Chaves.horarios_ginasio.get(j).getCodigo() == jsonobject.optInt("id_horario")) {
+                                if (jsonobject.optString("id_usuario") == preferencias.getID()) {
+                                    Chaves.horarios_ginasio.get(j).setStratus(1);
+                                    Chaves.horarios_ginasio.get(j).setTextoStatus(getString(R.string.my));
+                                } else {
+                                    Chaves.horarios_ginasio.get(j).setStratus(2);
+                                    Chaves.horarios_ginasio.get(j).setTextoStatus(getString(R.string.unavailable));
+                                }
+                            }
+                        }
                     }
+
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAdapter = new RecyclerGinasio(Chaves.horarios_ginasio);
+                            recyclerGinasioHoraio.setAdapter(mAdapter);
+                            ((RecyclerPrincipal) mAdapter).setOnItemClickListener(new RecyclerPrincipal
+                                    .MyClickListener() {
+                                @Override
+                                public void onItemClick(int position, View v) {
+
+                                }
+                            });
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                return false;
+                mProgressDialog.cancel();
             }
-        });
-
-        findPrev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (countGeneratedDays > 7) {
-                    countGeneratedDays -= 7;
-                    updateMontYear(countGeneratedDays - 7);
-                    mRecyclerView.smoothScrollToPosition(countGeneratedDays - 7);
-                }
-            }
-        });
-
-        findNext.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN: {
-                        findNext.setBackgroundColor(ContextCompat.getColor(context, R.color.c4));
-                        break;
-                    }
-                    case MotionEvent.ACTION_UP: {
-                        findNext.setBackgroundColor(ContextCompat.getColor(context, R.color.c1));
-                        break;
-                    }
-                }
-                return false;
-            }
-        });
-
-        findNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (countGeneratedDays == listDays.size()) {
-                    listDays = calendar.getMoreSevenDays(listDays.get(listDays.size() - 1).getFullDate());
-                    adapterDays.update(listDays);
-
-                    mRecyclerView.smoothScrollToPosition(adapterDays.getItemCount() - 1);
-                    updateMontYear(listDays.size() - 7);
-                    countGeneratedDays = listDays.size();
-                } else {
-                    countGeneratedDays += 7;
-                    updateMontYear(countGeneratedDays - 7);
-                    mRecyclerView.smoothScrollToPosition(countGeneratedDays - 1);
-                }
-            }
-        });
-    }
-
-    private void updateMontYear(int lengthList) {
-        String monthYear = calendar.getMonthIn7Days(listDays.get(lengthList).getFullDate());
-        txtMonthAndYear.setText(monthYear.toUpperCase());
+        }).start();
     }
 
 }

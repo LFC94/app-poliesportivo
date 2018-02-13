@@ -101,6 +101,7 @@ public class Fragment_Principal extends Fragment {
     }
 
 
+
     private void carregarGinasio() {
 
         mProgressDialog = ProgressDialog.show(activityPrincipal, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.gymnasium) + "...", true);
@@ -110,7 +111,7 @@ public class Fragment_Principal extends Fragment {
                 try {
                     Chaves.ginasio_principal = new ArrayList<Ginasios>();
 
-                    String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_ULR_GINASIO));
+                    String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_GINASIO));
                     jsonobject = new JSONObject(sJson);
                     jsonarray = jsonobject.getJSONArray("ginasio");
 

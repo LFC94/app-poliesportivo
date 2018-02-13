@@ -21,17 +21,23 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout
+    <devs.mulham.horizontalcalendar.HorizontalCalendarView
+        android:id="@+id/calendarGinasio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/appBarLayout2"
-        android:background="@color/colorPrimaryDark"
-        android:orientation="vertical"
-        android:padding="1dp">
+        android:background="@color/colorPrimary"
+        app:textColorNormal="@color/c5"
+        app:textColorSelected="@color/c3" />
 
-        <include layout="@layout/calendar" />
-    </LinearLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerGinasioHoraio"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/calendarGinasio" />
 
 </RelativeLayout>

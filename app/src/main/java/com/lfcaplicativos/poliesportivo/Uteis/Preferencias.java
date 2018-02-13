@@ -148,9 +148,9 @@ public class Preferencias {
 
     /************** CONFIGURACAO *************/
     public void ConfiguracaoPreferencias(String UrlEstado, String UrlCidade, String UrlGinasio) {
-        editor.putString(Chaves.CHAVE_ULR_CIDADE, UrlCidade);
-        editor.putString(Chaves.CHAVE_ULR_ESTADO, UrlEstado);
-        editor.putString(Chaves.CHAVE_ULR_GINASIO, UrlGinasio);
+        editor.putString(Chaves.CHAVE_URL_CIDADE, UrlCidade);
+        editor.putString(Chaves.CHAVE_URL_ESTADO, UrlEstado);
+        editor.putString(Chaves.CHAVE_URL_GINASIO, UrlGinasio);
         editor.commit();
     }
 

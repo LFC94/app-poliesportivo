@@ -6,9 +6,9 @@
     <color name="textColorHint">#ff6d00</color>
     <color name="colorButtonNormal">#388e3c</color>
 
-    <color name="c1">#388e3c</color>
-    <color name="c2">#ffffff</color>
-    <color name="c3">#00f40b</color>
-    <color name="c5">#9fefa3</color>
-    <color name="c4">#538455</color>
+    <color name="c3">#00c853</color>
+    <color name="c5">#a5d6a7</color>
+    <color name="c4">#388e3c</color>
+
+    <color name="available">#76FF03</color>
 </resources>

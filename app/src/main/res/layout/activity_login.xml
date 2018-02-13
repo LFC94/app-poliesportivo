@@ -86,7 +86,6 @@
                 android:id="@+id/image_Login_Logo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_above="@+id/button_Login_Login"
                 android:layout_below="@+id/relativeLayout"
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"

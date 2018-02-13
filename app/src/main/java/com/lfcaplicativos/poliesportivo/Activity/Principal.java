@@ -18,11 +18,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
 import com.lfcaplicativos.poliesportivo.Fragment.Fragment_Principal;
 import com.lfcaplicativos.poliesportivo.Fragment.Fragment_Usuario;
 import com.lfcaplicativos.poliesportivo.R;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
 import com.lfcaplicativos.poliesportivo.Uteis.Permissao;
+import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
 
 import java.io.InputStream;
 
@@ -33,6 +39,8 @@ public class Principal extends AppCompatActivity implements View.OnClickListener
     private BottomNavigationView navigation;
     private int codigoNavegation = Chaves.CHAVE_NAVEGATIN_PRINCIPAL;
     private boolean novo = false;
+    private DatabaseReference referenciaConfiguracao;
+    private Preferencias preferencias;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +50,31 @@ public class Principal extends AppCompatActivity implements View.OnClickListener
             if (args != null) {
                 args.putBoolean("novo", novo);
             }
+
+            preferencias = new Preferencias(this);
+            referenciaConfiguracao = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_CONFIGURACAO);
+
+            referenciaConfiguracao.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    try {
+
+                        for (DataSnapshot dados : dataSnapshot.getChildren()) {
+                            String chave = dados.getKey(), valor = dados.getValue().toString();
+                            preferencias.setPreferencias(chave, valor);
+                        }
+
+                    } catch (Exception e) {
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e("ERRO", "DatabaseError:" + databaseError.getMessage());
+
+                }
+            });
 
             setContentView(R.layout.activity_principal);
             toolbar = (Toolbar) findViewById(R.id.toolbar);
