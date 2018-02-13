@@ -184,7 +184,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
         mUser = mAuth.getCurrentUser();
         if (mUser != null) {
-            ChamarProximaTela(false);
+            chamarProximaTela(false);
         }
 
     }
@@ -339,9 +339,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                             Log.d(TAG, "signInWithCredential:success");
                             isReenviarCodigo = false;
                             countTimerReenvia.cancel();
-                            String sId = Base64Custom.CodificarBase64(sTelefoneVerificacao);
+                            String sId = Base64Custom.codificarBase64(sTelefoneVerificacao);
 
-                            preferencias.CadastraUsuarioPreferencias("", sTelefoneVerificacao, sId, "", "");
+                            preferencias.cadastraUsuarioPreferencias("", sTelefoneVerificacao, sId, "", "");
                             referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_USUARIO).child(sId);
                             referenciaFire.addValueEventListener(new ValueEventListener() {
                                 @Override
@@ -350,14 +350,14 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                                         String chave = dados.getKey(), valor = dados.getValue().toString();
                                         preferencias.setPreferencias(chave, valor);
                                     }
-                                    GravarUsuarioFire();
-                                    ChamarProximaTela(true);
+                                    gravarUsuarioFire();
+                                    chamarProximaTela(true);
                                 }
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
-                                    GravarUsuarioFire();
-                                    ChamarProximaTela(true);
+                                    gravarUsuarioFire();
+                                    chamarProximaTela(true);
                                 }
                             });
 
@@ -485,16 +485,14 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         dialogTelaVerificacao.show();
     }
 
-    public void verificaCode() {
+    private void verificaCode() {
         String code = editCodeVerifica.getText().toString().trim().replaceAll("[^0-9]*", "");
-        ;
 
         if (TextUtils.isEmpty(code)) {
             editCodeVerifica.setError(getString(R.string.invalid_code));
             editCodeVerifica.requestFocus();
             return;
         }
-        ;
         verifyPhoneNumberWithCode(sVerificaId, code);
 
     }
@@ -506,7 +504,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         signInWithPhoneAuthCredential(credential);
     }
 
-    private void ChamarProximaTela(boolean primeira_vez) {
+    private void chamarProximaTela(boolean primeira_vez) {
         Intent intent;
         intent = new Intent(Login.this, Principal.class);
         intent.putExtra("novo", primeira_vez);
@@ -514,9 +512,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         this.finish();
     }
 
-    public void GravarUsuarioFire() {
+    private void gravarUsuarioFire() {
         referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase();
-        referenciaFire.child(Chaves.CHAVE_USUARIO).child(preferencias.getSPreferencias(Chaves.CHAVE_ID)).setValue(preferencias.RetornaUsuarioPreferencias(false));
+        referenciaFire.child(Chaves.CHAVE_USUARIO).child(preferencias.getSPreferencias(Chaves.CHAVE_ID)).setValue(preferencias.retornaUsuarioPreferencias(false));
     }
 
 }

@@ -104,7 +104,7 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    public void calendario() {
+    private void calendario() {
         this.context = getBaseContext();
         this.calendar = new MyCalendar(this.context);
         this.listDays = this.calendar.getSevenDayAfterCurrentDate();
@@ -207,7 +207,7 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
         });
     }
 
-    public void updateMontYear(int lengthList) {
+    private void updateMontYear(int lengthList) {
         String monthYear = calendar.getMonthIn7Days(listDays.get(lengthList).getFullDate());
         txtMonthAndYear.setText(monthYear.toUpperCase());
     }

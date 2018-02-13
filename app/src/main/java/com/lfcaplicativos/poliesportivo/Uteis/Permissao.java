@@ -15,7 +15,7 @@ import com.lfcaplicativos.poliesportivo.R;
  */
 
 public class Permissao {
-    public static boolean ValidaPermicao(Activity activity, String permissao, int RequestCod) {
+    public static boolean validaPermicao(Activity activity, String permissao, int RequestCod) {
         if (Build.VERSION.SDK_INT >= 23) {
 
             if (ContextCompat.checkSelfPermission(activity.getApplicationContext(), permissao) != PackageManager.PERMISSION_GRANTED) {

@@ -127,7 +127,7 @@ public class Principal extends AppCompatActivity implements View.OnClickListener
         switch (v.getId()) {
 
             case R.id.fab_Usuario_Foto:
-                if (Permissao.ValidaPermicao(Principal.this, Manifest.permission.CAMERA, 1)) {
+                if (Permissao.validaPermicao(Principal.this, Manifest.permission.CAMERA, 1)) {
                     AbrieCameraGaleria();
                 }
                 break;

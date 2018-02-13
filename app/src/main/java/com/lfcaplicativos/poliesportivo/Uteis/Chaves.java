@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Lucas on 07/09/2017.
+ * Classe de chaves de configuracao
  */
 
 public class Chaves {

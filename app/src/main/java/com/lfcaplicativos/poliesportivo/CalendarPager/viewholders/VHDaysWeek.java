@@ -15,7 +15,7 @@ import com.lfcaplicativos.poliesportivo.R;
 public class VHDaysWeek extends RecyclerView.ViewHolder {
     public TextView dayWeek, fullDayWeek;
     public CardView card_view;
-    public Context context;
+    private Context context;
 
     public VHDaysWeek(final View itemView, Context context) {
         super(itemView);

@@ -113,7 +113,7 @@ public class Fragment_Usuario extends Fragment {
             ImagemPerfilUsuario(true);
 
             DatabaseReference referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase();
-            referenciaFire.child(Chaves.CHAVE_USUARIO).child(preferencias.getSPreferencias(Chaves.CHAVE_ID)).setValue(preferencias.RetornaUsuarioPreferencias(false));
+            referenciaFire.child(Chaves.CHAVE_USUARIO).child(preferencias.getSPreferencias(Chaves.CHAVE_ID)).setValue(preferencias.retornaUsuarioPreferencias(false));
 
             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(preferencias.getNOME()).build();
 
@@ -149,7 +149,7 @@ public class Fragment_Usuario extends Fragment {
                     return;
 
                 if (position >= 0) {
-                    if (Chaves.cidadelist_usuario != null && prim_cid == false) {
+                    if (Chaves.cidadelist_usuario != null && !prim_cid) {
                         return;
                     }
                     CarregarCidade(Chaves.estados_usuario.get(position).getSigla());

@@ -64,7 +64,7 @@ public class Preferencias {
 
 
     /************** Usuario *************/
-    public void CadastraUsuarioPreferencias(String Nome, String Telefone, String Id, String Cidade, String Estado) {
+    public void cadastraUsuarioPreferencias(String Nome, String Telefone, String Id, String Cidade, String Estado) {
         editor.putString(Chaves.CHAVE_TELEFONE, Telefone);
         editor.putString(Chaves.CHAVE_ID, Id);
         editor.putString(Chaves.CHAVE_NOME, Nome);
@@ -108,7 +108,7 @@ public class Preferencias {
         return sharedPreferences.getString(Chaves.CHAVE_ID, null);
     }
 
-    public HashMap<String, String> RetornaUsuarioPreferencias(boolean notnull) {
+    public HashMap<String, String> retornaUsuarioPreferencias(boolean notnull) {
         HashMap<String, String> Retorno = new HashMap<>();
 
         if (notnull) {

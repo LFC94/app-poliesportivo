@@ -20,7 +20,7 @@ import java.util.List;
 
 public class RVDaysWeek extends RecyclerView.Adapter<VHDaysWeek> {
 
-    Context mctx;
+    private Context mctx;
     private boolean isLoaded = false;
     private int activeCell = -1;
     private List<DaysList> mList;

@@ -170,8 +170,8 @@ public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             } else {
 
-                if (Permissao.ValidaPermicao(this, android.Manifest.permission.ACCESS_FINE_LOCATION, 1) &&
-                        Permissao.ValidaPermicao(this, Manifest.permission.ACCESS_COARSE_LOCATION, 1)) {
+                if (Permissao.validaPermicao(this, android.Manifest.permission.ACCESS_FINE_LOCATION, 1) &&
+                        Permissao.validaPermicao(this, Manifest.permission.ACCESS_COARSE_LOCATION, 1)) {
 
                     startGettingLocations();
                 } else {

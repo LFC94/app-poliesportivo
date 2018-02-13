@@ -83,7 +83,7 @@ public class Fragment_Principal extends Fragment {
         mLayoutManager = new LinearLayoutManager(activityPrincipal);
         recycler_Principal_Ginasio.setLayoutManager(mLayoutManager);
         if (Chaves.ginasio_principal == null) {
-            CarregarGinasio();
+            carregarGinasio();
         } else {
             mAdapter = new RecyclerPrincipal(Chaves.ginasio_principal);
             recycler_Principal_Ginasio.setAdapter(mAdapter);
@@ -91,7 +91,7 @@ public class Fragment_Principal extends Fragment {
                     .MyClickListener() {
                 @Override
                 public void onItemClick(int position, View v) {
-                    ChamaGinasio(position);
+                    chamaGinasio(position);
                 }
             });
         }
@@ -101,8 +101,7 @@ public class Fragment_Principal extends Fragment {
     }
 
 
-
-    private void CarregarGinasio() {
+    private void carregarGinasio() {
 
         mProgressDialog = ProgressDialog.show(activityPrincipal, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.gymnasium) + "...", true);
         new Thread(new Runnable() {
@@ -152,7 +151,7 @@ public class Fragment_Principal extends Fragment {
                                     .MyClickListener() {
                                 @Override
                                 public void onItemClick(int position, View v) {
-                                    ChamaGinasio(position);
+                                    chamaGinasio(position);
                                 }
                             });
                         }
@@ -166,7 +165,7 @@ public class Fragment_Principal extends Fragment {
     }
 
 
-    public void ChamaGinasio(int position) {
+    private void chamaGinasio(int position) {
         Intent intent;
         intent = new Intent(getActivity(), Ginasio.class);
         intent.putExtra("position", position);
