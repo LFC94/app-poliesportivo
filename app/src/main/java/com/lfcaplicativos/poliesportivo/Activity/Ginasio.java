@@ -13,10 +13,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.lfcaplicativos.poliesportivo.Adapter.RecyclerGinasio;
-import com.lfcaplicativos.poliesportivo.Adapter.RecyclerPrincipal;
 import com.lfcaplicativos.poliesportivo.Objetos.Horarios;
 import com.lfcaplicativos.poliesportivo.R;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
@@ -74,15 +72,12 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
             horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
                 @Override
                 public void onDateSelected(Calendar date, int position) {
-
                     carregarHorario(date);
-                    Toast.makeText(Ginasio.this, String.valueOf(date.get(Calendar.DAY_OF_WEEK)) + " - " + DateFormat.format("EEE, MMM d, yyyy", date).toString(), Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onCalendarScroll(HorizontalCalendarView calendarView,
                                              int dx, int dy) {
-
                 }
 
                 @Override
@@ -91,8 +86,6 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
                 }
             });
 
-            Log.i("Default Date", DateFormat.format("EEE, MMM d, yyyy", startDate).toString());
-            Toast.makeText(Ginasio.this, DateFormat.format("EEE, MMM d, yyyy", startDate).toString(), Toast.LENGTH_SHORT).show();
             carregarHorario(startDate);
 
         } catch (Exception e) {
@@ -141,7 +134,7 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
                 try {
                     Chaves.horarios_ginasio = new ArrayList<Horarios>();
 
-                    String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_HORARIOS) + "?DATA='" + DateFormat.format("yyyy-MM-dd", data) + "'&DIA=" + String.valueOf(dia));
+                    String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_HORARIOS) + "?GINASIO = " + String.valueOf(Chaves.ginasio_principal.get(position).getCodigo()) + "&DATA='" + DateFormat.format("yyyy-MM-dd", data) + "'&DIA=" + String.valueOf(dia));
                     jsonobject = new JSONObject(sJson);
                     jsonarrayHorario = jsonobject.getJSONArray("horario");
 
@@ -154,8 +147,8 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
                         final Horarios horarios = new Horarios();
                         Chaves.horarios_ginasio.add(horarios);
                         horarios.setCodigo(jsonobject.optInt("id"));
-                        horarios.setHoraInicial(jsonobject.optString("hora_ini"));
-                        horarios.setHoraFinal(jsonobject.optString("hora_fin"));
+                        horarios.setHoraInicial(jsonobject.optString("hora_ini").substring(0, 5));
+                        horarios.setHoraFinal(jsonobject.optString("hora_fin").substring(0, 5));
                         horarios.setStratus(0);
                         horarios.setTextoStatus(getString(R.string.available));
                     }
@@ -170,7 +163,7 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
                         int x = Chaves.horarios_ginasio.size();
                         for (int j = 0; j < x; j++) {
                             if (Chaves.horarios_ginasio.get(j).getCodigo() == jsonobject.optInt("id_horario")) {
-                                if (jsonobject.optString("id_usuario") == preferencias.getID()) {
+                                if (jsonobject.optString("id_usuario").equals(preferencias.getID())) {
                                     Chaves.horarios_ginasio.get(j).setStratus(1);
                                     Chaves.horarios_ginasio.get(j).setTextoStatus(getString(R.string.my));
                                 } else {
@@ -180,20 +173,22 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
                             }
                         }
                     }
-
-
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mAdapter = new RecyclerGinasio(Chaves.horarios_ginasio);
-                            recyclerGinasioHoraio.setAdapter(mAdapter);
-                            ((RecyclerPrincipal) mAdapter).setOnItemClickListener(new RecyclerPrincipal
-                                    .MyClickListener() {
-                                @Override
-                                public void onItemClick(int position, View v) {
+                            try {
+                                mAdapter = new RecyclerGinasio(Chaves.horarios_ginasio);
+                                recyclerGinasioHoraio.setAdapter(mAdapter);
+                                ((RecyclerGinasio) mAdapter).setOnItemClickListener(new RecyclerGinasio.MyClickListener() {
+                                    @Override
+                                    public void onItemClick(int position, View v) {
 
-                                }
-                            });
+                                    }
+                                });
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
                 } catch (Exception e) {

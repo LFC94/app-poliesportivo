@@ -10,5 +10,8 @@
     <color name="c5">#a5d6a7</color>
     <color name="c4">#388e3c</color>
 
-    <color name="available">#76FF03</color>
+    <color name="time_available">#76FF03</color>
+    <color name="time_my">#F4FF81</color>
+    <color name="time_unavailable">#F44336</color>
+
 </resources>

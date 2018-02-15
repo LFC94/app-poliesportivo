@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.lfcaplicativos.poliesportivo.Objetos.Horarios;
 import com.lfcaplicativos.poliesportivo.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
@@ -49,18 +48,28 @@ public class RecyclerGinasio extends RecyclerView.Adapter<RecyclerGinasio.DataOb
 
     @Override
     public DataObjectHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_cardprincipal, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_ginasio_horario, parent, false);
         return new DataObjectHolder(view);
     }
 
     @Override
     public void onBindViewHolder(DataObjectHolder holder, int position) {
-        SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
-        holder.textGinasioInfo.setText(sdfDate.format(mDataset.get(position).getHoraInicial()) + " - " + sdfDate.format(mDataset.get(position).getHoraFinal()));
+
+        holder.textGinasioInfo.setText(mDataset.get(position).getHoraInicial() + " - " + mDataset.get(position).getHoraFinal());
         holder.textGinasioStatus.setText(mDataset.get(position).getTextoStatus());
-
-        holder.linearLayoutGinasioHorario.setBackgroundResource(R.color.available);
-
+        switch (mDataset.get(position).getStratus()) {
+            case 1:
+                holder.linearLayoutGinasioHorario.setBackgroundResource(R.color.time_my);
+                break;
+            case 2:
+                holder.linearLayoutGinasioHorario.setBackgroundResource(R.color.time_unavailable);
+                break;
+            case 3:
+                holder.linearLayoutGinasioHorario.setBackgroundResource(R.color.time_available);
+                break;
+            default:
+                holder.linearLayoutGinasioHorario.setBackgroundResource(R.color.time_available);
+        }
 
     }
 
