@@ -51,8 +51,7 @@ import fr.ganfra.materialspinner.MaterialSpinner;
  */
 public class Fragment_Usuario extends Fragment {
 
-    private View viewUsuario;
-    private static Activity activityUsuario;
+    static Activity activityUsuario;
     public static MaterialEditText edit_Usuario_Nome;
     private MaterialSpinner spinner_Usuario_Estado, spinner_Usuario_Cidade;
     public static ImageView image_Usuario_Foto;
@@ -65,10 +64,7 @@ public class Fragment_Usuario extends Fragment {
 
 
     private Preferencias preferencias;
-    private DatabaseReference referenciaConfiguracao;
     private FirebaseAuth mAuth;
-    private FirebaseUser mUser;
-    private FirebaseStorage storage;
     private StorageReference storageRef;
 
     private boolean acesso_banco = true, prim_uf = true, prim_cid = true;
@@ -118,7 +114,7 @@ public class Fragment_Usuario extends Fragment {
             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(preferencias.getNOME()).build();
 
 
-            mUser = mAuth.getCurrentUser();
+            FirebaseUser mUser = mAuth.getCurrentUser();
             mUser.updateProfile(profileUpdates);
         }
     }
@@ -126,17 +122,17 @@ public class Fragment_Usuario extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        viewUsuario = inflater.inflate(R.layout.fragment_usuario, container, false);
+        View viewUsuario = inflater.inflate(R.layout.fragment_usuario, container, false);
 
         preferencias = new Preferencias(viewUsuario.getContext());
         mAuth = ConfiguracaoFirebase.getFirebaseAuth();
-        storage = FirebaseStorage.getInstance();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
 
-        edit_Usuario_Nome = (MaterialEditText) viewUsuario.findViewById(R.id.edit_Usuario_Nome);
-        spinner_Usuario_Estado = (MaterialSpinner) viewUsuario.findViewById(R.id.spinner_Usuario_Estado);
-        spinner_Usuario_Cidade = (MaterialSpinner) viewUsuario.findViewById(R.id.spinner_Usuario_Cidade);
-        image_Usuario_Foto = (ImageView) viewUsuario.findViewById(R.id.image_Usuario_Foto);
-        text_Usuario_Conexao = (TextView) viewUsuario.findViewById(R.id.text_Usuario_Conexao);
+        edit_Usuario_Nome = viewUsuario.findViewById(R.id.edit_Usuario_Nome);
+        spinner_Usuario_Estado = viewUsuario.findViewById(R.id.spinner_Usuario_Estado);
+        spinner_Usuario_Cidade = viewUsuario.findViewById(R.id.spinner_Usuario_Cidade);
+        image_Usuario_Foto = viewUsuario.findViewById(R.id.image_Usuario_Foto);
+        text_Usuario_Conexao = viewUsuario.findViewById(R.id.text_Usuario_Conexao);
 
 
         spinner_Usuario_Estado.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -304,7 +300,7 @@ public class Fragment_Usuario extends Fragment {
                             }
                         }
                     });
-                } catch (Exception e) {
+                } catch (Exception ignored) {
 
                 }
                 mProgressDialog.cancel();
@@ -390,7 +386,7 @@ public class Fragment_Usuario extends Fragment {
                     }).start();
                 }
             }, 0, 1000);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
 
@@ -402,7 +398,7 @@ public class Fragment_Usuario extends Fragment {
         spinner_Usuario_Cidade.setEnabled(acesso_banco);
         text_Usuario_Conexao.setVisibility(acesso_banco ? View.INVISIBLE : View.VISIBLE);
 
-        referenciaConfiguracao = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_CONFIGURACAO);
+        DatabaseReference referenciaConfiguracao = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_CONFIGURACAO);
 
         referenciaConfiguracao.addValueEventListener(new ValueEventListener() {
             @Override

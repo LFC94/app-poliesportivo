@@ -28,10 +28,10 @@ public class RecyclerPrincipal extends RecyclerView.Adapter<RecyclerPrincipal.Da
 
         public DataObjectHolder(View itemView) {
             super(itemView);
-            text_CardPrincipal_Titulo = (TextView) itemView.findViewById(R.id.text_CardPrincipal_Titulo);
-            text_CardPrincipal_Endereco = (TextView) itemView.findViewById(R.id.text_CardPrincipal_Endereco);
-            text_CardPrincipal_Modalidade = (TextView) itemView.findViewById(R.id.text_CardPrincipal_Modalidade);
-            image_CardPrincipal_Logo = (ImageView) itemView.findViewById(R.id.image_CardPrincipal_Logo);
+            text_CardPrincipal_Titulo = itemView.findViewById(R.id.text_CardPrincipal_Titulo);
+            text_CardPrincipal_Endereco = itemView.findViewById(R.id.text_CardPrincipal_Endereco);
+            text_CardPrincipal_Modalidade = itemView.findViewById(R.id.text_CardPrincipal_Modalidade);
+            image_CardPrincipal_Logo = itemView.findViewById(R.id.image_CardPrincipal_Logo);
             itemView.setOnClickListener(this);
         }
 
@@ -68,7 +68,7 @@ public class RecyclerPrincipal extends RecyclerView.Adapter<RecyclerPrincipal.Da
 
 
     public void setOnItemClickListener(MyClickListener myClickListener) {
-        this.myClickListener = myClickListener;
+        RecyclerPrincipal.myClickListener = myClickListener;
     }
 
     public void addItem(Ginasios dataObj, int index) {
@@ -87,6 +87,6 @@ public class RecyclerPrincipal extends RecyclerView.Adapter<RecyclerPrincipal.Da
     }
 
     public interface MyClickListener {
-        public void onItemClick(int position, View v);
+        void onItemClick(int position, View v);
     }
 }

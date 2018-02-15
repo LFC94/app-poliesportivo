@@ -38,18 +38,13 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  */
 public class Fragment_Principal extends Fragment {
-    private View viewPrincipal;
     private static Activity activityPrincipal;
 
-    private MaterialEditText edit_Principal_Busca;
     private RecyclerView recycler_Principal_Ginasio;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
     private Preferencias preferencias;
     private DatabaseReference referenciaConfiguracao;
-    private FirebaseAuth mAuth;
     private FirebaseUser mUser;
-    private FirebaseStorage storage;
     private StorageReference storageRef;
 
     private JSONObject jsonobject;
@@ -69,18 +64,18 @@ public class Fragment_Principal extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        viewPrincipal = inflater.inflate(R.layout.fragment_principal, container, false);
+        View viewPrincipal = inflater.inflate(R.layout.fragment_principal, container, false);
 
         preferencias = new Preferencias(viewPrincipal.getContext());
-        mAuth = ConfiguracaoFirebase.getFirebaseAuth();
-        storage = FirebaseStorage.getInstance();
+        FirebaseAuth mAuth = ConfiguracaoFirebase.getFirebaseAuth();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
 
-        edit_Principal_Busca = (MaterialEditText) viewPrincipal.findViewById(R.id.edit_Principal_Busca);
-        recycler_Principal_Ginasio = (RecyclerView) viewPrincipal.findViewById(R.id.recycler_principal_ginasio);
+        MaterialEditText edit_Principal_Busca = viewPrincipal.findViewById(R.id.edit_Principal_Busca);
+        recycler_Principal_Ginasio = viewPrincipal.findViewById(R.id.recycler_principal_ginasio);
 
 
         recycler_Principal_Ginasio.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(activityPrincipal);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activityPrincipal);
         recycler_Principal_Ginasio.setLayoutManager(mLayoutManager);
         if (Chaves.ginasio_principal == null) {
             carregarGinasio();

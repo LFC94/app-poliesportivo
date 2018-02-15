@@ -52,11 +52,11 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
                 args.putInt("position", position);
             }
             preferencias = new Preferencias(this);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            Toolbar toolbar = findViewById(R.id.toolbar);
             toolbar.setTitle(Chaves.ginasio_principal.get(position).getNome());
             setSupportActionBar(toolbar);
 
-            recyclerGinasioHoraio = (RecyclerView) findViewById(R.id.recyclerGinasioHoraio);
+            recyclerGinasioHoraio = findViewById(R.id.recyclerGinasioHoraio);
             recyclerGinasioHoraio.setHasFixedSize(true);
             recyclerGinasioHoraio.setLayoutManager(new LinearLayoutManager(this));
 
@@ -134,7 +134,7 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
                 try {
                     Chaves.horarios_ginasio = new ArrayList<Horarios>();
 
-                    String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_HORARIOS) + "?GINASIO = " + String.valueOf(Chaves.ginasio_principal.get(position).getCodigo()) + "&DATA='" + DateFormat.format("yyyy-MM-dd", data) + "'&DIA=" + String.valueOf(dia));
+                    String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_HORARIOS) + "?GINASIO=" + String.valueOf(Chaves.ginasio_principal.get(position).getCodigo()) + "&DATA='" + DateFormat.format("yyyy-MM-dd", data) + "'&DIA=" + String.valueOf(dia));
                     jsonobject = new JSONObject(sJson);
                     jsonarrayHorario = jsonobject.getJSONArray("horario");
 

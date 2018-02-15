@@ -15,7 +15,6 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="2dp"
-            android:layout_weight="1"
             android:background="#646464"
             android:text="@string/notConnect"
             android:textAlignment="center"
@@ -30,7 +29,8 @@
             android:layout_alignRight="@+id/spinner_Usuario_Estado"
             android:layout_below="@+id/text_Usuario_Conexao"
             android:adjustViewBounds="true"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/selectPhoto" />
 
 
         <com.rengwuxian.materialedittext.MaterialEditText

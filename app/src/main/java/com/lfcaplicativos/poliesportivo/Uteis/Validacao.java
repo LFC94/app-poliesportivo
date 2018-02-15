@@ -31,8 +31,8 @@ public class Validacao {
 
     public static boolean validatePhoneNumber(EditText editPhoneNumber, String smErro) {
         String telefone = editPhoneNumber.getText().toString();
-        telefone.replace("-", "").trim();
-        if ((TextUtils.isEmpty(telefone)) || (telefone.length() < 8)) {
+        telefone.replace("-", "");
+        if ((TextUtils.isEmpty(telefone.trim())) || (telefone.trim().length() < 8)) {
             editPhoneNumber.setError(smErro);
             editPhoneNumber.requestFocus();
             return false;

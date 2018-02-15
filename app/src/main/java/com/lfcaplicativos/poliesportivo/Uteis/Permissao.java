@@ -14,6 +14,7 @@ import com.lfcaplicativos.poliesportivo.R;
  * Created by Lucas on 05/06/2017.
  */
 
+@SuppressWarnings("ALL")
 public class Permissao {
     public static boolean validaPermicao(Activity activity, String permissao, int RequestCod) {
         if (Build.VERSION.SDK_INT >= 23) {

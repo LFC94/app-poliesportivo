@@ -2,6 +2,7 @@ package com.lfcaplicativos.poliesportivo.Activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -39,7 +40,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
@@ -74,8 +74,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private FirebaseAuth mAuth;
-    private FirebaseUser mUser;
-    private FirebaseStorage storage;
     private DatabaseReference referenciaFire;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
@@ -83,7 +81,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     private ImageView imageLogo;
     private EditText editCodArea, editTelefone;
     private MaterialEditText editCodeVerifica;
-    private TextView textMsg_Verifica_Fone, textReenvioCodigo;
+    private TextView textReenvioCodigo;
     private View viewProgress, viewLayout;
     private Dialog dialogTelaVerificacao;
 
@@ -92,7 +90,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getTitle());
         setSupportActionBar(toolbar);
 
@@ -100,9 +98,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
         viewProgress = findViewById(R.id.Progress_Login);
         viewLayout = findViewById(R.id.Layout_Login_Scroll);
-        imageLogo = (ImageView) findViewById(R.id.image_Login_Logo);
-        editCodArea = (EditText) findViewById(R.id.edit_Login_CodArea);
-        editTelefone = (EditText) findViewById(R.id.edit_Login_Telefone);
+        imageLogo = findViewById(R.id.image_Login_Logo);
+        editCodArea = findViewById(R.id.edit_Login_CodArea);
+        editTelefone = findViewById(R.id.edit_Login_Telefone);
 
         SimpleMaskFormatter simpleMaskTelefone = new SimpleMaskFormatter("NNNNN-NNNN");
 
@@ -143,7 +141,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
         showProgress(true, viewProgress, viewLayout);
 
-        storage = FirebaseStorage.getInstance();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference().child("Logos/Logo.png");
         storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -182,7 +180,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
             }
         };
 
-        mUser = mAuth.getCurrentUser();
+        FirebaseUser mUser = mAuth.getCurrentUser();
         if (mUser != null) {
             chamarProximaTela(false);
         }
@@ -290,7 +288,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show, final View mProgressView, final View mLoginFormView) {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+        if (Build.VERSION.SDK_INT >= 14) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
@@ -364,9 +362,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
                         } else {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
 
-                            }
                         }
                     }
                 });
@@ -407,7 +403,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         spanString.setSpan(new StyleSpan(Typeface.BOLD), iIni, sTitulo.length(), 0);
         dialogTelaVerificacao.setTitle(spanString);
 
-        textMsg_Verifica_Fone = (TextView) dialogTelaVerificacao.findViewById(R.id.text_Validacao_Msg_aguardando_SMS);
+        TextView textMsg_Verifica_Fone = dialogTelaVerificacao.findViewById(R.id.text_Validacao_Msg_aguardando_SMS);
 
         String sMensagem = getString(R.string.msg_verificaremos_numero) + " ";
         iIni = sMensagem.length();
@@ -417,9 +413,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         textMsg_Verifica_Fone.setText(spanString2);
 
         isReenviarCodigo = true;
-        textReenvioCodigo = (TextView) dialogTelaVerificacao.findViewById(R.id.text_Validacao_Cronometro);
+        textReenvioCodigo = dialogTelaVerificacao.findViewById(R.id.text_Validacao_Cronometro);
 
         countTimerReenvia = new CountDownTimer(120000, 1000) {
+            @SuppressLint("DefaultLocale")
             @Override
             public void onTick(long l) {
                 int segundos = (int) (l / 1000) % 60;      // se não precisar de segundos, basta remover esta linha.
@@ -439,7 +436,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         }.start();
 
 
-        editCodeVerifica = (MaterialEditText) dialogTelaVerificacao.findViewById(R.id.edit_Validacao_CodeVerif);
+        editCodeVerifica = dialogTelaVerificacao.findViewById(R.id.edit_Validacao_CodeVerif);
 
         editCodeVerifica.clearFocus();
 

@@ -4,6 +4,7 @@ package com.lfcaplicativos.poliesportivo.Objetos;
  * Created by Lucas on 07/09/2017.
  */
 
+@SuppressWarnings("ALL")
 public class Estado {
     private int idUF;
     private int idPais;

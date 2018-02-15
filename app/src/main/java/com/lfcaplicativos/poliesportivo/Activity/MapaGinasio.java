@@ -38,7 +38,6 @@ public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback
     private int position;
 
     private Marker currentLocationMaker;
-    private LatLng currentLocationLatLong;
 
 
     @Override
@@ -52,7 +51,7 @@ public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback
                     .findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
 
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
@@ -130,7 +129,7 @@ public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback
         if (currentLocationMaker != null) {
             currentLocationMaker.remove();
         }
-        currentLocationLatLong = new LatLng(location.getLatitude(), location.getLongitude());
+        LatLng currentLocationLatLong = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(currentLocationLatLong);
         markerOptions.title(getString(R.string.current_location));

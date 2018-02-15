@@ -39,7 +39,6 @@ public class Principal extends AppCompatActivity implements View.OnClickListener
     private BottomNavigationView navigation;
     private int codigoNavegation = Chaves.CHAVE_NAVEGATIN_PRINCIPAL;
     private boolean novo = false;
-    private DatabaseReference referenciaConfiguracao;
     private Preferencias preferencias;
 
     @Override
@@ -52,7 +51,7 @@ public class Principal extends AppCompatActivity implements View.OnClickListener
             }
 
             preferencias = new Preferencias(this);
-            referenciaConfiguracao = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_CONFIGURACAO);
+            DatabaseReference referenciaConfiguracao = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_CONFIGURACAO);
 
             referenciaConfiguracao.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -64,7 +63,7 @@ public class Principal extends AppCompatActivity implements View.OnClickListener
                             preferencias.setPreferencias(chave, valor);
                         }
 
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
 
                     }
                 }
@@ -77,11 +76,11 @@ public class Principal extends AppCompatActivity implements View.OnClickListener
             });
 
             setContentView(R.layout.activity_principal);
-            toolbar = (Toolbar) findViewById(R.id.toolbar);
+            toolbar = findViewById(R.id.toolbar);
             toolbar.setTitle(getTitle());
             setSupportActionBar(toolbar);
 
-            navigation = (BottomNavigationView) findViewById(R.id.navigation);
+            navigation = findViewById(R.id.navigation);
             navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {

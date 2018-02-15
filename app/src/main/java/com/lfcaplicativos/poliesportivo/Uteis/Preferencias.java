@@ -1,5 +1,6 @@
 package com.lfcaplicativos.poliesportivo.Uteis;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -10,18 +11,17 @@ import java.util.HashMap;
  * Classe para manipulacao de Preferences
  */
 
+@SuppressWarnings("ALL")
 public class Preferencias {
 
-    private Context context;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
-    private final String Arquivo = "PoliesportivoPreferences";
 
-
+    @SuppressLint("CommitPrefEdits")
     public Preferencias(Context context) {
-        this.context = context;
-        sharedPreferences = context.getSharedPreferences(Arquivo, Context.MODE_PRIVATE);
+        String arquivo = "PoliesportivoPreferences";
+        sharedPreferences = context.getSharedPreferences(arquivo, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
     }
 

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Poliesportivo</string>
-    <string name="action_settings">Configuração</string>
     <string name="name">Nome</string>
-    <string name="cadastre">Cadastro</string>
     <string name="permissao_negada">Permissão Negada</string>
     <string name="message_permission_denied">Para utilizar este aplicativo, você precisa aceitar a permissão:</string>
     <string name="confirm">Confirmar</string>
@@ -12,7 +10,6 @@
     <string name="phone_number">Numéro Telefone</string>
     <string name="message_verify_phone">O Poliesportivo enviará uma mensagem SMS para verificar seu número de telefone. Digite seu código de área e número de telefone.</string>
     <string name="ddd_invalid">Código de área inválida</string>
-    <string name="title_verifica_phone">Verificação do telefone</string>
     <string name="msg_verificaremos_numero">Nos verificaremos o número do telefone</string>
     <string name="msg_number_correto_edit">Este número está correto ou deseja editar?</string>
     <string name="edit">Editar</string>
@@ -28,7 +25,6 @@
     <string name="loading">Carregando</string>
     <string name="notName">Nome não informado</string>
     <string name="notstate">Selecione o seu estado</string>
-    <string name="notcity">Selecione o seu cidade</string>
     <string name="selectPhoto">Selecione a Foto de Perfil</string>
     <string name="notConnect">Não é possível se conectar à internet</string>
     <string name="title_activity_principal">Principal</string>
@@ -46,4 +42,5 @@
     <string name="available">Disponívei</string>
     <string name="unavailable">Indisponívei</string>
     <string name="my">Meu</string>
+    <string name="home">INICIO</string>
 </resources>

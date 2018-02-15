@@ -21,7 +21,7 @@ public class ConexaoHTTP {
 
     //Responsavel por carregar o Objeto JSON
     public static String getJSONFromAPI(String url) {
-        String retorno = "";
+        String retorno;
         try {
             URL apiEnd = new URL(url);
             int codigoResposta;
@@ -78,13 +78,9 @@ public class ConexaoHTTP {
     public static boolean verificaConexao(Activity activity) {
         boolean conectado;
         ConnectivityManager conectivtyManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (conectivtyManager.getActiveNetworkInfo() != null
+        conectado = conectivtyManager.getActiveNetworkInfo() != null
                 && conectivtyManager.getActiveNetworkInfo().isAvailable()
-                && conectivtyManager.getActiveNetworkInfo().isConnected()) {
-            conectado = true;
-        } else {
-            conectado = false;
-        }
+                && conectivtyManager.getActiveNetworkInfo().isConnected();
         return conectado;
     }
 

@@ -2,9 +2,7 @@
 
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDYRW6zI0pSVtpXmsdaxZSp5tQEvHsiAEE</string>
     <string name="app_name">Poliesportivo</string>
-    <string name="action_settings">Settings</string>
     <string name="name">Name</string>
-    <string name="cadastre">Cadastre</string>
     <string name="permissao_negada">Permission Denied</string>
     <string name="message_permission_denied">To use this app you need to accept the permission:</string>
     <string name="confirm">Confirm</string>
@@ -13,7 +11,6 @@
     <string name="phone_number">Phone Number</string>
     <string name="message_verify_phone">Poliesportivo will send an SMS message to verify your phone number. Enter your area code and phone number.</string>
     <string name="ddd_invalid">Invalid area code</string>
-    <string name="title_verifica_phone">Checking your phone</string>
     <string name="msg_verificaremos_numero">We\'ll check the phone number</string>
     <string name="msg_number_correto_edit">Is this number correct or do you want to edit?</string>
     <string name="edit">Edit</string>
@@ -29,7 +26,6 @@
     <string name="loading">Loading</string>
     <string name="notName">Name not reported</string>
     <string name="notstate">Select your state</string>
-    <string name="notcity">Select your city</string>
     <string name="selectPhoto">Select Profile Photo</string>
     <string name="notConnect">Cannot connect to the internet</string>
     <string name="title_activity_principal">Home</string>
@@ -47,4 +43,5 @@
     <string name="available">Available</string>
     <string name="unavailable">Unavailable</string>
     <string name="my">My</string>
+    <string name="home">HOME</string>
 </resources>

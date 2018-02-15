@@ -29,9 +29,9 @@ public class RecyclerGinasio extends RecyclerView.Adapter<RecyclerGinasio.DataOb
 
         public DataObjectHolder(View itemView) {
             super(itemView);
-            textGinasioInfo = (TextView) itemView.findViewById(R.id.textGinasioInfo);
-            textGinasioStatus = (TextView) itemView.findViewById(R.id.textGinasioStatus);
-            linearLayoutGinasioHorario = (LinearLayout) itemView.findViewById(R.id.linearLayoutGinasioHorario);
+            textGinasioInfo = itemView.findViewById(R.id.textGinasioInfo);
+            textGinasioStatus = itemView.findViewById(R.id.textGinasioStatus);
+            linearLayoutGinasioHorario = itemView.findViewById(R.id.linearLayoutGinasioHorario);
             itemView.setOnClickListener(this);
         }
 
@@ -75,7 +75,7 @@ public class RecyclerGinasio extends RecyclerView.Adapter<RecyclerGinasio.DataOb
 
 
     public void setOnItemClickListener(MyClickListener myClickListener) {
-        this.myClickListener = myClickListener;
+        RecyclerGinasio.myClickListener = myClickListener;
     }
 
     public void addItem(Horarios dataObj, int index) {
@@ -94,6 +94,6 @@ public class RecyclerGinasio extends RecyclerView.Adapter<RecyclerGinasio.DataOb
     }
 
     public interface MyClickListener {
-        public void onItemClick(int position, View v);
+        void onItemClick(int position, View v);
     }
 }
