@@ -39,7 +39,11 @@
             android:label="@string/gymnasium" />
         <activity
             android:name=".Activity.MapaGinasio"
-            android:label="@string/title_activity_mapa_ginasio"></activity>
+            android:label="@string/title_activity_mapa_ginasio" />
+        <activity
+            android:name=".Activity.Usuario"
+            android:label="@string/title_activity_usuario"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

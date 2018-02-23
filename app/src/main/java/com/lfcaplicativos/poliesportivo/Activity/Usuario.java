@@ -1,21 +1,23 @@
-package com.lfcaplicativos.poliesportivo.Fragment;
+package com.lfcaplicativos.poliesportivo.Activity;
 
-
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.provider.MediaStore;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,7 +28,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.lfcaplicativos.poliesportivo.Activity.Principal;
 import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
 import com.lfcaplicativos.poliesportivo.Objetos.Cidade;
 import com.lfcaplicativos.poliesportivo.Objetos.Estado;
@@ -40,22 +41,19 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class Fragment_Usuario extends Fragment {
+public class Usuario extends AppCompatActivity implements View.OnClickListener {
 
-    static Activity activityUsuario;
     public static MaterialEditText edit_Usuario_Nome;
     private MaterialSpinner spinner_Usuario_Estado, spinner_Usuario_Cidade;
     public static ImageView image_Usuario_Foto;
-    private TextView text_Usuario_Conexao;
+    public static Bitmap bitmapFotoPerfil = null;
 
     private JSONObject jsonobject;
     private JSONArray jsonarray;
@@ -68,29 +66,87 @@ public class Fragment_Usuario extends Fragment {
     private StorageReference storageRef;
 
     private boolean acesso_banco = true, prim_uf = true, prim_cid = true;
-    public static boolean salvar = false;
+    private boolean novo = false;
 
-    public Fragment_Usuario() {
-        // Required empty public constructor
-    }
-
-    public static Fragment_Usuario newInstance(Activity activity) {
-        Fragment_Usuario fragment = new Fragment_Usuario();
-        activityUsuario = activity;
-        return fragment;
-    }
-
-    /**
-     * Called when the fragment is no longer in use.  This is called
-     * after {@link #onStop()} and before {@link #onDetach()}.
-     */
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_usuario);
 
-        if (salvar) {
-            salvar = false;
+        Bundle args = new Bundle();
+        if (args != null) {
+            args.putBoolean("novo", novo);
+        }
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle(getTitle());
+        setSupportActionBar(toolbar);
+
+        preferencias = new Preferencias(this);
+        mAuth = ConfiguracaoFirebase.getFirebaseAuth();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        edit_Usuario_Nome = findViewById(R.id.edit_Usuario_Nome);
+        spinner_Usuario_Estado = findViewById(R.id.spinner_Usuario_Estado);
+        spinner_Usuario_Cidade = findViewById(R.id.spinner_Usuario_Cidade);
+        image_Usuario_Foto = findViewById(R.id.image_Usuario_Foto);
+
+
+        spinner_Usuario_Estado.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> arg0,
+                                       View arg1, int position, long arg3) {
+
+                if (!acesso_banco)
+                    return;
+
+                if (position >= 0) {
+                    if (Chaves.cidadelist_usuario != null && !prim_cid) {
+                        return;
+                    }
+                    CarregarCidade(Chaves.estados_usuario.get(position).getSigla());
+                } else {
+                    spinner_Usuario_Estado.setError(R.string.notstate);
+                    spinner_Usuario_Estado.requestFocus();
+                    Chaves.cidadelist_usuario.clear();
+                    spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
+                            android.R.layout.simple_spinner_dropdown_item,
+                            Chaves.cidadelist_usuario));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+        });
+
+        BuscarDadosFirebase();
+
+        ImagemPerfilUsuario(false);
+
+
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_usuario, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.item_usuario_confirmar) {
+            if (edit_Usuario_Nome.getText().toString().trim().isEmpty()) {
+                edit_Usuario_Nome.setError(getString(R.string.notName));
+                edit_Usuario_Nome.requestFocus();
+                return true;
+            }
             preferencias.setNOME(edit_Usuario_Nome.getText().toString().trim());
             if (acesso_banco) {
                 if (spinner_Usuario_Cidade.getSelectedItemPosition() > 0) {
@@ -116,65 +172,67 @@ public class Fragment_Usuario extends Fragment {
 
             FirebaseUser mUser = mAuth.getCurrentUser();
             mUser.updateProfile(profileUpdates);
+            finish();
         }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View viewUsuario = inflater.inflate(R.layout.fragment_usuario, container, false);
+    public void onClick(View v) {
 
-        preferencias = new Preferencias(viewUsuario.getContext());
-        mAuth = ConfiguracaoFirebase.getFirebaseAuth();
-        FirebaseStorage storage = FirebaseStorage.getInstance();
+        switch (v.getId()) {
 
-        edit_Usuario_Nome = viewUsuario.findViewById(R.id.edit_Usuario_Nome);
-        spinner_Usuario_Estado = viewUsuario.findViewById(R.id.spinner_Usuario_Estado);
-        spinner_Usuario_Cidade = viewUsuario.findViewById(R.id.spinner_Usuario_Cidade);
-        image_Usuario_Foto = viewUsuario.findViewById(R.id.image_Usuario_Foto);
-        text_Usuario_Conexao = viewUsuario.findViewById(R.id.text_Usuario_Conexao);
+            case R.id.fab_Usuario_Foto:
+                AbrieCameraGaleria();
+                break;
+        }
+    }
 
+    private void AbrieCameraGaleria() {
 
-        spinner_Usuario_Estado.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickIntent.setType("image/*");
+        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-            @Override
-            public void onItemSelected(AdapterView<?> arg0,
-                                       View arg1, int position, long arg3) {
+        Intent chooserIntent = Intent.createChooser(pickIntent, getString(R.string.selectPhoto));
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
 
-                if (!acesso_banco)
-                    return;
+        startActivityForResult(chooserIntent, Chaves.CHAVE_RESULT_PHOTO);
+    }
 
-                if (position >= 0) {
-                    if (Chaves.cidadelist_usuario != null && !prim_cid) {
-                        return;
-                    }
-                    CarregarCidade(Chaves.estados_usuario.get(position).getSigla());
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Chaves.CHAVE_RESULT_PHOTO && resultCode == Activity.RESULT_OK) {
+            if (data == null) {
+                //Display an error
+                return;
+            }
+            try {
+
+                if (data.getData() != null) {
+                    InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
+                    bitmapFotoPerfil = BitmapFactory.decodeStream(inputStream);
                 } else {
-                    spinner_Usuario_Estado.setError(R.string.notstate);
-                    spinner_Usuario_Estado.requestFocus();
-                    Chaves.cidadelist_usuario.clear();
-                    spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(activityUsuario,
-                            android.R.layout.simple_spinner_dropdown_item,
-                            Chaves.cidadelist_usuario));
+                    Bundle extras = data.getExtras();
+                    if (extras != null) {
+
+                        bitmapFotoPerfil = (Bitmap) extras.get("data");
+                    }
                 }
+
+                if (bitmapFotoPerfil != null)
+                    image_Usuario_Foto.setImageBitmap(bitmapFotoPerfil);
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-
-            }
-        });
-
-        BuscarDadosFirebase();
-
-        ImagemPerfilUsuario(false);
-
-
-        return viewUsuario;
+        }
     }
 
     private void CarregarEstado() {
-        mProgressDialog = ProgressDialog.show(activityUsuario, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.state) + "...", true);
+        mProgressDialog = ProgressDialog.show(this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.state) + "...", true);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -204,10 +262,10 @@ public class Fragment_Usuario extends Fragment {
 
                         Chaves.estadolist_usuario.add(jsonobject.optString("uf").trim() + " - " + jsonobject.optString("nome"));
                     }
-                    activityUsuario.runOnUiThread(new Runnable() {
+                    runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(activityUsuario,
+                            spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
                                     android.R.layout.simple_spinner_dropdown_item,
                                     Chaves.estadolist_usuario));
                             if (prim_uf) {
@@ -224,7 +282,7 @@ public class Fragment_Usuario extends Fragment {
                     });
                 } catch (Exception e) {
                     Log.e("ESTADO", "ERRO: " + e.getMessage());
-                    activityUsuario.runOnUiThread(new Runnable() {
+                    runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             FalhaCarregarDados();
@@ -242,13 +300,13 @@ public class Fragment_Usuario extends Fragment {
             spinner_Usuario_Estado.setError(R.string.notstate);
             spinner_Usuario_Estado.requestFocus();
             Chaves.cidadelist_usuario.clear();
-            spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(activityUsuario,
+            spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
                     android.R.layout.simple_spinner_dropdown_item,
                     Chaves.cidadelist_usuario));
             return;
         }
 
-        mProgressDialog = ProgressDialog.show(activityUsuario, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.city) + "...", true);
+        mProgressDialog = ProgressDialog.show(this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.city) + "...", true);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -283,10 +341,10 @@ public class Fragment_Usuario extends Fragment {
 
                         Chaves.cidadelist_usuario.add(jsonobject.optString("nome"));
                     }
-                    activityUsuario.runOnUiThread(new Runnable() {
+                    runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(activityUsuario,
+                            spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
                                     android.R.layout.simple_spinner_dropdown_item,
                                     Chaves.cidadelist_usuario));
                             if (!prim_uf && prim_cid) {
@@ -312,19 +370,19 @@ public class Fragment_Usuario extends Fragment {
     private void ImagemPerfilUsuario(boolean Salvar) {
 
         if (Salvar) {
-            if (Principal.bitmapFotoPerfil != null) {
-                Bitmap realImage = Principal.bitmapFotoPerfil;
+            if (bitmapFotoPerfil != null) {
+                Bitmap realImage = bitmapFotoPerfil;
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 realImage.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 byte[] b = baos.toByteArray();
                 preferencias.setFOTO_PERFIL(Base64.encodeToString(b, Base64.DEFAULT));
-                image_Usuario_Foto.setImageBitmap(Principal.bitmapFotoPerfil);
+                image_Usuario_Foto.setImageBitmap(bitmapFotoPerfil);
             }
         } else {
             if (preferencias.getFOTO_PERFIL() != null && !preferencias.getFOTO_PERFIL().trim().isEmpty()) {
                 byte[] b = Base64.decode(preferencias.getFOTO_PERFIL(), Base64.DEFAULT);
-                Principal.bitmapFotoPerfil = BitmapFactory.decodeByteArray(b, 0, b.length);
-                image_Usuario_Foto.setImageBitmap(Principal.bitmapFotoPerfil);
+                bitmapFotoPerfil = BitmapFactory.decodeByteArray(b, 0, b.length);
+                image_Usuario_Foto.setImageBitmap(bitmapFotoPerfil);
             }
         }
 
@@ -339,13 +397,13 @@ public class Fragment_Usuario extends Fragment {
             Chaves.estadolist_usuario.clear();
             if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
                 Chaves.estadolist_usuario.add(preferencias.getESTADO());
-                spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(activityUsuario,
+                spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
                         android.R.layout.simple_spinner_dropdown_item,
                         Chaves.estadolist_usuario));
 
                 spinner_Usuario_Estado.setSelection(1);
             } else {
-                spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(activityUsuario,
+                spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
                         android.R.layout.simple_spinner_dropdown_item,
                         Chaves.estadolist_usuario));
 
@@ -355,13 +413,13 @@ public class Fragment_Usuario extends Fragment {
             if (preferencias.getCIDADE() != null && !preferencias.getCIDADE().trim().isEmpty()) {
                 Chaves.cidadelist_usuario.clear();
                 Chaves.cidadelist_usuario.add(preferencias.getCIDADE());
-                spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(activityUsuario,
+                spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
                         android.R.layout.simple_spinner_dropdown_item,
                         Chaves.cidadelist_usuario));
 
                 spinner_Usuario_Cidade.setSelection(1);
             } else {
-                spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(activityUsuario,
+                spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
                         android.R.layout.simple_spinner_dropdown_item,
                         Chaves.cidadelist_usuario));
 
@@ -370,7 +428,6 @@ public class Fragment_Usuario extends Fragment {
         }
         spinner_Usuario_Estado.setEnabled(acesso_banco);
         spinner_Usuario_Cidade.setEnabled(acesso_banco);
-        text_Usuario_Conexao.setVisibility(acesso_banco ? View.INVISIBLE : View.VISIBLE);
 
         try {
             timer = new Timer();
@@ -378,7 +435,7 @@ public class Fragment_Usuario extends Fragment {
                 public void run() {
                     new Thread(new Runnable() {
                         public void run() {
-                            if (ConexaoHTTP.verificaConexao(activityUsuario)) {
+                            if (ConexaoHTTP.verificaConexao(Usuario.this)) {
                                 BuscarDadosFirebase();
                                 timer.cancel();
                             }
@@ -396,7 +453,6 @@ public class Fragment_Usuario extends Fragment {
         acesso_banco = true;
         spinner_Usuario_Estado.setEnabled(acesso_banco);
         spinner_Usuario_Cidade.setEnabled(acesso_banco);
-        text_Usuario_Conexao.setVisibility(acesso_banco ? View.INVISIBLE : View.VISIBLE);
 
         DatabaseReference referenciaConfiguracao = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_CONFIGURACAO);
 
@@ -415,7 +471,7 @@ public class Fragment_Usuario extends Fragment {
                     if (Chaves.estadolist_usuario == null) {
                         CarregarEstado();
                     } else {
-                        spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(activityUsuario,
+                        spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
                                 android.R.layout.simple_spinner_dropdown_item,
                                 Chaves.estadolist_usuario));
                         prim_uf = false;
@@ -427,7 +483,7 @@ public class Fragment_Usuario extends Fragment {
                         }
 
                         if (Chaves.cidadelist_usuario != null) {
-                            spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(activityUsuario,
+                            spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
                                     android.R.layout.simple_spinner_dropdown_item,
                                     Chaves.cidadelist_usuario));
                             prim_cid = false;
