@@ -32,9 +32,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activity.Principal"
-            android:label="@string/title_activity_principal" />
-        <activity
             android:name=".Activity.Ginasio"
             android:label="@string/gymnasium" />
         <activity
@@ -43,7 +40,8 @@
         <activity
             android:name=".Activity.Usuario"
             android:label="@string/title_activity_usuario"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Activity.Principal"></activity>
     </application>
 
 </manifest>

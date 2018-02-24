@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context="com.lfcaplicativos.poliesportivo.Activity.Principal">
 
-
-    <android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.NoActionBar.AppBarOverlay">
@@ -21,24 +18,27 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.NoActionBar.PopupOverlay" />
-
     </android.support.design.widget.AppBarLayout>
 
-    <FrameLayout
-        android:id="@+id/frame_Principal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-    </FrameLayout>
-
-    <android.support.design.widget.BottomNavigationView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/navigation"
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/edit_Principal_Busca"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
-        app:menu="@menu/navigation_principal" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/appBarLayout"
+        android:hint="@string/search"
+        app:met_iconLeft="@android:drawable/ic_menu_search" />
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_principal_ginasio"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/edit_Principal_Busca"
+        app:met_floatingLabel="highlight">
 
-</LinearLayout>
+        <requestFocus />
+    </android.support.v7.widget.RecyclerView>
+</RelativeLayout>

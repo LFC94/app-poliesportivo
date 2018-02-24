@@ -1,6 +1,5 @@
 package com.lfcaplicativos.poliesportivo.Activity;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -78,7 +77,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
             args.putBoolean("novo", novo);
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getTitle());
         setSupportActionBar(toolbar);

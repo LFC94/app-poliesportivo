@@ -1,139 +1,198 @@
 package com.lfcaplicativos.poliesportivo.Activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.lfcaplicativos.poliesportivo.Adapter.RecyclerPrincipal;
 import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
-import com.lfcaplicativos.poliesportivo.Fragment.Fragment_Principal;
+import com.lfcaplicativos.poliesportivo.Objetos.Ginasios;
 import com.lfcaplicativos.poliesportivo.R;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
+import com.lfcaplicativos.poliesportivo.Uteis.ConexaoHTTP;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
-public class Principal extends AppCompatActivity  {
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
 
-    private Toolbar toolbar;
-    private BottomNavigationView navigation;
-    private int codigoNavegation = Chaves.CHAVE_NAVEGATIN_PRINCIPAL;
+public class Principal extends AppCompatActivity {
+    private RecyclerView recycler_Principal_Ginasio;
+    private RecyclerView.Adapter mAdapter;
     private Preferencias preferencias;
+    private DatabaseReference referenciaConfiguracao;
+    private FirebaseUser mUser;
+    private StorageReference storageRef;
 
+    private JSONObject jsonobject;
+    private JSONArray jsonarray;
+    private ProgressDialog mProgressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            preferencias = new Preferencias(this);
-            DatabaseReference referenciaConfiguracao = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_CONFIGURACAO);
 
-            referenciaConfiguracao.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    try {
+        preferencias = new Preferencias(this);
+        DatabaseReference referenciaConfiguracao = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_CONFIGURACAO);
 
-                        for (DataSnapshot dados : dataSnapshot.getChildren()) {
-                            String chave = dados.getKey(), valor = dados.getValue().toString();
-                            preferencias.setPreferencias(chave, valor);
-                        }
-
-                    } catch (Exception ignored) {
-
+        referenciaConfiguracao.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                try {
+                    for (DataSnapshot dados : dataSnapshot.getChildren()) {
+                        String chave = dados.getKey(), valor = String.valueOf(dados.getValue());
+                        preferencias.setPreferencias(chave, valor);
+                        carregarGinasio();
                     }
+                } catch (Exception ignored) {
+
                 }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("ERRO", "DatabaseError:" + databaseError.getMessage());
+            }
+        });
+        setContentView(R.layout.activity_principal);
 
+        Toolbar toolbar;
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle(getTitle());
+        setSupportActionBar(toolbar);
+
+        FirebaseAuth mAuth = ConfiguracaoFirebase.getFirebaseAuth();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        MaterialEditText edit_Principal_Busca = findViewById(R.id.edit_Principal_Busca);
+        recycler_Principal_Ginasio = findViewById(R.id.recycler_principal_ginasio);
+
+
+        recycler_Principal_Ginasio.setHasFixedSize(true);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        recycler_Principal_Ginasio.setLayoutManager(mLayoutManager);
+        if (Chaves.ginasio_principal == null) {
+            carregarGinasio();
+        } else {
+            mAdapter = new RecyclerPrincipal(Chaves.ginasio_principal);
+            recycler_Principal_Ginasio.setAdapter(mAdapter);
+            ((RecyclerPrincipal) mAdapter).setOnItemClickListener(new RecyclerPrincipal
+                    .MyClickListener() {
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.e("ERRO", "DatabaseError:" + databaseError.getMessage());
-
+                public void onItemClick(int position, View v) {
+                    chamaGinasio(position);
                 }
             });
-
-            setContentView(R.layout.activity_principal);
-            toolbar = findViewById(R.id.toolbar);
-            toolbar.setTitle(getTitle());
-            setSupportActionBar(toolbar);
-
-            navigation = findViewById(R.id.navigation);
-            navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-                    switch (item.getItemId()) {
-                        case R.id.navigation_home:
-                            codigoNavegation = Chaves.CHAVE_NAVEGATIN_PRINCIPAL;
-                            chamerFragment(Fragment_Principal.newInstance(Principal.this));
-                            break;
-                        case R.id.navigation_usuario:
-                            Intent intent;
-                            intent = new Intent(Principal.this, Usuario.class);
-                            intent.putExtra("novo", false);
-                            startActivity(intent);
-                            break;
-                        default:
-                            return false;
-                    }
-
-                    return true;
-                }
-            });
-            chamerFragment(Fragment_Principal.newInstance(this));
-
-        } catch (Exception e) {
-            Log.e("Erro", e.getMessage());
         }
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_usuario, menu);
+        getMenuInflater().inflate(R.menu.menu_principal, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.item_principal_usuario) {
+            Intent intent;
+            intent = new Intent(Principal.this, Usuario.class);
+            intent.putExtra("novo", false);
+            startActivity(intent);
+        }
 
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    private void carregarGinasio() {
 
-        prepararMenu();
+        mProgressDialog = ProgressDialog.show(this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.gymnasium) + "...", true);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Chaves.ginasio_principal = new ArrayList<Ginasios>();
 
-        return true;
+                    String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_GINASIO));
+                    jsonobject = new JSONObject(sJson);
+                    jsonarray = jsonobject.getJSONArray("ginasio");
+
+                    for (int i = 0; i < jsonarray.length(); i++) {
+                        jsonobject = jsonarray.getJSONObject(i);
+
+                        final Ginasios ginasios = new Ginasios();
+                        Chaves.ginasio_principal.add(ginasios);
+                        ginasios.setCodigo(jsonobject.optInt("id"));
+                        ginasios.setNome(jsonobject.optString("nome"));
+                        ginasios.setFantasia(jsonobject.optString("fantasia"));
+                        ginasios.setEndereco(jsonobject.optString("endereco"));
+                        ginasios.setNumero(jsonobject.optString("numero"));
+                        ginasios.setBairro(jsonobject.optString("bairro"));
+                        ginasios.setCidade(jsonobject.optString("cidade"));
+                        ginasios.setEstado(jsonobject.optString("estado"));
+                        ginasios.setLatitude(jsonobject.optDouble("lat"));
+                        ginasios.setLongitude(jsonobject.optDouble("lng"));
+                        ginasios.setModalidade(jsonobject.optString("modalidade"));
+                        ginasios.setPiso(jsonobject.optString("piso"));
+                        ginasios.setNomelogo(jsonobject.optString("nomelogo"));
+                        ginasios.setCoberto(jsonobject.optBoolean("coberto", false));
+                        ginasios.setEstacionamento(jsonobject.optBoolean("estacionamento", false));
+                        ginasios.setNomelogo(jsonobject.optString("nomelogo"));
+
+                        if (ginasios.getNomelogo() != null && !ginasios.getNomelogo().trim().isEmpty()) {
+                            byte[] b = Base64.decode(ginasios.getNomelogo(), Base64.DEFAULT);
+                            ginasios.setLogo(BitmapFactory.decodeByteArray(b, 0, b.length));
+                        }
+                    }
+                    Thread.sleep(1000);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAdapter = new RecyclerPrincipal(Chaves.ginasio_principal);
+                            recycler_Principal_Ginasio.setAdapter(mAdapter);
+                            ((RecyclerPrincipal) mAdapter).setOnItemClickListener(new RecyclerPrincipal
+                                    .MyClickListener() {
+                                @Override
+                                public void onItemClick(int position, View v) {
+                                    chamaGinasio(position);
+                                }
+                            });
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                mProgressDialog.cancel();
+            }
+        }).start();
     }
 
-
-
-
-    private void chamerFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frame_Principal, fragment);
-        transaction.commit();
-        prepararMenu();
+    private void chamaGinasio(int position) {
+        Intent intent;
+        intent = new Intent(Principal.this, Ginasio.class);
+        intent.putExtra("position", position);
+        startActivity(intent);
     }
-
-    private void prepararMenu() {
-        toolbar.getMenu().findItem(R.id.item_usuario_confirmar).setVisible(codigoNavegation == Chaves.CHAVE_NAVEGATIN_USUARIO);
-        toolbar.refreshDrawableState();
-    }
-
-
 }
