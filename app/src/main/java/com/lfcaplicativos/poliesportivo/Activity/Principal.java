@@ -3,8 +3,8 @@ package com.lfcaplicativos.poliesportivo.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -16,7 +16,6 @@ import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -48,11 +47,14 @@ public class Principal extends AppCompatActivity {
     private JSONObject jsonobject;
     private JSONArray jsonarray;
     private ProgressDialog mProgressDialog;
+
+    private boolean novo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Bundle args = new Bundle();
         preferencias = new Preferencias(this);
+        novo =  (preferencias.getNOME() == null || preferencias.getNOME().trim().isEmpty());
         DatabaseReference referenciaConfiguracao = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_CONFIGURACAO);
 
         referenciaConfiguracao.addValueEventListener(new ValueEventListener() {
@@ -62,7 +64,6 @@ public class Principal extends AppCompatActivity {
                     for (DataSnapshot dados : dataSnapshot.getChildren()) {
                         String chave = dados.getKey(), valor = String.valueOf(dados.getValue());
                         preferencias.setPreferencias(chave, valor);
-                        carregarGinasio();
                     }
                 } catch (Exception ignored) {
 
@@ -90,6 +91,15 @@ public class Principal extends AppCompatActivity {
         recycler_Principal_Ginasio.setHasFixedSize(true);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         recycler_Principal_Ginasio.setLayoutManager(mLayoutManager);
+
+        if(novo) {
+            chamaUsuario(true);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         if (Chaves.ginasio_principal == null) {
             carregarGinasio();
         } else {
@@ -104,6 +114,7 @@ public class Principal extends AppCompatActivity {
             });
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -117,10 +128,7 @@ public class Principal extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.item_principal_usuario) {
-            Intent intent;
-            intent = new Intent(Principal.this, Usuario.class);
-            intent.putExtra("novo", false);
-            startActivity(intent);
+            chamaUsuario(false);
         }
 
         return super.onOptionsItemSelected(item);
@@ -193,6 +201,13 @@ public class Principal extends AppCompatActivity {
         Intent intent;
         intent = new Intent(Principal.this, Ginasio.class);
         intent.putExtra("position", position);
+        startActivity(intent);
+    }
+
+    private void chamaUsuario(boolean userNovo){
+        Intent intent;
+        intent = new Intent(Principal.this, Usuario.class);
+        intent.putExtra("novo", userNovo);
         startActivity(intent);
     }
 }

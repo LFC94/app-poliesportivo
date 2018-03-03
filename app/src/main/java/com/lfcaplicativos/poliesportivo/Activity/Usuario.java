@@ -73,7 +73,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
         setContentView(R.layout.activity_usuario);
 
         Bundle args = new Bundle();
-        if (args != null) {
+        if (args.size() > 0) {
             args.putBoolean("novo", novo);
         }
 
@@ -105,10 +105,13 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                     if (Chaves.cidadelist_usuario != null && !prim_cid) {
                         return;
                     }
-                    CarregarCidade(Chaves.estados_usuario.get(position).getSigla());
+                    carregarCidade(Chaves.estados_usuario.get(position).getSigla());
                 } else {
                     spinner_Usuario_Estado.setError(R.string.notstate);
                     spinner_Usuario_Estado.requestFocus();
+                    if (Chaves.cidadelist_usuario == null)
+                        return;
+
                     Chaves.cidadelist_usuario.clear();
                     spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
                             android.R.layout.simple_spinner_dropdown_item,
@@ -122,12 +125,21 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
             }
         });
 
-        BuscarDadosFirebase();
+        buscarDadosFirebase();
 
-        ImagemPerfilUsuario(false);
+        imagemPerfilUsuario(false);
 
 
     }
+
+    @Override
+    public void onBackPressed() {
+        if (!gravarUsuario())
+            return;
+
+        super.onBackPressed();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -141,37 +153,8 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.item_usuario_confirmar) {
-            if (edit_Usuario_Nome.getText().toString().trim().isEmpty()) {
-                edit_Usuario_Nome.setError(getString(R.string.notName));
-                edit_Usuario_Nome.requestFocus();
-                return true;
-            }
-            preferencias.setNOME(edit_Usuario_Nome.getText().toString().trim());
-            if (acesso_banco) {
-                if (spinner_Usuario_Cidade.getSelectedItemPosition() > 0) {
-                    preferencias.setCIDADE(Chaves.cidades_usuario.get(spinner_Usuario_Cidade.getSelectedItemPosition() - 1).getNome());
-                } else {
-                    preferencias.setCIDADE("");
-                }
-
-                if (spinner_Usuario_Estado.getSelectedItemPosition() > 0) {
-                    preferencias.setESTADO(Chaves.estados_usuario.get(spinner_Usuario_Estado.getSelectedItemPosition() - 1).getNome());
-                } else {
-                    preferencias.setESTADO("");
-                }
-            }
-
-            ImagemPerfilUsuario(true);
-
-            DatabaseReference referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase();
-            referenciaFire.child(Chaves.CHAVE_USUARIO).child(preferencias.getSPreferencias(Chaves.CHAVE_ID)).setValue(preferencias.retornaUsuarioPreferencias(false));
-
-            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(preferencias.getNOME()).build();
-
-
-            FirebaseUser mUser = mAuth.getCurrentUser();
-            mUser.updateProfile(profileUpdates);
-            finish();
+            if (gravarUsuario())
+                finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -183,21 +166,9 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
         switch (v.getId()) {
 
             case R.id.fab_Usuario_Foto:
-                AbrieCameraGaleria();
+                abrieCameraGaleria();
                 break;
         }
-    }
-
-    private void AbrieCameraGaleria() {
-
-        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        pickIntent.setType("image/*");
-        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        Intent chooserIntent = Intent.createChooser(pickIntent, getString(R.string.selectPhoto));
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
-
-        startActivityForResult(chooserIntent, Chaves.CHAVE_RESULT_PHOTO);
     }
 
     @Override
@@ -230,7 +201,19 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
-    private void CarregarEstado() {
+    private void abrieCameraGaleria() {
+
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickIntent.setType("image/*");
+        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        Intent chooserIntent = Intent.createChooser(pickIntent, getString(R.string.selectPhoto));
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
+
+        startActivityForResult(chooserIntent, Chaves.CHAVE_RESULT_PHOTO);
+    }
+
+    private void carregarEstado() {
         mProgressDialog = ProgressDialog.show(this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.state) + "...", true);
         new Thread(new Runnable() {
             @Override
@@ -284,7 +267,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            FalhaCarregarDados();
+                            falhaCarregarDados();
                         }
                     });
                 }
@@ -293,7 +276,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
         }).start();
     }
 
-    private void CarregarCidade(final String UFEstado) {
+    private void carregarCidade(final String UFEstado) {
 
         if (UFEstado.trim().isEmpty()) {
             spinner_Usuario_Estado.setError(R.string.notstate);
@@ -366,7 +349,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
 
     }
 
-    private void ImagemPerfilUsuario(boolean Salvar) {
+    private void imagemPerfilUsuario(boolean Salvar) {
 
         if (Salvar) {
             if (bitmapFotoPerfil != null) {
@@ -387,7 +370,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
 
     }
 
-    private void FalhaCarregarDados() {
+    private void falhaCarregarDados() {
         acesso_banco = false;
 
         if (preferencias.getNOME() != null) {
@@ -435,7 +418,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                     new Thread(new Runnable() {
                         public void run() {
                             if (ConexaoHTTP.verificaConexao(Usuario.this)) {
-                                BuscarDadosFirebase();
+                                buscarDadosFirebase();
                                 timer.cancel();
                             }
                         }
@@ -448,7 +431,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
 
     }
 
-    private void BuscarDadosFirebase() {
+    private void buscarDadosFirebase() {
         acesso_banco = true;
         spinner_Usuario_Estado.setEnabled(acesso_banco);
         spinner_Usuario_Cidade.setEnabled(acesso_banco);
@@ -468,7 +451,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                         edit_Usuario_Nome.setText(preferencias.getNOME());
 
                     if (Chaves.estadolist_usuario == null) {
-                        CarregarEstado();
+                        carregarEstado();
                     } else {
                         spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
                                 android.R.layout.simple_spinner_dropdown_item,
@@ -500,18 +483,57 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
 
                 } catch (Exception e) {
                     Log.e("ESTADO", "ERRO: " + e.getMessage());
-                    FalhaCarregarDados();
+                    falhaCarregarDados();
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.e("ERRO", "DatabaseError:" + databaseError.getMessage());
-                FalhaCarregarDados();
+                falhaCarregarDados();
             }
         });
 
     }
 
+    private boolean gravarUsuario() {
+        if (edit_Usuario_Nome.getText().toString().trim().isEmpty()) {
+            edit_Usuario_Nome.setError(getString(R.string.notName));
+            edit_Usuario_Nome.requestFocus();
+            return false;
+        }
+        if (spinner_Usuario_Estado.getSelectedItemPosition() <= 0) {
+            spinner_Usuario_Estado.setError(R.string.notstate);
+            spinner_Usuario_Estado.requestFocus();
+            return false;
+        }
+
+        preferencias.setNOME(edit_Usuario_Nome.getText().toString().trim());
+        if (acesso_banco) {
+            if (spinner_Usuario_Cidade.getSelectedItemPosition() > 0) {
+                preferencias.setCIDADE(Chaves.cidades_usuario.get(spinner_Usuario_Cidade.getSelectedItemPosition() - 1).getNome());
+            } else {
+                preferencias.setCIDADE("");
+            }
+
+            if (spinner_Usuario_Estado.getSelectedItemPosition() > 0) {
+                preferencias.setESTADO(Chaves.estados_usuario.get(spinner_Usuario_Estado.getSelectedItemPosition() - 1).getNome());
+            } else {
+                preferencias.setESTADO("");
+            }
+        }
+
+        imagemPerfilUsuario(true);
+
+        DatabaseReference referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase();
+        referenciaFire.child(Chaves.CHAVE_USUARIO).child(preferencias.getSPreferencias(Chaves.CHAVE_ID)).setValue(preferencias.retornaUsuarioPreferencias(false));
+
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(preferencias.getNOME()).build();
+
+
+        FirebaseUser mUser = mAuth.getCurrentUser();
+        mUser.updateProfile(profileUpdates);
+        return true;
+    }
 
 }

@@ -49,7 +49,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.lfcaplicativos.poliesportivo.Config.Base64Custom;
 import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
 import com.lfcaplicativos.poliesportivo.R;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
@@ -182,7 +181,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
         FirebaseUser mUser = mAuth.getCurrentUser();
         if (mUser != null) {
-            chamarProximaTela(false);
+            chamarProximaTela();
         }
 
     }
@@ -337,7 +336,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                             Log.d(TAG, "signInWithCredential:success");
                             isReenviarCodigo = false;
                             countTimerReenvia.cancel();
-                            String sId = Base64Custom.codificarBase64(sTelefoneVerificacao);
+                            String sId = mAuth.getUid();//Base64Custom.codificarBase64(sTelefoneVerificacao);
 
                             preferencias.cadastraUsuarioPreferencias("", sTelefoneVerificacao, sId, "", "");
                             referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_USUARIO).child(sId);
@@ -349,13 +348,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                                         preferencias.setPreferencias(chave, valor);
                                     }
                                     gravarUsuarioFire();
-                                    chamarProximaTela(true);
+                                    chamarProximaTela();
                                 }
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
                                     gravarUsuarioFire();
-                                    chamarProximaTela(true);
+                                    chamarProximaTela();
                                 }
                             });
 
@@ -501,12 +500,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
         signInWithPhoneAuthCredential(credential);
     }
 
-    private void chamarProximaTela(boolean primeira_vez) {
+    private void chamarProximaTela() {
         Intent intent;
         intent = new Intent(Login.this, Principal.class);
-        intent.putExtra("novo", primeira_vez);
         startActivity(intent);
-        this.finish();
+        Login.this.finish();
     }
 
     private void gravarUsuarioFire() {
