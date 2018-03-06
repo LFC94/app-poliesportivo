@@ -43,4 +43,7 @@
     <string name="unavailable">Indisponívei</string>
     <string name="my">Meu</string>
     <string name="home">INICIO</string>
+    <string name="google">Google</string>
+    <string name="message_dataGoogle">Deseja importar os dados do Google?</string>
+    <string name="disconnect">Desconectar</string>
 </resources>

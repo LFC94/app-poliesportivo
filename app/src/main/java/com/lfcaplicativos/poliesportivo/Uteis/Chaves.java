@@ -14,8 +14,6 @@ import java.util.ArrayList;
 
 public class Chaves {
 
-    public static final String ULR_FIREBASE = "https://poliesportivo-37275.firebaseio.com/";
-
     public static final String CHAVE_USUARIO = "USUARIO";
     public static final String CHAVE_NOME = "NOME";
     public static final String CHAVE_ESTADO = "ESTADO";
@@ -29,12 +27,12 @@ public class Chaves {
     public static final String CHAVE_URL_GINASIO = "URL_GINASIOS";
     public static final String CHAVE_URL_HORARIOS = "URL_HORARIOS";
 
+    public static final String CHAVE_AUTENTC_PHONE = "AUTENTC_PHONE";
+    public static final String CHAVE_AUTENTC_GOOGLE = "AUTENTC_GOOGLE";
 
     public static final int CHAVE_RESULT_PHOTO = 1;
     public static final int CHAVE_RESULT_LOCATION = 2;
-
-    public static final int CHAVE_NAVEGATIN_USUARIO = 3;
-    public static final int CHAVE_NAVEGATIN_PRINCIPAL = 0;
+    public static final int CHAVE_RESULT_GOOGLE = 3;
 
 
     public static ArrayList<String> estadolist_usuario;

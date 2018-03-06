@@ -1,7 +1,9 @@
 package com.lfcaplicativos.poliesportivo.Activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,15 +20,25 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
 import com.lfcaplicativos.poliesportivo.Objetos.Cidade;
 import com.lfcaplicativos.poliesportivo.Objetos.Estado;
@@ -35,6 +47,7 @@ import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
 import com.lfcaplicativos.poliesportivo.Uteis.ConexaoHTTP;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
 import com.rengwuxian.materialedittext.MaterialEditText;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,48 +62,49 @@ import fr.ganfra.materialspinner.MaterialSpinner;
 
 public class Usuario extends AppCompatActivity implements View.OnClickListener {
 
-    public static MaterialEditText edit_Usuario_Nome;
+    public MaterialEditText edit_Usuario_Nome;
+    public ImageView image_Usuario_Foto;
+    public Bitmap bitmapFotoPerfil = null;
     private MaterialSpinner spinner_Usuario_Estado, spinner_Usuario_Cidade;
-    public static ImageView image_Usuario_Foto;
-    public static Bitmap bitmapFotoPerfil = null;
+    private SignInButton button_Usuario_SingInGoogle;
+
 
     private JSONObject jsonobject;
     private JSONArray jsonarray;
     private ProgressDialog mProgressDialog;
     private Timer timer;
 
-
     private Preferencias preferencias;
     private FirebaseAuth mAuth;
-    private StorageReference storageRef;
+    private FirebaseUser mUser;
+    private GoogleSignInClient mGoogleSignInClient;
 
     private boolean acesso_banco = true, prim_uf = true, prim_cid = true;
-    private boolean novo = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_usuario);
 
-        Bundle args = new Bundle();
-        if (args.size() > 0) {
-            args.putBoolean("novo", novo);
-        }
-
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getTitle());
         setSupportActionBar(toolbar);
 
         preferencias = new Preferencias(this);
         mAuth = ConfiguracaoFirebase.getFirebaseAuth();
-        FirebaseStorage storage = FirebaseStorage.getInstance();
+        mUser = mAuth.getCurrentUser();
 
         edit_Usuario_Nome = findViewById(R.id.edit_Usuario_Nome);
         spinner_Usuario_Estado = findViewById(R.id.spinner_Usuario_Estado);
         spinner_Usuario_Cidade = findViewById(R.id.spinner_Usuario_Cidade);
         image_Usuario_Foto = findViewById(R.id.image_Usuario_Foto);
 
+        button_Usuario_SingInGoogle = findViewById(R.id.button_Usuario_SingInGoogle);
+        button_Usuario_SingInGoogle.setOnClickListener(this);
+        if(preferencias.getBPreferencias(Chaves.CHAVE_AUTENTC_GOOGLE)){
+            button_Usuario_SingInGoogle.setVisibility(View.INVISIBLE);
+        }
 
         spinner_Usuario_Estado.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -129,7 +143,11 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
 
         imagemPerfilUsuario(false);
 
-
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     }
 
     @Override
@@ -168,36 +186,51 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
             case R.id.fab_Usuario_Foto:
                 abrieCameraGaleria();
                 break;
+            case R.id.button_Usuario_SingInGoogle:
+                signIn();
+                break;
         }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Chaves.CHAVE_RESULT_PHOTO && resultCode == Activity.RESULT_OK) {
-            if (data == null) {
-                //Display an error
-                return;
-            }
-            try {
+        switch (requestCode) {
+            case Chaves.CHAVE_RESULT_PHOTO:
+                if (resultCode == Activity.RESULT_OK) {
+                    if (data == null) {
+                        //Display an error
+                        return;
+                    }
+                    try {
 
-                if (data.getData() != null) {
-                    InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
-                    bitmapFotoPerfil = BitmapFactory.decodeStream(inputStream);
-                } else {
-                    Bundle extras = data.getExtras();
-                    if (extras != null) {
+                        if (data.getData() != null) {
+                            InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
+                            bitmapFotoPerfil = BitmapFactory.decodeStream(inputStream);
+                        } else {
+                            Bundle extras = data.getExtras();
+                            if (extras != null) {
 
-                        bitmapFotoPerfil = (Bitmap) extras.get("data");
+                                bitmapFotoPerfil = (Bitmap) extras.get("data");
+                            }
+                        }
+
+                        if (bitmapFotoPerfil != null)
+                            image_Usuario_Foto.setImageBitmap(bitmapFotoPerfil);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
-
-                if (bitmapFotoPerfil != null)
-                    image_Usuario_Foto.setImageBitmap(bitmapFotoPerfil);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                break;
+            case Chaves.CHAVE_RESULT_GOOGLE:
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                if (result.isSuccess()) {
+                    // Google Sign In was successful, authenticate with Firebase
+                    GoogleSignInAccount account = result.getSignInAccount();
+                    firebaseAuthWithGoogle(account);
+                }
+                break;
         }
     }
 
@@ -536,4 +569,44 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
         return true;
     }
 
+    private void signIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, Chaves.CHAVE_RESULT_GOOGLE);
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+
+        mAuth.getCurrentUser().linkWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    // Sign in success, update UI with the signed-in user's information
+                    mUser = mAuth.getCurrentUser();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Usuario.this);
+                    builder.setTitle(getString(R.string.google));
+                    builder.setMessage(getString(R.string.message_dataGoogle));
+                    builder.setIcon(android.R.drawable.ic_dialog_info);
+                    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                           if (!mUser.getDisplayName().trim().isEmpty())
+                            edit_Usuario_Nome.setText(mUser.getDisplayName());
+                            if (mUser.getPhotoUrl() != null){
+                                Picasso.with(getApplicationContext()).load(mUser.getPhotoUrl().toString()).into(image_Usuario_Foto);
+                                bitmapFotoPerfil = image_Usuario_Foto.getDrawingCache();
+                            }
+                        }
+                    });
+                    builder.setNegativeButton(R.string.no, null);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                } else {
+
+                }
+
+            }
+        });
+    }
 }

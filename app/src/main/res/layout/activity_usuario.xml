@@ -20,13 +20,14 @@
             app:popupTheme="@style/AppTheme.NoActionBar.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
+
     <com.github.siyamed.shapeimageview.OctogonImageView
         android:id="@+id/image_Usuario_Foto"
         android:layout_width="150dp"
-        android:layout_height="148dp"
+        android:layout_height="150dp"
         android:layout_below="@+id/appBarLayout"
         android:layout_centerHorizontal="true"
-        app:siSquare="true"/>
+        app:siSquare="true" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_Usuario_Foto"
@@ -43,36 +44,16 @@
 
     <com.rengwuxian.materialedittext.MaterialEditText
         android:id="@+id/edit_Usuario_Nome"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/spinner_Usuario_Estado"
-        android:layout_alignStart="@+id/spinner_Usuario_Estado"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_below="@+id/image_Usuario_Foto"
-        android:ems="20"
         android:hint="@string/name"
         android:inputType="textCapWords|textPersonName"
-        app:layout_anchor="@+id/spinner_Usuario_Estado"
         app:layout_anchorGravity="top|center"
         app:met_floatingLabel="highlight" />
 
-
-    <fr.ganfra.materialspinner.MaterialSpinner
-        android:id="@+id/spinner_Usuario_Cidade"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/spinner_Usuario_Estado"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="0dp"
-        android:minWidth="500dp"
-        app:layout_anchorGravity="bottom|center"
-        app:ms_alignLabels="false"
-        app:ms_arrowSize="16dp"
-        app:ms_floatingLabelColor="@color/colorPrimary"
-        app:ms_floatingLabelText="@string/city"
-        app:ms_hint="@string/city" />
 
     <fr.ganfra.materialspinner.MaterialSpinner
         android:id="@+id/spinner_Usuario_Estado"
@@ -87,9 +68,35 @@
         app:layout_anchor="@+id/spinner_Usuario_Cidade"
         app:layout_anchorGravity="top|center"
         app:ms_alignLabels="false"
-        app:ms_arrowSize="16dp"
         app:ms_floatingLabelColor="@color/colorPrimary"
         app:ms_floatingLabelText="@string/state"
         app:ms_hint="@string/state" />
+
+    <fr.ganfra.materialspinner.MaterialSpinner
+        android:id="@+id/spinner_Usuario_Cidade"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/spinner_Usuario_Estado"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="0dp"
+        android:minWidth="500dp"
+        app:layout_anchorGravity="bottom|center"
+        app:ms_alignLabels="false"
+        app:ms_floatingLabelColor="@color/colorPrimary"
+        app:ms_floatingLabelText="@string/city"
+        app:ms_hint="@string/city" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/button_Usuario_SingInGoogle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/spinner_Usuario_Cidade"
+        tools:visibility="gone" />
 
 </RelativeLayout>

@@ -181,6 +181,14 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
         FirebaseUser mUser = mAuth.getCurrentUser();
         if (mUser != null) {
+
+            for(int providers=1;providers<= mUser.getProviders().size();providers++){
+                String s = mUser.getProviderData().get(providers).getProviderId();
+                if (s.toLowerCase().indexOf(("phone"))>=0)
+                    preferencias.setPreferencias(Chaves.CHAVE_AUTENTC_PHONE,true);
+                if (s.toLowerCase().indexOf(("google"))>=0)
+                    preferencias.setPreferencias(Chaves.CHAVE_AUTENTC_GOOGLE,true);
+            }
             chamarProximaTela();
         }
 

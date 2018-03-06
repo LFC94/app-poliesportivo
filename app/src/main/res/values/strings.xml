@@ -44,4 +44,7 @@
     <string name="unavailable">Unavailable</string>
     <string name="my">My</string>
     <string name="home">HOME</string>
+    <string name="google">Google</string>
+    <string name="message_dataGoogle">Do you want to import the data from Google?</string>
+    <string name="disconnect">Disconnect</string>
 </resources>
