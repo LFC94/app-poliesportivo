@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
@@ -29,7 +30,6 @@ import com.lfcaplicativos.poliesportivo.R;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
 import com.lfcaplicativos.poliesportivo.Uteis.ConexaoHTTP;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
-import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,6 +43,7 @@ public class Principal extends AppCompatActivity {
     private DatabaseReference referenciaConfiguracao;
     private FirebaseUser mUser;
     private StorageReference storageRef;
+    private SearchView menu_search_Principal;
 
     private JSONObject jsonobject;
     private JSONArray jsonarray;
@@ -84,9 +85,7 @@ public class Principal extends AppCompatActivity {
         FirebaseAuth mAuth = ConfiguracaoFirebase.getFirebaseAuth();
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
-        MaterialEditText edit_Principal_Busca = findViewById(R.id.edit_Principal_Busca);
         recycler_Principal_Ginasio = findViewById(R.id.recycler_principal_ginasio);
-
 
         recycler_Principal_Ginasio.setHasFixedSize(true);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
@@ -119,6 +118,11 @@ public class Principal extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_principal, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.item_principal_search);
+        menu_search_Principal = (SearchView) searchItem.getActionView();
+
+
         return true;
     }
 

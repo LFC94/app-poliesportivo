@@ -7,4 +7,8 @@
         android:icon="@drawable/ic_action_tick"
         android:title="@string/confirm"
         app:showAsAction="ifRoom" />
+    <item
+        android:title="@string/syncGoogle"
+        android:id="@+id/item_usuario_importeGoogle"
+        app:showAsAction="never" />
 </menu>

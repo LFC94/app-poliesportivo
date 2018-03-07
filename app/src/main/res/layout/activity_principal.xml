@@ -20,23 +20,13 @@
             app:popupTheme="@style/AppTheme.NoActionBar.PopupOverlay" />
     </android.support.design.widget.AppBarLayout>
 
-    <com.rengwuxian.materialedittext.MaterialEditText
-        android:id="@+id/edit_Principal_Busca"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/appBarLayout"
-        android:hint="@string/search"
-        app:met_iconLeft="@android:drawable/ic_menu_search" />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_principal_ginasio"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/edit_Principal_Busca"
+        android:layout_below="@+id/appBarLayout"
         app:met_floatingLabel="highlight">
 
         <requestFocus />

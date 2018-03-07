@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -18,7 +19,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -26,7 +29,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -60,14 +67,14 @@ import java.util.TimerTask;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 
-public class Usuario extends AppCompatActivity implements View.OnClickListener {
+public class Usuario extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     public MaterialEditText edit_Usuario_Nome;
     public ImageView image_Usuario_Foto;
     public Bitmap bitmapFotoPerfil = null;
     private MaterialSpinner spinner_Usuario_Estado, spinner_Usuario_Cidade;
     private SignInButton button_Usuario_SingInGoogle;
-
+    private Button button_Usuario_DisconnectGoogle;
 
     private JSONObject jsonobject;
     private JSONArray jsonarray;
@@ -78,7 +85,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private GoogleSignInClient mGoogleSignInClient;
-
+    private GoogleApiClient mGoogleApiClient;
     private boolean acesso_banco = true, prim_uf = true, prim_cid = true;
 
 
@@ -101,9 +108,14 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
         image_Usuario_Foto = findViewById(R.id.image_Usuario_Foto);
 
         button_Usuario_SingInGoogle = findViewById(R.id.button_Usuario_SingInGoogle);
+
+        button_Usuario_DisconnectGoogle = findViewById(R.id.button_Usuario_DisconnectGoogle);
         button_Usuario_SingInGoogle.setOnClickListener(this);
-        if(preferencias.getBPreferencias(Chaves.CHAVE_AUTENTC_GOOGLE)){
+
+        if (preferencias.getBPreferencias(Chaves.CHAVE_AUTENTC_GOOGLE)) {
             button_Usuario_SingInGoogle.setVisibility(View.INVISIBLE);
+        } else {
+            button_Usuario_DisconnectGoogle.setVisibility(View.INVISIBLE);
         }
 
         spinner_Usuario_Estado.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -148,6 +160,11 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
     }
 
     @Override
@@ -169,25 +186,49 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.item_usuario_confirmar) {
-            if (gravarUsuario())
-                finish();
+        switch (id) {
+            case R.id.item_usuario_confirmar:
+                if (gravarUsuario())
+                    finish();
+                break;
+            case R.id.item_usuario_importeGoogle:
+                impotarDadosGoogle();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        try {
+            menu.findItem(R.id.item_usuario_importeGoogle).setVisible(preferencias.getBPreferencias(Chaves.CHAVE_AUTENTC_GOOGLE));
+
+        } catch (Exception e) {
+        }
+        return true;
+    }
+
+    @Override
     public void onClick(View v) {
 
         switch (v.getId()) {
-
             case R.id.fab_Usuario_Foto:
                 abrieCameraGaleria();
                 break;
             case R.id.button_Usuario_SingInGoogle:
                 signIn();
+                break;
+            case R.id.button_Usuario_DisconnectGoogle:
+                mAuth.signOut();
+                // Google revoke access
+                Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
+                        new ResultCallback<Status>() {
+                            @Override
+                            public void onResult(@NonNull Status status) {
+
+                            }
+                        });
                 break;
         }
     }
@@ -232,6 +273,12 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d("", "onConnectionFailed:" + connectionResult);
+        Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
     }
 
     private void abrieCameraGaleria() {
@@ -584,29 +631,35 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener {
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
                     mUser = mAuth.getCurrentUser();
-                    AlertDialog.Builder builder = new AlertDialog.Builder(Usuario.this);
-                    builder.setTitle(getString(R.string.google));
-                    builder.setMessage(getString(R.string.message_dataGoogle));
-                    builder.setIcon(android.R.drawable.ic_dialog_info);
-                    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                           if (!mUser.getDisplayName().trim().isEmpty())
-                            edit_Usuario_Nome.setText(mUser.getDisplayName());
-                            if (mUser.getPhotoUrl() != null){
-                                Picasso.with(getApplicationContext()).load(mUser.getPhotoUrl().toString()).into(image_Usuario_Foto);
-                                bitmapFotoPerfil = image_Usuario_Foto.getDrawingCache();
-                            }
-                        }
-                    });
-                    builder.setNegativeButton(R.string.no, null);
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
+                    impotarDadosGoogle();
+
                 } else {
 
                 }
 
             }
         });
+    }
+
+    private void impotarDadosGoogle() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(Usuario.this);
+        builder.setTitle(getString(R.string.google));
+        builder.setMessage(getString(R.string.message_dataGoogle));
+        builder.setIcon(R.drawable.googleg_standard_color_18);
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (!mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getDisplayName().trim().isEmpty())
+                    edit_Usuario_Nome.setText(mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getDisplayName());
+                if (mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhotoUrl() != null) {
+                    Picasso.with(getApplicationContext()).load(mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhotoUrl().toString()).into(image_Usuario_Foto);
+                    bitmapFotoPerfil = image_Usuario_Foto.getDrawingCache();
+                }
+
+            }
+        });
+        builder.setNegativeButton(R.string.no, null);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }

@@ -18,7 +18,6 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.NoActionBar.PopupOverlay" />
-
     </android.support.design.widget.AppBarLayout>
 
     <com.github.siyamed.shapeimageview.OctogonImageView
@@ -81,7 +80,6 @@
         android:layout_below="@+id/spinner_Usuario_Estado"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="0dp"
         android:minWidth="500dp"
         app:layout_anchorGravity="bottom|center"
         app:ms_alignLabels="false"
@@ -93,10 +91,26 @@
         android:id="@+id/button_Usuario_SingInGoogle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/spinner_Usuario_Cidade"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:visibility="visible"
         tools:visibility="gone" />
+
+    <Button
+        android:id="@+id/button_Usuario_DisconnectGoogle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button_Usuario_SingInGoogle"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:ems="10"
+        android:onClick="onClick"
+        android:text="@string/disconnect"
+        android:textAllCaps="false"
+        android:theme="@style/MyDarkButton"
+        android:drawableLeft="@drawable/googleg_standard_color_18" />
 
 </RelativeLayout>

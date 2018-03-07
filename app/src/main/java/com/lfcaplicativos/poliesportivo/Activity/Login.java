@@ -73,6 +73,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
     private DatabaseReference referenciaFire;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
@@ -179,16 +180,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
             }
         };
 
-        FirebaseUser mUser = mAuth.getCurrentUser();
+        mUser = mAuth.getCurrentUser();
         if (mUser != null) {
 
-            for(int providers=1;providers<= mUser.getProviders().size();providers++){
-                String s = mUser.getProviderData().get(providers).getProviderId();
-                if (s.toLowerCase().indexOf(("phone"))>=0)
-                    preferencias.setPreferencias(Chaves.CHAVE_AUTENTC_PHONE,true);
-                if (s.toLowerCase().indexOf(("google"))>=0)
-                    preferencias.setPreferencias(Chaves.CHAVE_AUTENTC_GOOGLE,true);
-            }
             chamarProximaTela();
         }
 
@@ -509,6 +503,18 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     }
 
     private void chamarProximaTela() {
+        for (int providers = 1; providers <= mUser.getProviders().size(); providers++) {
+            String s = mUser.getProviderData().get(providers).getProviderId();
+            if (s.toLowerCase().indexOf(("phone")) >= 0) {
+                preferencias.setPreferencias(Chaves.CHAVE_AUTENTC_PHONE, true);
+                Chaves.CHAVE_INDEX_PHONE = providers;
+            }
+            if (s.toLowerCase().indexOf(("google")) >= 0) {
+                preferencias.setPreferencias(Chaves.CHAVE_AUTENTC_GOOGLE, true);
+                Chaves.CHAVE_INDEX_GOOGLE = providers;
+            }
+        }
+
         Intent intent;
         intent = new Intent(Login.this, Principal.class);
         startActivity(intent);

@@ -33,6 +33,8 @@ public class Chaves {
     public static final int CHAVE_RESULT_PHOTO = 1;
     public static final int CHAVE_RESULT_LOCATION = 2;
     public static final int CHAVE_RESULT_GOOGLE = 3;
+    public static int CHAVE_INDEX_PHONE = 0;
+    public static int CHAVE_INDEX_GOOGLE = 0;
 
 
     public static ArrayList<String> estadolist_usuario;
