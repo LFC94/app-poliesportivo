@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +24,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.github.rtoshiro.util.format.SimpleMaskFormatter;
+import com.github.rtoshiro.util.format.text.MaskTextWatcher;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -53,6 +56,7 @@ import com.lfcaplicativos.poliesportivo.R;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
 import com.lfcaplicativos.poliesportivo.Uteis.ConexaoHTTP;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
+import com.lfcaplicativos.poliesportivo.Uteis.Validacao;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 
@@ -67,9 +71,9 @@ import java.util.TimerTask;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 
-public class Usuario extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
+public class Usuario extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, View.OnKeyListener {
 
-    public MaterialEditText edit_Usuario_Nome;
+    public MaterialEditText edit_Usuario_Nome, edit_Usuario_Telefone;
     public ImageView image_Usuario_Foto;
     public Bitmap bitmapFotoPerfil = null;
     private MaterialSpinner spinner_Usuario_Estado, spinner_Usuario_Cidade;
@@ -103,6 +107,14 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
         mUser = mAuth.getCurrentUser();
 
         edit_Usuario_Nome = findViewById(R.id.edit_Usuario_Nome);
+        edit_Usuario_Telefone = findViewById(R.id.edit_Usuario_Telefone);
+
+        SimpleMaskFormatter simpleMaskTelefone = new SimpleMaskFormatter("(NN) NNNNN-NNNN");
+        MaskTextWatcher maskTelefone = new MaskTextWatcher(edit_Usuario_Telefone, simpleMaskTelefone);
+        edit_Usuario_Telefone.addTextChangedListener(maskTelefone);
+
+        edit_Usuario_Telefone.setOnKeyListener(this);
+
         spinner_Usuario_Estado = findViewById(R.id.spinner_Usuario_Estado);
         spinner_Usuario_Cidade = findViewById(R.id.spinner_Usuario_Cidade);
         image_Usuario_Foto = findViewById(R.id.image_Usuario_Foto);
@@ -204,8 +216,10 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
         try {
             menu.findItem(R.id.item_usuario_importeGoogle).setVisible(preferencias.getBPreferencias(Chaves.CHAVE_AUTENTC_GOOGLE));
 
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
+
+
         return true;
     }
 
@@ -455,6 +469,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
 
         if (preferencias.getNOME() != null) {
             edit_Usuario_Nome.setText(preferencias.getNOME());
+            edit_Usuario_Telefone.setText(preferencias.getTELEFONE());
 
             Chaves.estadolist_usuario.clear();
             if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
@@ -529,6 +544,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                     }
                     if (preferencias.getNOME() != null)
                         edit_Usuario_Nome.setText(preferencias.getNOME());
+                    edit_Usuario_Telefone.setText(preferencias.getTELEFONE());
 
                     if (Chaves.estadolist_usuario == null) {
                         carregarEstado();
@@ -587,8 +603,13 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
             spinner_Usuario_Estado.requestFocus();
             return false;
         }
-
+        if(!edit_Usuario_Telefone.getText().toString().trim().isEmpty()&&
+                !Validacao.validateDDDPhoneNumber(edit_Usuario_Telefone,getString(R.string.ddd_invalid),getString(R.string.phone_invalid))){
+            edit_Usuario_Telefone.requestFocus();
+            return false;
+        }
         preferencias.setNOME(edit_Usuario_Nome.getText().toString().trim());
+        preferencias.setTelefone(edit_Usuario_Telefone.getText().toString().trim());
         if (acesso_banco) {
             if (spinner_Usuario_Cidade.getSelectedItemPosition() > 0) {
                 preferencias.setCIDADE(Chaves.cidades_usuario.get(spinner_Usuario_Cidade.getSelectedItemPosition() - 1).getNome());
@@ -651,6 +672,11 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
             public void onClick(DialogInterface dialog, int which) {
                 if (!mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getDisplayName().trim().isEmpty())
                     edit_Usuario_Nome.setText(mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getDisplayName());
+
+                if (edit_Usuario_Telefone.getText().toString().trim().isEmpty() &&
+                        !mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhoneNumber().trim().isEmpty())
+                    edit_Usuario_Telefone.setText(mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhoneNumber());
+
                 if (mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhotoUrl() != null) {
                     Picasso.with(getApplicationContext()).load(mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhotoUrl().toString()).into(image_Usuario_Foto);
                     bitmapFotoPerfil = image_Usuario_Foto.getDrawingCache();
@@ -661,5 +687,24 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
         builder.setNegativeButton(R.string.no, null);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if ((event.getAction() == KeyEvent.ACTION_DOWN)) {
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                switch (v.getId()) {
+                    case R.id.edit_Usuario_Telefone:
+                            if(!edit_Usuario_Telefone.getText().toString().trim().isEmpty()&&
+                                Validacao.validateDDDPhoneNumber(edit_Usuario_Telefone,getString(R.string.ddd_invalid),getString(R.string.phone_invalid))){
+                                spinner_Usuario_Estado.requestFocus();
+                                return false;
+                            }
+                        break;
+                }
+            }
+        }
+
+        return false;
     }
 }

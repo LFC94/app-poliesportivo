@@ -5,12 +5,12 @@
         android:id="@+id/item_principal_search"
         android:title="@string/search"
         android:icon="@android:drawable/ic_menu_search"
-        app:showAsAction="ifRoom|collapseActionView"
+        app:showAsAction="collapseActionView|always"
         app:actionViewClass="android.support.v7.widget.SearchView" />
     <item
         android:id="@+id/item_principal_usuario"
         android:icon="@drawable/ic_action_user"
         android:title="@string/title_activity_usuario"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="collapseActionView|always" />
 </menu>
 

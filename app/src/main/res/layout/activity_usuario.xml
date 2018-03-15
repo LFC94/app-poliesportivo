@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.lfcaplicativos.poliesportivo.Activity.Usuario">
 
     <android.support.design.widget.AppBarLayout
@@ -20,97 +21,110 @@
             app:popupTheme="@style/AppTheme.NoActionBar.PopupOverlay" />
     </android.support.design.widget.AppBarLayout>
 
-    <com.github.siyamed.shapeimageview.OctogonImageView
-        android:id="@+id/image_Usuario_Foto"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_below="@+id/appBarLayout"
-        android:layout_centerHorizontal="true"
-        app:siSquare="true" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_Usuario_Foto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/edit_Usuario_Nome"
-        android:layout_alignEnd="@+id/image_Usuario_Foto"
-        android:layout_alignRight="@+id/image_Usuario_Foto"
-        android:layout_gravity="bottom|end"
-        android:onClick="onClick"
-        app:backgroundTint="@color/colorButtonNormal"
-        app:srcCompat="@drawable/ic_add_a_photo"
-        tools:context="com.lfcaplicativos.poliesportivo.Activity.Principal" />
-
-    <com.rengwuxian.materialedittext.MaterialEditText
-        android:id="@+id/edit_Usuario_Nome"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_below="@+id/image_Usuario_Foto"
-        android:hint="@string/name"
-        android:inputType="textCapWords|textPersonName"
-        app:layout_anchorGravity="top|center"
-        app:met_floatingLabel="highlight" />
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.github.siyamed.shapeimageview.OctogonImageView
+                android:id="@+id/image_Usuario_Foto"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_centerHorizontal="true"
+                app:siSquare="true" />
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edit_Usuario_Nome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/image_Usuario_Foto"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:hint="@string/name"
+                android:inputType="textCapWords|textPersonName"
+                app:met_floatingLabel="highlight" />
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edit_Usuario_Telefone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edit_Usuario_Nome"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:ems="10"
+                android:hint="@string/phone_number"
+                android:inputType="number|numberSigned"
+                app:met_floatingLabel="highlight" />
+
+            <fr.ganfra.materialspinner.MaterialSpinner
+                android:id="@+id/spinner_Usuario_Estado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edit_Usuario_Telefone"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:minWidth="250dp"
+                app:layout_anchorGravity="top|center"
+                app:ms_alignLabels="false"
+                app:ms_floatingLabelColor="@color/colorPrimary"
+                app:ms_floatingLabelText="@string/state"
+                app:ms_hint="@string/state" />
+
+            <fr.ganfra.materialspinner.MaterialSpinner
+                android:id="@+id/spinner_Usuario_Cidade"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/spinner_Usuario_Estado"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:minWidth="500dp"
+                app:layout_anchorGravity="bottom|center"
+                app:ms_alignLabels="false"
+                app:ms_floatingLabelColor="@color/colorPrimary"
+                app:ms_floatingLabelText="@string/city"
+                app:ms_hint="@string/city" />
+
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/button_Usuario_SingInGoogle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/spinner_Usuario_Cidade"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:visibility="visible"
+                tools:visibility="gone" />
+
+            <Button
+                android:id="@+id/button_Usuario_DisconnectGoogle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/spinner_Usuario_Cidade"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:drawableLeft="@drawable/googleg_standard_color_18"
+                android:ems="10"
+                android:onClick="onClick"
+                android:text="@string/disconnect"
+                android:textAllCaps="false"
+                android:theme="@style/MyDarkButton"/>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_Usuario_Foto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/edit_Usuario_Nome"
+                android:layout_alignEnd="@+id/image_Usuario_Foto"
+                android:layout_alignRight="@+id/image_Usuario_Foto"
+                android:layout_gravity="bottom|end"
+                android:onClick="onClick"
+                app:backgroundTint="@color/colorButtonNormal"
+                app:srcCompat="@drawable/ic_add_a_photo"
+                tools:context="com.lfcaplicativos.poliesportivo.Activity.Principal" />
+        </RelativeLayout>
+    </ScrollView>
 
 
-    <fr.ganfra.materialspinner.MaterialSpinner
-        android:id="@+id/spinner_Usuario_Estado"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/edit_Usuario_Nome"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:minWidth="250dp"
-        app:layout_anchor="@+id/spinner_Usuario_Cidade"
-        app:layout_anchorGravity="top|center"
-        app:ms_alignLabels="false"
-        app:ms_floatingLabelColor="@color/colorPrimary"
-        app:ms_floatingLabelText="@string/state"
-        app:ms_hint="@string/state" />
-
-    <fr.ganfra.materialspinner.MaterialSpinner
-        android:id="@+id/spinner_Usuario_Cidade"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/spinner_Usuario_Estado"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:minWidth="500dp"
-        app:layout_anchorGravity="bottom|center"
-        app:ms_alignLabels="false"
-        app:ms_floatingLabelColor="@color/colorPrimary"
-        app:ms_floatingLabelText="@string/city"
-        app:ms_hint="@string/city" />
-
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/button_Usuario_SingInGoogle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/spinner_Usuario_Cidade"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:visibility="visible"
-        tools:visibility="gone" />
-
-    <Button
-        android:id="@+id/button_Usuario_DisconnectGoogle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button_Usuario_SingInGoogle"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:ems="10"
-        android:onClick="onClick"
-        android:text="@string/disconnect"
-        android:textAllCaps="false"
-        android:theme="@style/MyDarkButton"
-        android:drawableLeft="@drawable/googleg_standard_color_18" />
-
-</RelativeLayout>
+</LinearLayout>

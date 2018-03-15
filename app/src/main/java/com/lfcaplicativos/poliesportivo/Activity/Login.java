@@ -340,7 +340,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
                             countTimerReenvia.cancel();
                             String sId = mAuth.getUid();//Base64Custom.codificarBase64(sTelefoneVerificacao);
 
-                            preferencias.cadastraUsuarioPreferencias("", sTelefoneVerificacao, sId, "", "");
+                            preferencias.cadastraUsuarioPreferencias("", editCodArea.getText().toString() + editTelefone.getText().toString(), sId, "", "");
                             referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_USUARIO).child(sId);
                             referenciaFire.addValueEventListener(new ValueEventListener() {
                                 @Override
@@ -505,11 +505,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
     private void chamarProximaTela() {
         for (int providers = 1; providers <= mUser.getProviders().size(); providers++) {
             String s = mUser.getProviderData().get(providers).getProviderId();
-            if (s.toLowerCase().indexOf(("phone")) >= 0) {
+            if (s.toLowerCase().contains(("phone"))) {
                 preferencias.setPreferencias(Chaves.CHAVE_AUTENTC_PHONE, true);
                 Chaves.CHAVE_INDEX_PHONE = providers;
             }
-            if (s.toLowerCase().indexOf(("google")) >= 0) {
+            if (s.toLowerCase().contains(("google"))) {
                 preferencias.setPreferencias(Chaves.CHAVE_AUTENTC_GOOGLE, true);
                 Chaves.CHAVE_INDEX_GOOGLE = providers;
             }

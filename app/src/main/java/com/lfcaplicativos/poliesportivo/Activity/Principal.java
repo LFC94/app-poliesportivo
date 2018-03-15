@@ -1,6 +1,8 @@
 package com.lfcaplicativos.poliesportivo.Activity;
 
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -30,6 +32,7 @@ import com.lfcaplicativos.poliesportivo.R;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
 import com.lfcaplicativos.poliesportivo.Uteis.ConexaoHTTP;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
+import com.lfcaplicativos.poliesportivo.Uteis.Validacao;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -44,6 +47,7 @@ public class Principal extends AppCompatActivity {
     private FirebaseUser mUser;
     private StorageReference storageRef;
     private SearchView menu_search_Principal;
+    private Toolbar toolbar;
 
     private JSONObject jsonobject;
     private JSONArray jsonarray;
@@ -77,7 +81,7 @@ public class Principal extends AppCompatActivity {
         });
         setContentView(R.layout.activity_principal);
 
-        Toolbar toolbar;
+
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getTitle());
         setSupportActionBar(toolbar);
@@ -115,14 +119,49 @@ public class Principal extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_principal, menu);
 
-        MenuItem searchItem = menu.findItem(R.id.item_principal_search);
+        final MenuItem searchItem = menu.findItem(R.id.item_principal_search);
         menu_search_Principal = (SearchView) searchItem.getActionView();
 
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
 
+            @Override
+            public boolean onMenuItemActionExpand(final MenuItem item) {
+                Validacao.itemsVisibility(menu, searchItem, false);
+                toolbar.refreshDrawableState();
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(final MenuItem item) {
+                Validacao.itemsVisibility(menu, searchItem, true);
+                toolbar.refreshDrawableState();
+                return true;
+            }
+        });
+
+        SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+        menu_search_Principal.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
+
+        menu_search_Principal.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+
+                return true;
+            }
+
+        });
         return true;
     }
 
@@ -130,7 +169,6 @@ public class Principal extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.item_principal_usuario) {
             chamaUsuario(false);
         }
@@ -214,4 +252,6 @@ public class Principal extends AppCompatActivity {
         intent.putExtra("novo", userNovo);
         startActivity(intent);
     }
+
+
 }

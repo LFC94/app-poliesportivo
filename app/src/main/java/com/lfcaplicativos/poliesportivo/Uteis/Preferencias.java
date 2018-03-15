@@ -88,6 +88,11 @@ public class Preferencias {
         editor.commit();
     }
 
+    public void setTelefone(String telefone) {
+        editor.putString(Chaves.CHAVE_TELEFONE, telefone);
+        editor.commit();
+    }
+
     public String getNOME() {
         return sharedPreferences.getString(Chaves.CHAVE_NOME, null);
     }
