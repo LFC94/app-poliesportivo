@@ -206,13 +206,13 @@ public class Principal extends AppCompatActivity {
                         ginasios.setLongitude(jsonobject.optDouble("lng"));
                         ginasios.setModalidade(jsonobject.optString("modalidade"));
                         ginasios.setPiso(jsonobject.optString("piso"));
-                        ginasios.setNomelogo(jsonobject.optString("nomelogo"));
+                        ginasios.setNomeLogo(jsonobject.optString("nomelogo"));
                         ginasios.setCoberto(jsonobject.optBoolean("coberto", false));
                         ginasios.setEstacionamento(jsonobject.optBoolean("estacionamento", false));
-                        ginasios.setNomelogo(jsonobject.optString("nomelogo"));
+                        ginasios.setNomeLogo(jsonobject.optString("nomelogo"));
 
-                        if (ginasios.getNomelogo() != null && !ginasios.getNomelogo().trim().isEmpty()) {
-                            byte[] b = Base64.decode(ginasios.getNomelogo(), Base64.DEFAULT);
+                        if (ginasios.getNomeLogo() != null && !ginasios.getNomeLogo().trim().isEmpty()) {
+                            byte[] b = Base64.decode(ginasios.getNomeLogo(), Base64.DEFAULT);
                             ginasios.setLogo(BitmapFactory.decodeByteArray(b, 0, b.length));
                         }
                     }

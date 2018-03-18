@@ -34,7 +34,7 @@ import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 public class Ginasio extends AppCompatActivity implements View.OnClickListener {
 
     private int position = 0;
-    private RecyclerView recyclerGinasioHoraio;
+    private RecyclerView recyclerGinasioHorario;
     private RecyclerView.Adapter mAdapter;
     private Preferencias preferencias;
 
@@ -56,9 +56,9 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
             toolbar.setTitle(Chaves.ginasio_principal.get(position).getNome());
             setSupportActionBar(toolbar);
 
-            recyclerGinasioHoraio = findViewById(R.id.recyclerGinasioHoraio);
-            recyclerGinasioHoraio.setHasFixedSize(true);
-            recyclerGinasioHoraio.setLayoutManager(new LinearLayoutManager(this));
+            recyclerGinasioHorario = findViewById(R.id.recyclerGinasioHoraio);
+            recyclerGinasioHorario.setHasFixedSize(true);
+            recyclerGinasioHorario.setLayoutManager(new LinearLayoutManager(this));
 
             Calendar startDate = Calendar.getInstance();
             Calendar endDate = Calendar.getInstance();
@@ -178,7 +178,7 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
                         public void run() {
                             try {
                                 mAdapter = new RecyclerGinasio(Chaves.horarios_ginasio);
-                                recyclerGinasioHoraio.setAdapter(mAdapter);
+                                recyclerGinasioHorario.setAdapter(mAdapter);
                                 ((RecyclerGinasio) mAdapter).setOnItemClickListener(new RecyclerGinasio.MyClickListener() {
                                     @Override
                                     public void onItemClick(int position, View v) {

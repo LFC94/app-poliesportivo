@@ -336,7 +336,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                         estado.setNome(jsonobject.optString("nome"));
                         Chaves.estados_usuario.add(estado);
 
-                        Chaves.estadolist_usuario.add(jsonobject.optString("uf").trim() + " - " + jsonobject.optString("nome"));
+                        Chaves.estadolist_usuario.add(jsonobject.optString("uf").trim() + " - " + jsonobject.optString("nome").trim());
                     }
                     runOnUiThread(new Runnable() {
                         @Override

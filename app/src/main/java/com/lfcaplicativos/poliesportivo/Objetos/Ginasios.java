@@ -9,7 +9,7 @@ import android.graphics.Bitmap;
 public class Ginasios {
     private int codigo;
     private double latitude, longitude;
-    private String nome, fantasia, endereco, numero, bairro, cidade, estado, modalidade, nomelogo, piso;
+    private String nome, fantasia, endereco, numero, bairro, cidade, estado, modalidade, nomeLogo, piso;
     private Bitmap logo;
     private Boolean estacionamento, coberto;
 
@@ -102,12 +102,12 @@ public class Ginasios {
         this.modalidade = modalidade;
     }
 
-    public String getNomelogo() {
-        return nomelogo;
+    public String getNomeLogo() {
+        return nomeLogo;
     }
 
-    public void setNomelogo(String nomelogo) {
-        this.nomelogo = nomelogo;
+    public void setNomeLogo(String nomeLogo) {
+        this.nomeLogo = nomeLogo;
     }
 
     public String getPiso() {
