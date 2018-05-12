@@ -307,6 +307,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
         startActivityForResult(chooserIntent, Chaves.CHAVE_RESULT_PHOTO);
     }
 
+
     private void carregarEstado() {
         mProgressDialog = ProgressDialog.show(this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.state) + "...", true);
         new Thread(new Runnable() {
@@ -315,7 +316,13 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                 try {
                     Chaves.estados_usuario = new ArrayList<Estado>();
                     Chaves.estadolist_usuario = new ArrayList<String>();
-                    String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_ESTADO));
+
+                    String sJson = preferencias.getSPreferencias(Chaves.CHAVE_ARRAY_ESTADO);
+                    if (preferencias.getSPreferencias(Chaves.CHAVE_ATU_ESTADO) == null || !Chaves.atuServerEstado.trim().equalsIgnoreCase(preferencias.getSPreferencias(Chaves.CHAVE_ATU_ESTADO))) {
+                        sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_ESTADO));
+                        preferencias.setPreferencias(Chaves.CHAVE_ATU_ESTADO, Chaves.atuServerEstado);
+                        preferencias.setPreferencias(Chaves.CHAVE_ARRAY_ESTADO, sJson);
+                    }
                     jsonobject = new JSONObject(sJson);
                     jsonarray = jsonobject.getJSONArray("estado");
                     Chaves.estadolist_usuario.clear();
@@ -389,11 +396,13 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                 try {
                     Chaves.cidades_usuario = new ArrayList<Cidade>();
                     Chaves.cidadelist_usuario = new ArrayList<String>();
-                    String url = preferencias.getSPreferencias(Chaves.CHAVE_URL_CIDADE);
-                    url += "?UF='" + UFEstado + "'";
 
-
-                    String sJson = ConexaoHTTP.getJSONFromAPI(url);
+                    String sJson = preferencias.getSPreferencias(Chaves.CHAVE_ARRAY_CIDADE);
+                    if (preferencias.getSPreferencias(Chaves.CHAVE_ATU_CIDADE)==null||!Chaves.atuServerCidade.trim().equalsIgnoreCase(preferencias.getSPreferencias(Chaves.CHAVE_ATU_CIDADE).trim())){
+                        sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_CIDADE));
+                        preferencias.setPreferencias(Chaves.CHAVE_ATU_CIDADE,Chaves.atuServerCidade);
+                        preferencias.setPreferencias(Chaves.CHAVE_ARRAY_CIDADE,sJson);
+                    }
                     jsonobject = new JSONObject(sJson);
                     jsonarray = jsonobject.getJSONArray("cidade");
                     Chaves.cidadelist_usuario.clear();
@@ -407,6 +416,9 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
 
                     for (int i = 0; i < jsonarray.length(); i++) {
                         jsonobject = jsonarray.getJSONObject(i);
+
+                        if(!jsonobject.optString("uf").trim().equalsIgnoreCase(UFEstado.trim()))
+                            continue;
 
                         cidade = new Cidade();
                         cidade.setIdPais(55);
@@ -530,65 +542,41 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
         acesso_banco = true;
         spinner_Usuario_Estado.setEnabled(acesso_banco);
         spinner_Usuario_Cidade.setEnabled(acesso_banco);
+        ConfiguracaoFirebase.buscarConfiguracoes(preferencias);
 
-        DatabaseReference referenciaConfiguracao = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_CONFIGURACAO);
+        if (preferencias.getNOME() != null)
+            edit_Usuario_Nome.setText(preferencias.getNOME());
 
-        referenciaConfiguracao.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                try {
+        edit_Usuario_Telefone.setText(preferencias.getTELEFONE());
 
-                    for (DataSnapshot dados : dataSnapshot.getChildren()) {
-                        String chave = dados.getKey(), valor = dados.getValue().toString();
-                        preferencias.setPreferencias(chave, valor);
-                    }
-                    if (preferencias.getNOME() != null)
-                        edit_Usuario_Nome.setText(preferencias.getNOME());
-                    edit_Usuario_Telefone.setText(preferencias.getTELEFONE());
-
-                    if (Chaves.estadolist_usuario == null) {
-                        carregarEstado();
-                    } else {
-                        spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
-                                android.R.layout.simple_spinner_dropdown_item,
-                                Chaves.estadolist_usuario));
-                        prim_uf = false;
-                        if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
-                            for (int i = 0; i < Chaves.estados_usuario.size(); i++) {
-                                if (Chaves.estados_usuario.get(i).getNome().equals(preferencias.getESTADO()))
-                                    spinner_Usuario_Estado.setSelection(i + 1);
-                            }
-                        }
-
-                        if (Chaves.cidadelist_usuario != null) {
-                            spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    Chaves.cidadelist_usuario));
-                            prim_cid = false;
-                            if (preferencias.getCIDADE() != null && !preferencias.getCIDADE().trim().isEmpty()) {
-                                for (int i = 0; i < Chaves.cidades_usuario.size(); i++) {
-                                    if (Chaves.cidades_usuario.get(i).getNome().equals(preferencias.getCIDADE()))
-                                        spinner_Usuario_Cidade.setSelection(i + 1);
-                                }
-                            }
-
-                        }
-
-
-                    }
-
-                } catch (Exception e) {
-                    Log.e("ESTADO", "ERRO: " + e.getMessage());
-                    falhaCarregarDados();
+        if (Chaves.estadolist_usuario == null) {
+            carregarEstado();
+        } else {
+            spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    Chaves.estadolist_usuario));
+            prim_uf = false;
+            if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
+                for (int i = 0; i < Chaves.estados_usuario.size(); i++) {
+                    if (Chaves.estados_usuario.get(i).getNome().equals(preferencias.getESTADO()))
+                        spinner_Usuario_Estado.setSelection(i + 1);
                 }
             }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("ERRO", "DatabaseError:" + databaseError.getMessage());
-                falhaCarregarDados();
+            if (Chaves.cidadelist_usuario != null) {
+                spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
+                        android.R.layout.simple_spinner_dropdown_item,
+                        Chaves.cidadelist_usuario));
+                prim_cid = false;
+                if (preferencias.getCIDADE() != null && !preferencias.getCIDADE().trim().isEmpty()) {
+                    for (int i = 0; i < Chaves.cidades_usuario.size(); i++) {
+                        if (Chaves.cidades_usuario.get(i).getNome().equals(preferencias.getCIDADE()))
+                            spinner_Usuario_Cidade.setSelection(i + 1);
+                    }
+                }
+
             }
-        });
+        }
 
     }
 

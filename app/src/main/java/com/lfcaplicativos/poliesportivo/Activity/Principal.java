@@ -60,25 +60,8 @@ public class Principal extends AppCompatActivity {
         Bundle args = new Bundle();
         preferencias = new Preferencias(this);
         novo =  (preferencias.getNOME() == null || preferencias.getNOME().trim().isEmpty());
-        DatabaseReference referenciaConfiguracao = ConfiguracaoFirebase.getFirebaseDatabase().child(Chaves.CHAVE_CONFIGURACAO);
+        ConfiguracaoFirebase.buscarConfiguracoes(preferencias);
 
-        referenciaConfiguracao.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                try {
-                    for (DataSnapshot dados : dataSnapshot.getChildren()) {
-                        String chave = dados.getKey(), valor = String.valueOf(dados.getValue());
-                        preferencias.setPreferencias(chave, valor);
-                    }
-                } catch (Exception ignored) {
-
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("ERRO", "DatabaseError:" + databaseError.getMessage());
-            }
-        });
         setContentView(R.layout.activity_principal);
 
 

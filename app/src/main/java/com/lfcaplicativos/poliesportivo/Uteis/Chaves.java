@@ -18,6 +18,10 @@ public class Chaves {
     public static final String CHAVE_NOME = "NOME";
     public static final String CHAVE_ESTADO = "ESTADO";
     public static final String CHAVE_CIDADE = "CIDADE";
+    public static final String CHAVE_ARRAY_ESTADO = "ARRAYESTADO";
+    public static final String CHAVE_ARRAY_CIDADE = "ARRAYCIDADE";
+    public static final String CHAVE_ATU_ESTADO = "ATUESTADO";
+    public static final String CHAVE_ATU_CIDADE = "ATUCIDADE";
     public static final String CHAVE_TELEFONE = "TELEFONE";
     public static final String CHAVE_ID = "ID";
     public static final String CHAVE_FOTO_PERFIL = "FOTO_PERFIL";
@@ -36,7 +40,8 @@ public class Chaves {
     public static int CHAVE_INDEX_PHONE = 0;
     public static int CHAVE_INDEX_GOOGLE = 0;
 
-
+    public static String atuServerCidade;
+    public static String atuServerEstado;
     public static ArrayList<String> estadolist_usuario;
     public static ArrayList<String> cidadelist_usuario;
     public static ArrayList<Estado> estados_usuario;
