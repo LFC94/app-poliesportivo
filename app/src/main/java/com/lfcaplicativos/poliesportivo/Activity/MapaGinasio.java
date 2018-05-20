@@ -2,6 +2,7 @@ package com.lfcaplicativos.poliesportivo.Activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,7 +37,7 @@ public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private int position;
-
+    private ProgressDialog mProgressDialog;
     private Marker currentLocationMaker;
 
 
@@ -71,13 +72,12 @@ public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         boolean isGPS = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        boolean isNetwork = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;// Distance in meters
         long MIN_TIME_BW_UPDATES = 1000;// Time in milliseconds
 
 
         //Check if GPS and Network are on, if not asks the user to turn on
-        if (!isGPS && !isNetwork) {
+        if (!isGPS) {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
             alertDialog.setTitle(getString(R.string.gps_disabled));
             alertDialog.setMessage(getString(R.string.enable_gps) + "?");
@@ -97,24 +97,12 @@ public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback
             alertDialog.show();
         }
 
-        if (ActivityCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        if (isNetwork) {
-            // from Network Provider
-
-            lm.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER,
-                    MIN_TIME_BW_UPDATES,
-                    MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-
-        }
-
         if (isGPS) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            mProgressDialog = ProgressDialog.show(this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.map) + "...", true);
             lm.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
                     MIN_TIME_BW_UPDATES,
@@ -125,7 +113,8 @@ public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onLocationChanged(Location location) {
-
+        if (mProgressDialog != null)
+            mProgressDialog.cancel();
         if (currentLocationMaker != null) {
             currentLocationMaker.remove();
         }
@@ -169,20 +158,7 @@ public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             } else {
 
-                if (Permissao.validaPermicao(this, android.Manifest.permission.ACCESS_FINE_LOCATION, 1) &&
-                        Permissao.validaPermicao(this, Manifest.permission.ACCESS_COARSE_LOCATION, 1)) {
-
-                    startGettingLocations();
-                } else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        ArrayList<String> permissions = new ArrayList<>();
-                        permissions.add(android.Manifest.permission.ACCESS_FINE_LOCATION);
-                        permissions.add(android.Manifest.permission.ACCESS_COARSE_LOCATION);
-
-                        requestPermissions(permissions.toArray(new String[permissions.size()]),
-                                1);
-                    }
-                }
+                adicionarLocalAtual();
             }
         }
     }
@@ -190,20 +166,51 @@ public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        for (int i = 0; i < grantResults.length; i++) {
-            int resultado = grantResults[i];
-            if (resultado == PackageManager.PERMISSION_GRANTED) {
-                startGettingLocations();
+        boolean permitido = false;
+        if (grantResults.length > 0) {
+            permitido = true;
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    permitido = false;
+                    break;
+                }
             }
         }
+        if (permitido)
+            switch (requestCode) {
+                case Chaves.CHAVE_PERMISAO_LOCATION:
+                    adicionarLocalAtual();
+                    break;
+            }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Chaves.CHAVE_RESULT_LOCATION && resultCode == Activity.RESULT_OK) {
-            startGettingLocations();
+        switch (requestCode) {
+            case Chaves.CHAVE_RESULT_LOCATION:
+                LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                boolean isGPS = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                if (isGPS) {
+                    startGettingLocations();
+                }
+                break;
         }
     }
 
+    public void adicionarLocalAtual() {
+        if (Permissao.validaPermicao(this, android.Manifest.permission.ACCESS_FINE_LOCATION) &&
+                Permissao.validaPermicao(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+
+            startGettingLocations();
+        } else {
+            ArrayList<String> permissions = new ArrayList<>();
+            permissions.add(android.Manifest.permission.ACCESS_FINE_LOCATION);
+            permissions.add(android.Manifest.permission.ACCESS_COARSE_LOCATION);
+
+            Permissao.chamarPermicao(this, permissions.toArray(new String[permissions.size()]),
+                    Chaves.CHAVE_PERMISAO_LOCATION);
+
+        }
+    }
 }

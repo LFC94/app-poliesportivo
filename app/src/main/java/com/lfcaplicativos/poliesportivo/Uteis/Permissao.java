@@ -16,16 +16,17 @@ import com.lfcaplicativos.poliesportivo.R;
 
 @SuppressWarnings("ALL")
 public class Permissao {
-    public static boolean validaPermicao(Activity activity, String permissao, int RequestCod) {
-        if (Build.VERSION.SDK_INT >= 23) {
-
+    public static boolean validaPermicao(Activity activity, String permissao) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(activity.getApplicationContext(), permissao) != PackageManager.PERMISSION_GRANTED) {
-                String[] aPermissao = new String[]{permissao};
-                ActivityCompat.requestPermissions(activity, aPermissao, RequestCod);
+                return false;
             }
-
         }
         return true;
+    }
+
+    public static void chamarPermicao(Activity activity, String[] permissao, int RequestCod) {
+        ActivityCompat.requestPermissions(activity, permissao, RequestCod);
     }
 
     public static void alertaValidacaoPemissao(final Activity activity, String permissao) {

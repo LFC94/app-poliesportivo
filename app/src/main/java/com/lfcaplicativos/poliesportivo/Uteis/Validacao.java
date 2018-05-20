@@ -1,9 +1,15 @@
 package com.lfcaplicativos.poliesportivo.Uteis;
 
+import android.app.Activity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.ImageView;
+
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.util.Arrays;
 
@@ -75,4 +81,35 @@ public class Validacao {
             if (item != exception) item.setVisible(visible);
         }
     }
+
+    public static void carregarImagem(final Activity activity, final ImageView imageView, final String url){
+        Picasso.with(activity)
+                .load(url)
+                .networkPolicy(NetworkPolicy.OFFLINE)
+                .into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError() {
+                        //Try again online if cache failed
+                        Picasso.with(activity)
+                                .load(url)
+                                .into(imageView, new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                    }
+                                });
+                    }
+                });
+    }
+
+
 }

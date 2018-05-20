@@ -1,18 +1,20 @@
 package com.lfcaplicativos.poliesportivo.Activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -38,6 +40,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -45,20 +49,23 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.lfcaplicativos.poliesportivo.Config.ConfiguracaoFirebase;
 import com.lfcaplicativos.poliesportivo.Objetos.Cidade;
 import com.lfcaplicativos.poliesportivo.Objetos.Estado;
 import com.lfcaplicativos.poliesportivo.R;
 import com.lfcaplicativos.poliesportivo.Uteis.Chaves;
 import com.lfcaplicativos.poliesportivo.Uteis.ConexaoHTTP;
+import com.lfcaplicativos.poliesportivo.Uteis.Permissao;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
 import com.lfcaplicativos.poliesportivo.Uteis.Validacao;
 import com.rengwuxian.materialedittext.MaterialEditText;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -69,14 +76,11 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import fr.ganfra.materialspinner.MaterialSpinner;
-
 public class Usuario extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, View.OnKeyListener {
 
     public MaterialEditText edit_Usuario_Nome, edit_Usuario_Telefone;
     public ImageView image_Usuario_Foto;
-    public Bitmap bitmapFotoPerfil = null;
-    private MaterialSpinner spinner_Usuario_Estado, spinner_Usuario_Cidade;
+    private SearchableSpinner spinner_Usuario_Estado, spinner_Usuario_Cidade;
     private SignInButton button_Usuario_SingInGoogle;
     private Button button_Usuario_DisconnectGoogle;
 
@@ -88,9 +92,11 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
     private Preferencias preferencias;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
+    private FirebaseStorage storage;
+    private StorageReference storageRef;
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleApiClient mGoogleApiClient;
-    private boolean acesso_banco = true, prim_uf = true, prim_cid = true;
+    private boolean prim_uf = true, prim_cid = true;
 
 
     @Override
@@ -106,6 +112,8 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
         mAuth = ConfiguracaoFirebase.getFirebaseAuth();
         mUser = mAuth.getCurrentUser();
 
+        storage = FirebaseStorage.getInstance();
+
         edit_Usuario_Nome = findViewById(R.id.edit_Usuario_Nome);
         edit_Usuario_Telefone = findViewById(R.id.edit_Usuario_Telefone);
 
@@ -116,7 +124,13 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
         edit_Usuario_Telefone.setOnKeyListener(this);
 
         spinner_Usuario_Estado = findViewById(R.id.spinner_Usuario_Estado);
+        spinner_Usuario_Estado.setTitle(getString(R.string.state));
+        spinner_Usuario_Estado.setPositiveButton(getString(R.string.confirm));
+
         spinner_Usuario_Cidade = findViewById(R.id.spinner_Usuario_Cidade);
+        spinner_Usuario_Cidade.setTitle(getString(R.string.city));
+        spinner_Usuario_Cidade.setPositiveButton(getString(R.string.confirm));
+
         image_Usuario_Foto = findViewById(R.id.image_Usuario_Foto);
 
         button_Usuario_SingInGoogle = findViewById(R.id.button_Usuario_SingInGoogle);
@@ -136,16 +150,10 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
             public void onItemSelected(AdapterView<?> arg0,
                                        View arg1, int position, long arg3) {
 
-                if (!acesso_banco)
-                    return;
-
                 if (position >= 0) {
-                    if (Chaves.cidadelist_usuario != null && !prim_cid) {
-                        return;
-                    }
                     carregarCidade(Chaves.estados_usuario.get(position).getSigla());
                 } else {
-                    spinner_Usuario_Estado.setError(R.string.notstate);
+                    // spinner_Usuario_Estado.setError(R.string.notstate);
                     spinner_Usuario_Estado.requestFocus();
                     if (Chaves.cidadelist_usuario == null)
                         return;
@@ -165,8 +173,6 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
 
         buscarDadosFirebase();
 
-        imagemPerfilUsuario(false);
-
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -177,14 +183,6 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (!gravarUsuario())
-            return;
-
-        super.onBackPressed();
     }
 
     @Override
@@ -258,7 +256,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                         return;
                     }
                     try {
-
+                        Bitmap bitmapFotoPerfil = null;
                         if (data.getData() != null) {
                             InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
                             bitmapFotoPerfil = BitmapFactory.decodeStream(inputStream);
@@ -290,6 +288,26 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        boolean permitido = false;
+        if (grantResults.length > 0) {
+            permitido = true;
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    permitido = false;
+                    break;
+                }
+            }
+        }
+        switch (requestCode) {
+            case Chaves.CHAVE_PERMISAO_PHOTO:
+                if (permitido)
+                    abrieCameraGaleria();
+                break;
+        }
+    }
+
+    @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.d("", "onConnectionFailed:" + connectionResult);
         Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
@@ -297,16 +315,27 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
 
     private void abrieCameraGaleria() {
 
-        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        pickIntent.setType("image/*");
-        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (Permissao.validaPermicao(this, Manifest.permission.CAMERA) &&
+                Permissao.validaPermicao(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
 
-        Intent chooserIntent = Intent.createChooser(pickIntent, getString(R.string.selectPhoto));
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
+            Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            pickIntent.setType("image/*");
+            Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        startActivityForResult(chooserIntent, Chaves.CHAVE_RESULT_PHOTO);
+            Intent chooserIntent = Intent.createChooser(pickIntent, getString(R.string.selectPhoto));
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
+
+            startActivityForResult(chooserIntent, Chaves.CHAVE_RESULT_PHOTO);
+
+        } else {
+
+            String[] permissions = new String[2];
+            permissions[0] = Manifest.permission.CAMERA;
+            permissions[1] = Manifest.permission.READ_EXTERNAL_STORAGE;
+            Permissao.chamarPermicao(this, permissions, Chaves.CHAVE_PERMISAO_PHOTO);
+
+        }
     }
-
 
     private void carregarEstado() {
         mProgressDialog = ProgressDialog.show(this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.state) + "...", true);
@@ -332,7 +361,8 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                     estado.setIdUF(0);
                     estado.setSigla("");
                     estado.setNome("");
-
+                    Chaves.estados_usuario.add(estado);
+                    Chaves.estadolist_usuario.add("");
                     for (int i = 0; i < jsonarray.length(); i++) {
                         jsonobject = jsonarray.getJSONObject(i);
 
@@ -356,7 +386,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                                 if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
                                     for (int i = 0; i < Chaves.estados_usuario.size(); i++) {
                                         if (Chaves.estados_usuario.get(i).getNome().equals(preferencias.getESTADO()))
-                                            spinner_Usuario_Estado.setSelection(i + 1);
+                                            spinner_Usuario_Estado.setSelection(i);
                                     }
                                 }
                             }
@@ -380,7 +410,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
     private void carregarCidade(final String UFEstado) {
 
         if (UFEstado.trim().isEmpty()) {
-            spinner_Usuario_Estado.setError(R.string.notstate);
+            //spinner_Usuario_Estado.setError(R.string.notstate);
             spinner_Usuario_Estado.requestFocus();
             Chaves.cidadelist_usuario.clear();
             spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
@@ -398,10 +428,10 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                     Chaves.cidadelist_usuario = new ArrayList<String>();
 
                     String sJson = preferencias.getSPreferencias(Chaves.CHAVE_ARRAY_CIDADE);
-                    if (preferencias.getSPreferencias(Chaves.CHAVE_ATU_CIDADE)==null||!Chaves.atuServerCidade.trim().equalsIgnoreCase(preferencias.getSPreferencias(Chaves.CHAVE_ATU_CIDADE).trim())){
+                    if (preferencias.getSPreferencias(Chaves.CHAVE_ATU_CIDADE) == null || !Chaves.atuServerCidade.trim().equalsIgnoreCase(preferencias.getSPreferencias(Chaves.CHAVE_ATU_CIDADE).trim())) {
                         sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_CIDADE));
-                        preferencias.setPreferencias(Chaves.CHAVE_ATU_CIDADE,Chaves.atuServerCidade);
-                        preferencias.setPreferencias(Chaves.CHAVE_ARRAY_CIDADE,sJson);
+                        preferencias.setPreferencias(Chaves.CHAVE_ATU_CIDADE, Chaves.atuServerCidade);
+                        preferencias.setPreferencias(Chaves.CHAVE_ARRAY_CIDADE, sJson);
                     }
                     jsonobject = new JSONObject(sJson);
                     jsonarray = jsonobject.getJSONArray("cidade");
@@ -409,15 +439,16 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                     Chaves.cidades_usuario.clear();
 
                     Cidade cidade = new Cidade();
-                    cidade.setIdPais(0);
+                    cidade.setIdPais(55);
                     cidade.setIdUF(0);
                     cidade.setIdCidade(0);
                     cidade.setNome("");
-
+                    Chaves.cidades_usuario.add(cidade);
+                    Chaves.cidadelist_usuario.add("");
                     for (int i = 0; i < jsonarray.length(); i++) {
                         jsonobject = jsonarray.getJSONObject(i);
 
-                        if(!jsonobject.optString("uf").trim().equalsIgnoreCase(UFEstado.trim()))
+                        if (!jsonobject.optString("uf").trim().equalsIgnoreCase(UFEstado.trim()))
                             continue;
 
                         cidade = new Cidade();
@@ -435,13 +466,10 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                             spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
                                     android.R.layout.simple_spinner_dropdown_item,
                                     Chaves.cidadelist_usuario));
-                            if (!prim_uf && prim_cid) {
-                                prim_cid = false;
-                                if (preferencias.getCIDADE() != null && !preferencias.getCIDADE().trim().isEmpty()) {
-                                    for (int i = 0; i < Chaves.cidades_usuario.size(); i++) {
-                                        if (Chaves.cidades_usuario.get(i).getNome().equals(preferencias.getCIDADE()))
-                                            spinner_Usuario_Cidade.setSelection(i + 1);
-                                    }
+                            if (preferencias.getCIDADE() != null && !preferencias.getCIDADE().trim().isEmpty()) {
+                                for (int i = 0; i < Chaves.cidades_usuario.size(); i++) {
+                                    if (Chaves.cidades_usuario.get(i).getNome().equals(preferencias.getCIDADE()))
+                                        spinner_Usuario_Cidade.setSelection(i);
                                 }
                             }
                         }
@@ -455,29 +483,27 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
 
     }
 
-    private void imagemPerfilUsuario(boolean Salvar) {
+    private void gravarImagemFireBase() {
+        image_Usuario_Foto.setDrawingCacheEnabled(true);
+        image_Usuario_Foto.buildDrawingCache();
+        Bitmap bitmap = image_Usuario_Foto.getDrawingCache();
+        if (bitmap != null) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] data = baos.toByteArray();
 
-        if (Salvar) {
-            if (bitmapFotoPerfil != null) {
-                Bitmap realImage = bitmapFotoPerfil;
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                realImage.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                byte[] b = baos.toByteArray();
-                preferencias.setFOTO_PERFIL(Base64.encodeToString(b, Base64.DEFAULT));
-                image_Usuario_Foto.setImageBitmap(bitmapFotoPerfil);
-            }
-        } else {
-            if (preferencias.getFOTO_PERFIL() != null && !preferencias.getFOTO_PERFIL().trim().isEmpty()) {
-                byte[] b = Base64.decode(preferencias.getFOTO_PERFIL(), Base64.DEFAULT);
-                bitmapFotoPerfil = BitmapFactory.decodeByteArray(b, 0, b.length);
-                image_Usuario_Foto.setImageBitmap(bitmapFotoPerfil);
-            }
+            UploadTask uploadTask = storageRef.putBytes(data);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle unsuccessful uploads
+                }
+            });
         }
-
     }
 
     private void falhaCarregarDados() {
-        acesso_banco = false;
+
 
         if (preferencias.getNOME() != null) {
             edit_Usuario_Nome.setText(preferencias.getNOME());
@@ -515,9 +541,6 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                 spinner_Usuario_Cidade.setSelection(0);
             }
         }
-        spinner_Usuario_Estado.setEnabled(acesso_banco);
-        spinner_Usuario_Cidade.setEnabled(acesso_banco);
-
         try {
             timer = new Timer();
             timer.schedule(new TimerTask() {
@@ -539,10 +562,18 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
     }
 
     private void buscarDadosFirebase() {
-        acesso_banco = true;
-        spinner_Usuario_Estado.setEnabled(acesso_banco);
-        spinner_Usuario_Cidade.setEnabled(acesso_banco);
         ConfiguracaoFirebase.buscarConfiguracoes(preferencias);
+
+        String nomefoto_perfil = preferencias.getSPreferencias(Chaves.CHAVE_ID).replaceAll("[^a-zA-Z0-9]+", "").trim() + ".JPEG";
+
+        storageRef = storage.getReference().child(Chaves.CHAVE_FOTO_PERFIL).child(nomefoto_perfil);
+        storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Validacao.carregarImagem(Usuario.this, image_Usuario_Foto, uri.toString());
+                // Picasso.with(getApplicationContext()).load(uri).into(image_Usuario_Foto);
+            }
+        });
 
         if (preferencias.getNOME() != null)
             edit_Usuario_Nome.setText(preferencias.getNOME());
@@ -559,7 +590,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
             if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
                 for (int i = 0; i < Chaves.estados_usuario.size(); i++) {
                     if (Chaves.estados_usuario.get(i).getNome().equals(preferencias.getESTADO()))
-                        spinner_Usuario_Estado.setSelection(i + 1);
+                        spinner_Usuario_Estado.setSelection(i);
                 }
             }
 
@@ -571,7 +602,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                 if (preferencias.getCIDADE() != null && !preferencias.getCIDADE().trim().isEmpty()) {
                     for (int i = 0; i < Chaves.cidades_usuario.size(); i++) {
                         if (Chaves.cidades_usuario.get(i).getNome().equals(preferencias.getCIDADE()))
-                            spinner_Usuario_Cidade.setSelection(i + 1);
+                            spinner_Usuario_Cidade.setSelection(i);
                     }
                 }
 
@@ -587,32 +618,32 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
             return false;
         }
         if (spinner_Usuario_Estado.getSelectedItemPosition() <= 0) {
-            spinner_Usuario_Estado.setError(R.string.notstate);
+            //spinner_Usuario_Estado.setError(R.string.notstate);
             spinner_Usuario_Estado.requestFocus();
             return false;
         }
-        if(!edit_Usuario_Telefone.getText().toString().trim().isEmpty()&&
-                !Validacao.validateDDDPhoneNumber(edit_Usuario_Telefone,getString(R.string.ddd_invalid),getString(R.string.phone_invalid))){
+        if (!edit_Usuario_Telefone.getText().toString().trim().isEmpty() &&
+                !Validacao.validateDDDPhoneNumber(edit_Usuario_Telefone, getString(R.string.ddd_invalid), getString(R.string.phone_invalid))) {
             edit_Usuario_Telefone.requestFocus();
             return false;
         }
         preferencias.setNOME(edit_Usuario_Nome.getText().toString().trim());
         preferencias.setTelefone(edit_Usuario_Telefone.getText().toString().trim());
-        if (acesso_banco) {
-            if (spinner_Usuario_Cidade.getSelectedItemPosition() > 0) {
-                preferencias.setCIDADE(Chaves.cidades_usuario.get(spinner_Usuario_Cidade.getSelectedItemPosition() - 1).getNome());
-            } else {
-                preferencias.setCIDADE("");
-            }
 
-            if (spinner_Usuario_Estado.getSelectedItemPosition() > 0) {
-                preferencias.setESTADO(Chaves.estados_usuario.get(spinner_Usuario_Estado.getSelectedItemPosition() - 1).getNome());
-            } else {
-                preferencias.setESTADO("");
-            }
+        if (spinner_Usuario_Cidade.getSelectedItemPosition() > 0) {
+            preferencias.setCIDADE(Chaves.cidades_usuario.get(spinner_Usuario_Cidade.getSelectedItemPosition()).getNome());
+        } else {
+            preferencias.setCIDADE("");
         }
 
-        imagemPerfilUsuario(true);
+        if (spinner_Usuario_Estado.getSelectedItemPosition() > 0) {
+            preferencias.setESTADO(Chaves.estados_usuario.get(spinner_Usuario_Estado.getSelectedItemPosition()).getNome());
+        } else {
+            preferencias.setESTADO("");
+        }
+
+
+        gravarImagemFireBase();
 
         DatabaseReference referenciaFire = ConfiguracaoFirebase.getFirebaseDatabase();
         referenciaFire.child(Chaves.CHAVE_USUARIO).child(preferencias.getSPreferencias(Chaves.CHAVE_ID)).setValue(preferencias.retornaUsuarioPreferencias(false));
@@ -666,8 +697,18 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                     edit_Usuario_Telefone.setText(mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhoneNumber());
 
                 if (mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhotoUrl() != null) {
-                    Picasso.with(getApplicationContext()).load(mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhotoUrl().toString()).into(image_Usuario_Foto);
-                    bitmapFotoPerfil = image_Usuario_Foto.getDrawingCache();
+                    Picasso.with(getApplicationContext()).load(mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhotoUrl().toString()).into(image_Usuario_Foto,
+                            new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    gravarImagemFireBase();
+                                }
+
+                                @Override
+                                public void onError() {
+                                }
+                            });
+
                 }
 
             }
@@ -683,11 +724,11 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
                 switch (v.getId()) {
                     case R.id.edit_Usuario_Telefone:
-                            if(!edit_Usuario_Telefone.getText().toString().trim().isEmpty()&&
-                                Validacao.validateDDDPhoneNumber(edit_Usuario_Telefone,getString(R.string.ddd_invalid),getString(R.string.phone_invalid))){
-                                spinner_Usuario_Estado.requestFocus();
-                                return false;
-                            }
+                        if (!edit_Usuario_Telefone.getText().toString().trim().isEmpty() &&
+                                Validacao.validateDDDPhoneNumber(edit_Usuario_Telefone, getString(R.string.ddd_invalid), getString(R.string.phone_invalid))) {
+                            spinner_Usuario_Estado.requestFocus();
+                            return false;
+                        }
                         break;
                 }
             }

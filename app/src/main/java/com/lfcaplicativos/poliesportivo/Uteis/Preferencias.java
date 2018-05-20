@@ -127,29 +127,16 @@ public class Preferencias {
                 Retorno.put(Chaves.CHAVE_ESTADO, sharedPreferences.getString(Chaves.CHAVE_ESTADO, null));
             if (getCIDADE() != null)
                 Retorno.put(Chaves.CHAVE_CIDADE, sharedPreferences.getString(Chaves.CHAVE_CIDADE, null));
-            if (getFOTO_PERFIL() != null)
-                Retorno.put(Chaves.CHAVE_FOTO_PERFIL, sharedPreferences.getString(Chaves.CHAVE_FOTO_PERFIL, null));
         } else {
             Retorno.put(Chaves.CHAVE_NOME, sharedPreferences.getString(Chaves.CHAVE_NOME, null));
             Retorno.put(Chaves.CHAVE_TELEFONE, sharedPreferences.getString(Chaves.CHAVE_TELEFONE, null));
             Retorno.put(Chaves.CHAVE_ID, sharedPreferences.getString(Chaves.CHAVE_ID, null));
             Retorno.put(Chaves.CHAVE_ESTADO, sharedPreferences.getString(Chaves.CHAVE_ESTADO, null));
             Retorno.put(Chaves.CHAVE_CIDADE, sharedPreferences.getString(Chaves.CHAVE_CIDADE, null));
-            Retorno.put(Chaves.CHAVE_FOTO_PERFIL, sharedPreferences.getString(Chaves.CHAVE_FOTO_PERFIL, null));
         }
 
         return Retorno;
     }
-
-    public void setFOTO_PERFIL(String Foto_Perfil) {
-        editor.putString(Chaves.CHAVE_FOTO_PERFIL, Foto_Perfil);
-        editor.commit();
-    }
-
-    public String getFOTO_PERFIL() {
-        return sharedPreferences.getString(Chaves.CHAVE_FOTO_PERFIL, null);
-    }
-
 
     /************** CONFIGURACAO *************/
     public void ConfiguracaoPreferencias(String UrlEstado, String UrlCidade, String UrlGinasio) {

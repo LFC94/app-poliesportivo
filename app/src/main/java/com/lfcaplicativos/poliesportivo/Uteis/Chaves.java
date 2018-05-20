@@ -34,8 +34,10 @@ public class Chaves {
     public static final String CHAVE_AUTENTC_PHONE = "AUTENTC_PHONE";
     public static final String CHAVE_AUTENTC_GOOGLE = "AUTENTC_GOOGLE";
 
-    public static final int CHAVE_RESULT_PHOTO = 1;
+    public static final int CHAVE_RESULT_PHOTO = 6;
+    public static final int CHAVE_PERMISAO_PHOTO = 61;
     public static final int CHAVE_RESULT_LOCATION = 2;
+    public static final int CHAVE_PERMISAO_LOCATION = 21;
     public static final int CHAVE_RESULT_GOOGLE = 3;
     public static int CHAVE_INDEX_PHONE = 0;
     public static int CHAVE_INDEX_GOOGLE = 0;

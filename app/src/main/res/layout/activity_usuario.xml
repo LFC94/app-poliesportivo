@@ -16,8 +16,8 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
             app:popupTheme="@style/AppTheme.NoActionBar.PopupOverlay" />
     </android.support.design.widget.AppBarLayout>
 
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.github.siyamed.shapeimageview.OctogonImageView
+            <com.github.siyamed.shapeimageview.CircularImageView
                 android:id="@+id/image_Usuario_Foto"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
@@ -60,36 +60,43 @@
                 android:inputType="number|numberSigned"
                 app:met_floatingLabel="highlight" />
 
-            <fr.ganfra.materialspinner.MaterialSpinner
-                android:id="@+id/spinner_Usuario_Estado"
+            <TextView
+                android:id="@+id/text_Usuario_Estado"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/edit_Usuario_Telefone"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:defaultFocusHighlightEnabled="false"
-                android:focusableInTouchMode="false"
-                android:focusedByDefault="false"
-                android:minWidth="250dp"
-                android:touchscreenBlocksFocus="false"
-                app:layout_anchorGravity="top|center"
-                app:ms_alignLabels="false"
-                app:ms_floatingLabelColor="@color/colorPrimary"
-                app:ms_floatingLabelText="@string/state"
-                app:ms_hint="@string/state" />
+                android:layout_marginLeft="16dp"
+                android:gravity="center_vertical"
+                android:text="@string/state"
+                android:textSize="12sp" />
 
-            <fr.ganfra.materialspinner.MaterialSpinner
-                android:id="@+id/spinner_Usuario_Cidade"
+            <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                android:id="@+id/spinner_Usuario_Estado"
+                style="@style/Platform.Widget.AppCompat.Spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/text_Usuario_Estado"
+                android:layout_marginLeft="16dp"
+                android:minWidth="250dp" />
+
+            <TextView
+                android:id="@+id/text_Usuario_Cidade"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/spinner_Usuario_Estado"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:minWidth="500dp"
-                app:layout_anchorGravity="bottom|center"
-                app:ms_alignLabels="false"
-                app:ms_floatingLabelColor="@color/colorPrimary"
-                app:ms_floatingLabelText="@string/city"
-                app:ms_hint="@string/city" />
+                android:layout_marginLeft="16dp"
+                android:gravity="center_vertical"
+                android:text="@string/city"
+                android:textSize="12sp" />
+
+            <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                android:id="@+id/spinner_Usuario_Cidade"
+                style="@style/Platform.Widget.AppCompat.Spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/text_Usuario_Cidade"
+                android:layout_marginLeft="16dp"
+                android:minWidth="500dp" />
 
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/button_Usuario_SingInGoogle"
@@ -109,11 +116,12 @@
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:drawableLeft="@drawable/googleg_standard_color_18"
+                android:drawableStart="@drawable/googleg_standard_color_18"
                 android:ems="10"
                 android:onClick="onClick"
                 android:text="@string/disconnect"
                 android:textAllCaps="false"
-                android:theme="@style/MyDarkButton"/>
+                android:theme="@style/MyDarkButton" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab_Usuario_Foto"
