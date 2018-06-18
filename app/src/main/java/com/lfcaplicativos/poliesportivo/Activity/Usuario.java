@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
 import com.google.android.gms.auth.api.Auth;
@@ -50,6 +51,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -63,8 +65,6 @@ import com.lfcaplicativos.poliesportivo.Uteis.Permissao;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
 import com.lfcaplicativos.poliesportivo.Uteis.Validacao;
 import com.rengwuxian.materialedittext.MaterialEditText;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 import org.json.JSONArray;
@@ -93,6 +93,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private FirebaseStorage storage;
+    private FirebaseRemoteConfig mFirebaseRemoteConfig;
     private StorageReference storageRef;
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleApiClient mGoogleApiClient;
@@ -111,8 +112,9 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
         preferencias = new Preferencias(this);
         mAuth = ConfiguracaoFirebase.getFirebaseAuth();
         mUser = mAuth.getCurrentUser();
-
         storage = FirebaseStorage.getInstance();
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+
 
         edit_Usuario_Nome = findViewById(R.id.edit_Usuario_Nome);
         edit_Usuario_Telefone = findViewById(R.id.edit_Usuario_Telefone);
@@ -428,7 +430,11 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                     Chaves.cidadelist_usuario = new ArrayList<String>();
 
                     String sJson = preferencias.getSPreferencias(Chaves.CHAVE_ARRAY_CIDADE);
-                    if (preferencias.getSPreferencias(Chaves.CHAVE_ATU_CIDADE) == null || !Chaves.atuServerCidade.trim().equalsIgnoreCase(preferencias.getSPreferencias(Chaves.CHAVE_ATU_CIDADE).trim())) {
+                    if (preferencias.getSPreferencias(Chaves.CHAVE_ARRAY_CIDADE) == null || preferencias.getSPreferencias(Chaves.CHAVE_ARRAY_CIDADE).isEmpty() ||
+                            preferencias.getSPreferencias(Chaves.CHAVE_ATU_CIDADE) == null || preferencias.getSPreferencias(Chaves.CHAVE_ATU_CIDADE).isEmpty() ||
+                            !Chaves.atuServerCidade.trim().equalsIgnoreCase(preferencias.getSPreferencias(Chaves.CHAVE_ATU_CIDADE).trim())
+                            ) {
+
                         sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_CIDADE));
                         preferencias.setPreferencias(Chaves.CHAVE_ATU_CIDADE, Chaves.atuServerCidade);
                         preferencias.setPreferencias(Chaves.CHAVE_ARRAY_CIDADE, sJson);
@@ -571,7 +577,6 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
             @Override
             public void onSuccess(Uri uri) {
                 Validacao.carregarImagem(Usuario.this, image_Usuario_Foto, uri.toString());
-                // Picasso.with(getApplicationContext()).load(uri).into(image_Usuario_Foto);
             }
         });
 
@@ -697,18 +702,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                     edit_Usuario_Telefone.setText(mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhoneNumber());
 
                 if (mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhotoUrl() != null) {
-                    Picasso.with(getApplicationContext()).load(mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhotoUrl().toString()).into(image_Usuario_Foto,
-                            new Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    gravarImagemFireBase();
-                                }
-
-                                @Override
-                                public void onError() {
-                                }
-                            });
-
+                    Glide.with(getApplicationContext()).load(mUser.getProviderData().get(Chaves.CHAVE_INDEX_GOOGLE).getPhotoUrl().toString()).into(image_Usuario_Foto);
                 }
 
             }

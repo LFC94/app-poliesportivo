@@ -30,12 +30,11 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.github.siyamed.shapeimageview.CircularImageView
+            <ImageView
                 android:id="@+id/image_Usuario_Foto"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:layout_centerHorizontal="true"
-                app:siSquare="true" />
+                android:layout_centerHorizontal="true" />
 
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:id="@+id/edit_Usuario_Nome"

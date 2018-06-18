@@ -20,8 +20,8 @@ public class Chaves {
     public static final String CHAVE_CIDADE = "CIDADE";
     public static final String CHAVE_ARRAY_ESTADO = "ARRAYESTADO";
     public static final String CHAVE_ARRAY_CIDADE = "ARRAYCIDADE";
-    public static final String CHAVE_ATU_ESTADO = "ATUESTADO";
-    public static final String CHAVE_ATU_CIDADE = "ATUCIDADE";
+    public static final String CHAVE_ATU_ESTADO = "ATU_ESTADO";
+    public static final String CHAVE_ATU_CIDADE = "ATU_CIDADE";
     public static final String CHAVE_TELEFONE = "TELEFONE";
     public static final String CHAVE_ID = "ID";
     public static final String CHAVE_FOTO_PERFIL = "FOTO_PERFIL";

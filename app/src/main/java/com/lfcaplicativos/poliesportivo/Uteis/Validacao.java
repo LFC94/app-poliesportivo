@@ -7,9 +7,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.util.Arrays;
 
@@ -83,32 +81,9 @@ public class Validacao {
     }
 
     public static void carregarImagem(final Activity activity, final ImageView imageView, final String url){
-        Picasso.with(activity)
+        Glide.with(activity)
                 .load(url)
-                .networkPolicy(NetworkPolicy.OFFLINE)
-                .into(imageView, new Callback() {
-                    @Override
-                    public void onSuccess() {
-
-                    }
-
-                    @Override
-                    public void onError() {
-                        //Try again online if cache failed
-                        Picasso.with(activity)
-                                .load(url)
-                                .into(imageView, new Callback() {
-                                    @Override
-                                    public void onSuccess() {
-
-                                    }
-
-                                    @Override
-                                    public void onError() {
-                                    }
-                                });
-                    }
-                });
+                .into(imageView);
     }
 
 

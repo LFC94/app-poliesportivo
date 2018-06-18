@@ -33,7 +33,7 @@ import com.lfcaplicativos.poliesportivo.Uteis.Permissao;
 
 import java.util.ArrayList;
 
-public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback, LocationListener, View.OnClickListener {
+public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
 
     private GoogleMap mMap;
     private int position;
@@ -60,10 +60,7 @@ public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LatLng latLng = new LatLng(Chaves.ginasio_principal.get(position).getLatitude(), Chaves.ginasio_principal.get(position).getLongitude());
-        mMap.addMarker(new MarkerOptions().position(latLng).title(Chaves.ginasio_principal.get(position).getNome()));
-        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(latLng).build();
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        adicionarLocalAtual();
     }
 
 
@@ -147,23 +144,6 @@ public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onClick(View view) {
-        if (view == findViewById(R.id.floating_mapaginasio_Local)) {
-
-            if (currentLocationMaker != null) {
-                currentLocationMaker.remove();
-                currentLocationMaker = null;
-                LatLng latLng = new LatLng(Chaves.ginasio_principal.get(position).getLatitude(), Chaves.ginasio_principal.get(position).getLongitude());
-                CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(latLng).build();
-                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-            } else {
-
-                adicionarLocalAtual();
-            }
-        }
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean permitido = false;
@@ -199,6 +179,12 @@ public class MapaGinasio extends AppCompatActivity implements OnMapReadyCallback
     }
 
     public void adicionarLocalAtual() {
+
+        LatLng latLng = new LatLng(Chaves.ginasio_principal.get(position).getLatitude(), Chaves.ginasio_principal.get(position).getLongitude());
+        mMap.addMarker(new MarkerOptions().position(latLng).title(Chaves.ginasio_principal.get(position).getNome()));
+        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(latLng).build();
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
         if (Permissao.validaPermicao(this, android.Manifest.permission.ACCESS_FINE_LOCATION) &&
                 Permissao.validaPermicao(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
 

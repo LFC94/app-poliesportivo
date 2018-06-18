@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.lfcaplicativos.poliesportivo.Activity.Ginasio">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.NoActionBar.AppBarOverlay">
+        android:theme="@style/AppTheme.NoActionBar.AppBarOverlay"
+        app:layout_constraintTop_toTopOf="parent">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -21,23 +23,55 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <include
+        android:id="@+id/include"
+        layout="@layout/fragment_mapa_ginasio"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@+id/appBarLayout2"
+        android:layout_weight="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.51"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout2" />
+
     <devs.mulham.horizontalcalendar.HorizontalCalendarView
         android:id="@+id/calendarGinasio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/appBarLayout2"
+        android:layout_above="@+id/recyclerGinasioHoraio"
         android:background="@color/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerGinasioHoraio"
+        app:layout_constraintTop_toBottomOf="@+id/include"
         app:textColorNormal="@color/c5"
-        app:textColorSelected="@color/c3" />
+        app:textColorSelected="@color/c3"
+        tools:layout_editor_absoluteX="0dp" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerGinasioHoraio"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/calendarGinasio" />
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/textNoTimeGinasio"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/no_time_day"
+            android:textAllCaps="true"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            android:textColor="?attr/colorError"
+            android:textStyle="bold"
+            app:fontFamily="serif" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerGinasioHoraio"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </RelativeLayout>
+
+
+</LinearLayout>

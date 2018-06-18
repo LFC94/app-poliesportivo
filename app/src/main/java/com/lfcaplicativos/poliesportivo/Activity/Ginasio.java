@@ -13,7 +13,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.lfcaplicativos.poliesportivo.Adapter.RecyclerGinasio;
 import com.lfcaplicativos.poliesportivo.Objetos.Horarios;
 import com.lfcaplicativos.poliesportivo.R;
@@ -31,7 +39,7 @@ import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 
-public class Ginasio extends AppCompatActivity implements View.OnClickListener {
+public class Ginasio extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
 
     private int position = 0;
     private RecyclerView recyclerGinasioHorario;
@@ -41,6 +49,9 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
     private JSONObject jsonobject, jsonobject1, jsonobject2;
     private JSONArray jsonarrayHorario, jsonarrayHorarios;
     private ProgressDialog mProgressDialog;
+    private GoogleMap mMap;
+    private TextView textViewNoTimeGinasio;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +66,9 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
             Toolbar toolbar = findViewById(R.id.toolbar);
             toolbar.setTitle(Chaves.ginasio_principal.get(position).getNome());
             setSupportActionBar(toolbar);
+
+            textViewNoTimeGinasio = findViewById(R.id.textNoTimeGinasio);
+            textViewNoTimeGinasio.setVisibility(View.INVISIBLE);
 
             recyclerGinasioHorario = findViewById(R.id.recyclerGinasioHoraio);
             recyclerGinasioHorario.setHasFixedSize(true);
@@ -88,9 +102,23 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
 
             carregarHorario(startDate);
 
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
+
+
         } catch (Exception e) {
             Log.i("Erro: ", e.getMessage());
         }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        LatLng latLng = new LatLng(Chaves.ginasio_principal.get(position).getLatitude(), Chaves.ginasio_principal.get(position).getLongitude());
+        mMap.addMarker(new MarkerOptions().position(latLng).title(Chaves.ginasio_principal.get(position).getNome()));
+        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(latLng).build();
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     @Override
@@ -127,12 +155,14 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
     private void carregarHorario(final Calendar data) {
 
         final int dia = data.get(Calendar.DAY_OF_WEEK);
+        textViewNoTimeGinasio.setVisibility(View.INVISIBLE);
         mProgressDialog = ProgressDialog.show(this, getString(R.string.loading), getString(R.string.loading) + " " + getString(R.string.available_times) + "...", true);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Chaves.horarios_ginasio = new ArrayList<Horarios>();
+
 
                     String sJson = ConexaoHTTP.getJSONFromAPI(preferencias.getSPreferencias(Chaves.CHAVE_URL_HORARIOS) + "?GINASIO=" + String.valueOf(Chaves.ginasio_principal.get(position).getCodigo()) + "&DATA='" + DateFormat.format("yyyy-MM-dd", data) + "'&DIA=" + String.valueOf(dia));
                     jsonobject = new JSONObject(sJson);
@@ -177,6 +207,8 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener {
                         @Override
                         public void run() {
                             try {
+                                if(Chaves.horarios_ginasio.size() <= 0)
+                                    textViewNoTimeGinasio.setVisibility(View.VISIBLE);
                                 mAdapter = new RecyclerGinasio(Chaves.horarios_ginasio);
                                 recyclerGinasioHorario.setAdapter(mAdapter);
                                 ((RecyclerGinasio) mAdapter).setOnItemClickListener(new RecyclerGinasio.MyClickListener() {

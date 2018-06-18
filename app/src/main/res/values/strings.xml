@@ -48,4 +48,5 @@
     <string name="message_dataGoogle">Do you want to import the data from Google?</string>
     <string name="disconnect">Disconnect</string>
     <string name="syncGoogle">Sync Google</string>
+    <string name="no_time_day">No time for the selected day</string>
 </resources>

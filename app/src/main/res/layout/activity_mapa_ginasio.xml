@@ -13,15 +13,4 @@
         tools:layout_editor_absoluteX="60dp"
         tools:layout_editor_absoluteY="98dp" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floating_mapaginasio_Local"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:clickable="true"
-        android:onClick="onClick"
-        app:srcCompat="@android:drawable/ic_menu_mylocation"
-        android:focusable="true" />
 </RelativeLayout>

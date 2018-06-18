@@ -47,4 +47,5 @@
     <string name="message_dataGoogle">Deseja importar os dados do Google?</string>
     <string name="disconnect">Desconectar</string>
     <string name="syncGoogle">Sincronizar Google</string>
+    <string name="no_time_day">Não possui horário para o dia Selecionado</string>
 </resources>
