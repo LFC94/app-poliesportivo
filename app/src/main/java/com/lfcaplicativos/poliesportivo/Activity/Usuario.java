@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -320,7 +321,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
         if (Permissao.validaPermicao(this, Manifest.permission.CAMERA) &&
                 Permissao.validaPermicao(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
 
-            Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             pickIntent.setType("image/*");
             Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
@@ -333,7 +334,9 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
 
             String[] permissions = new String[2];
             permissions[0] = Manifest.permission.CAMERA;
-            permissions[1] = Manifest.permission.READ_EXTERNAL_STORAGE;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                permissions[1] = Manifest.permission.READ_EXTERNAL_STORAGE;
+            }
             Permissao.chamarPermicao(this, permissions, Chaves.CHAVE_PERMISAO_PHOTO);
 
         }

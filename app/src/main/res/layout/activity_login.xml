@@ -4,6 +4,7 @@
     android:id="@+id/Layout_Login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
     tools:context="com.lfcaplicativos.poliesportivo.Activity.Login">
 
@@ -23,8 +24,8 @@
 
     <ProgressBar
         android:id="@+id/Progress_Login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:visibility="gone" />
 
     <ScrollView
@@ -46,10 +47,10 @@
                 android:id="@+id/text_Login_Messagem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
                 android:layout_margin="5dp"
                 android:text="@string/message_verify_phone"
                 android:textAlignment="center"
-                android:layout_alignParentTop="true"
                 android:textAppearance="@android:style/TextAppearance.Medium" />
 
             <RelativeLayout
@@ -88,9 +89,9 @@
                 android:layout_height="match_parent"
                 android:layout_below="@+id/relativeLayout"
                 android:adjustViewBounds="true"
+                android:contentDescription="@string/logo"
                 android:scaleType="fitCenter"
-                app:srcCompat="@drawable/logo"
-                android:contentDescription="@string/logo" />
+                app:srcCompat="@drawable/logo" />
 
         </RelativeLayout>
     </ScrollView>

@@ -5,10 +5,8 @@
     tools:context="com.lfcaplicativos.poliesportivo.Activity.Ginasio">
 
     <item
-        android:id="@+id/item_ginasio_map"
-        android:checkable="false"
-        android:icon="@android:drawable/ic_dialog_map"
-        android:title="@string/map"
-        android:visible="true"
+        android:id="@+id/item_ginasio_favorite"
+        android:icon="@drawable/ic_favorite"
+        android:title="@string/favorite"
         app:showAsAction="ifRoom" />
 </menu>

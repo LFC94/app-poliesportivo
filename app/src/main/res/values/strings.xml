@@ -49,4 +49,5 @@
     <string name="disconnect">Disconnect</string>
     <string name="syncGoogle">Sync Google</string>
     <string name="no_time_day">No time for the selected day</string>
+    <string name="favorite">Add Favorite</string>
 </resources>
