@@ -13,9 +13,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -66,7 +66,7 @@ import com.lfcaplicativos.poliesportivo.Uteis.Permissao;
 import com.lfcaplicativos.poliesportivo.Uteis.Preferencias;
 import com.lfcaplicativos.poliesportivo.Uteis.Validacao;
 import com.rengwuxian.materialedittext.MaterialEditText;
-import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
+//import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -81,7 +81,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
 
     public MaterialEditText edit_Usuario_Nome, edit_Usuario_Telefone;
     public ImageView image_Usuario_Foto;
-    private SearchableSpinner spinner_Usuario_Estado, spinner_Usuario_Cidade;
+//    private SearchableSpinner spinner_Usuario_Estado, spinner_Usuario_Cidade;
     private SignInButton button_Usuario_SingInGoogle;
     private Button button_Usuario_DisconnectGoogle;
 
@@ -125,14 +125,14 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
         edit_Usuario_Telefone.addTextChangedListener(maskTelefone);
 
         edit_Usuario_Telefone.setOnKeyListener(this);
-
-        spinner_Usuario_Estado = findViewById(R.id.spinner_Usuario_Estado);
-        spinner_Usuario_Estado.setTitle(getString(R.string.state));
-        spinner_Usuario_Estado.setPositiveButton(getString(R.string.confirm));
-
-        spinner_Usuario_Cidade = findViewById(R.id.spinner_Usuario_Cidade);
-        spinner_Usuario_Cidade.setTitle(getString(R.string.city));
-        spinner_Usuario_Cidade.setPositiveButton(getString(R.string.confirm));
+//
+//        spinner_Usuario_Estado = findViewById(R.id.spinner_Usuario_Estado);
+//        spinner_Usuario_Estado.setTitle(getString(R.string.state));
+//        spinner_Usuario_Estado.setPositiveButton(getString(R.string.confirm));
+//
+//        spinner_Usuario_Cidade = findViewById(R.id.spinner_Usuario_Cidade);
+//        spinner_Usuario_Cidade.setTitle(getString(R.string.city));
+//        spinner_Usuario_Cidade.setPositiveButton(getString(R.string.confirm));
 
         image_Usuario_Foto = findViewById(R.id.image_Usuario_Foto);
 
@@ -147,32 +147,32 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
             button_Usuario_DisconnectGoogle.setVisibility(View.INVISIBLE);
         }
 
-        spinner_Usuario_Estado.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> arg0,
-                                       View arg1, int position, long arg3) {
-
-                if (position >= 0) {
-                    carregarCidade(Chaves.estados_usuario.get(position).getSigla());
-                } else {
-                    // spinner_Usuario_Estado.setError(R.string.notstate);
-                    spinner_Usuario_Estado.requestFocus();
-                    if (Chaves.cidadelist_usuario == null)
-                        return;
-
-                    Chaves.cidadelist_usuario.clear();
-                    spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
-                            android.R.layout.simple_spinner_dropdown_item,
-                            Chaves.cidadelist_usuario));
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-
-            }
-        });
+//        spinner_Usuario_Estado.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//
+//            @Override
+//            public void onItemSelected(AdapterView<?> arg0,
+//                                       View arg1, int position, long arg3) {
+//
+//                if (position >= 0) {
+//                    carregarCidade(Chaves.estados_usuario.get(position).getSigla());
+//                } else {
+//                    // spinner_Usuario_Estado.setError(R.string.notstate);
+//                    spinner_Usuario_Estado.requestFocus();
+//                    if (Chaves.cidadelist_usuario == null)
+//                        return;
+//
+//                    Chaves.cidadelist_usuario.clear();
+//                    spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
+//                            android.R.layout.simple_spinner_dropdown_item,
+//                            Chaves.cidadelist_usuario));
+//                }
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> arg0) {
+//
+//            }
+//        });
 
         buscarDadosFirebase();
 
@@ -292,6 +292,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean permitido = false;
         if (grantResults.length > 0) {
             permitido = true;
@@ -383,18 +384,18 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    Chaves.estadolist_usuario));
-                            if (prim_uf) {
-                                prim_uf = false;
-                                if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
-                                    for (int i = 0; i < Chaves.estados_usuario.size(); i++) {
-                                        if (Chaves.estados_usuario.get(i).getNome().equals(preferencias.getESTADO()))
-                                            spinner_Usuario_Estado.setSelection(i);
-                                    }
-                                }
-                            }
+//                            spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
+//                                    android.R.layout.simple_spinner_dropdown_item,
+//                                    Chaves.estadolist_usuario));
+//                            if (prim_uf) {
+//                                prim_uf = false;
+//                                if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
+//                                    for (int i = 0; i < Chaves.estados_usuario.size(); i++) {
+//                                        if (Chaves.estados_usuario.get(i).getNome().equals(preferencias.getESTADO()))
+//                                            spinner_Usuario_Estado.setSelection(i);
+//                                    }
+//                                }
+//                            }
 
                         }
                     });
@@ -416,11 +417,11 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
 
         if (UFEstado.trim().isEmpty()) {
             //spinner_Usuario_Estado.setError(R.string.notstate);
-            spinner_Usuario_Estado.requestFocus();
+//            spinner_Usuario_Estado.requestFocus();
             Chaves.cidadelist_usuario.clear();
-            spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
-                    android.R.layout.simple_spinner_dropdown_item,
-                    Chaves.cidadelist_usuario));
+//            spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
+//                    android.R.layout.simple_spinner_dropdown_item,
+//                    Chaves.cidadelist_usuario));
             return;
         }
 
@@ -472,15 +473,15 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    Chaves.cidadelist_usuario));
-                            if (preferencias.getCIDADE() != null && !preferencias.getCIDADE().trim().isEmpty()) {
-                                for (int i = 0; i < Chaves.cidades_usuario.size(); i++) {
-                                    if (Chaves.cidades_usuario.get(i).getNome().equals(preferencias.getCIDADE()))
-                                        spinner_Usuario_Cidade.setSelection(i);
-                                }
-                            }
+//                            spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
+//                                    android.R.layout.simple_spinner_dropdown_item,
+//                                    Chaves.cidadelist_usuario));
+//                            if (preferencias.getCIDADE() != null && !preferencias.getCIDADE().trim().isEmpty()) {
+//                                for (int i = 0; i < Chaves.cidades_usuario.size(); i++) {
+//                                    if (Chaves.cidades_usuario.get(i).getNome().equals(preferencias.getCIDADE()))
+//                                        spinner_Usuario_Cidade.setSelection(i);
+//                                }
+//                            }
                         }
                     });
                 } catch (Exception ignored) {
@@ -521,33 +522,33 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
             Chaves.estadolist_usuario.clear();
             if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
                 Chaves.estadolist_usuario.add(preferencias.getESTADO());
-                spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
-                        android.R.layout.simple_spinner_dropdown_item,
-                        Chaves.estadolist_usuario));
+//                spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
+//                        android.R.layout.simple_spinner_dropdown_item,
+//                        Chaves.estadolist_usuario));
 
-                spinner_Usuario_Estado.setSelection(1);
+//                spinner_Usuario_Estado.setSelection(1);
             } else {
-                spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
-                        android.R.layout.simple_spinner_dropdown_item,
-                        Chaves.estadolist_usuario));
+//                spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
+//                        android.R.layout.simple_spinner_dropdown_item,
+//                        Chaves.estadolist_usuario));
 
-                spinner_Usuario_Estado.setSelection(0);
+//                spinner_Usuario_Estado.setSelection(0);
             }
             Chaves.cidadelist_usuario.clear();
             if (preferencias.getCIDADE() != null && !preferencias.getCIDADE().trim().isEmpty()) {
                 Chaves.cidadelist_usuario.clear();
                 Chaves.cidadelist_usuario.add(preferencias.getCIDADE());
-                spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
-                        android.R.layout.simple_spinner_dropdown_item,
-                        Chaves.cidadelist_usuario));
-
-                spinner_Usuario_Cidade.setSelection(1);
+//                spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
+//                        android.R.layout.simple_spinner_dropdown_item,
+//                        Chaves.cidadelist_usuario));
+//
+//                spinner_Usuario_Cidade.setSelection(1);
             } else {
-                spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
-                        android.R.layout.simple_spinner_dropdown_item,
-                        Chaves.cidadelist_usuario));
-
-                spinner_Usuario_Cidade.setSelection(0);
+//                spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
+//                        android.R.layout.simple_spinner_dropdown_item,
+//                        Chaves.cidadelist_usuario));
+//
+//                spinner_Usuario_Cidade.setSelection(0);
             }
         }
         try {
@@ -591,28 +592,28 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
         if (Chaves.estadolist_usuario == null) {
             carregarEstado();
         } else {
-            spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
-                    android.R.layout.simple_spinner_dropdown_item,
-                    Chaves.estadolist_usuario));
+//            spinner_Usuario_Estado.setAdapter(new ArrayAdapter<>(Usuario.this,
+//                    android.R.layout.simple_spinner_dropdown_item,
+//                    Chaves.estadolist_usuario));
             prim_uf = false;
-            if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
-                for (int i = 0; i < Chaves.estados_usuario.size(); i++) {
-                    if (Chaves.estados_usuario.get(i).getNome().equals(preferencias.getESTADO()))
-                        spinner_Usuario_Estado.setSelection(i);
-                }
-            }
+//            if (preferencias.getESTADO() != null && !preferencias.getESTADO().trim().isEmpty()) {
+//                for (int i = 0; i < Chaves.estados_usuario.size(); i++) {
+//                    if (Chaves.estados_usuario.get(i).getNome().equals(preferencias.getESTADO()))
+//                        spinner_Usuario_Estado.setSelection(i);
+//                }
+//            }
 
             if (Chaves.cidadelist_usuario != null) {
-                spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
-                        android.R.layout.simple_spinner_dropdown_item,
-                        Chaves.cidadelist_usuario));
-                prim_cid = false;
-                if (preferencias.getCIDADE() != null && !preferencias.getCIDADE().trim().isEmpty()) {
-                    for (int i = 0; i < Chaves.cidades_usuario.size(); i++) {
-                        if (Chaves.cidades_usuario.get(i).getNome().equals(preferencias.getCIDADE()))
-                            spinner_Usuario_Cidade.setSelection(i);
-                    }
-                }
+//                spinner_Usuario_Cidade.setAdapter(new ArrayAdapter<>(Usuario.this,
+//                        android.R.layout.simple_spinner_dropdown_item,
+//                        Chaves.cidadelist_usuario));
+//                prim_cid = false;
+//                if (preferencias.getCIDADE() != null && !preferencias.getCIDADE().trim().isEmpty()) {
+//                    for (int i = 0; i < Chaves.cidades_usuario.size(); i++) {
+//                        if (Chaves.cidades_usuario.get(i).getNome().equals(preferencias.getCIDADE()))
+//                            spinner_Usuario_Cidade.setSelection(i);
+//                    }
+//                }
 
             }
         }
@@ -625,11 +626,11 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
             edit_Usuario_Nome.requestFocus();
             return false;
         }
-        if (spinner_Usuario_Estado.getSelectedItemPosition() <= 0) {
-            //spinner_Usuario_Estado.setError(R.string.notstate);
-            spinner_Usuario_Estado.requestFocus();
-            return false;
-        }
+//        if (spinner_Usuario_Estado.getSelectedItemPosition() <= 0) {
+//            //spinner_Usuario_Estado.setError(R.string.notstate);
+//            spinner_Usuario_Estado.requestFocus();
+//            return false;
+//        }
         if (!edit_Usuario_Telefone.getText().toString().trim().isEmpty() &&
                 !Validacao.validateDDDPhoneNumber(edit_Usuario_Telefone, getString(R.string.ddd_invalid), getString(R.string.phone_invalid))) {
             edit_Usuario_Telefone.requestFocus();
@@ -638,17 +639,17 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
         preferencias.setNOME(edit_Usuario_Nome.getText().toString().trim());
         preferencias.setTelefone(edit_Usuario_Telefone.getText().toString().trim());
 
-        if (spinner_Usuario_Cidade.getSelectedItemPosition() > 0) {
-            preferencias.setCIDADE(Chaves.cidades_usuario.get(spinner_Usuario_Cidade.getSelectedItemPosition()).getNome());
-        } else {
-            preferencias.setCIDADE("");
-        }
+//        if (spinner_Usuario_Cidade.getSelectedItemPosition() > 0) {
+//            preferencias.setCIDADE(Chaves.cidades_usuario.get(spinner_Usuario_Cidade.getSelectedItemPosition()).getNome());
+//        } else {
+//            preferencias.setCIDADE("");
+//        }
 
-        if (spinner_Usuario_Estado.getSelectedItemPosition() > 0) {
-            preferencias.setESTADO(Chaves.estados_usuario.get(spinner_Usuario_Estado.getSelectedItemPosition()).getNome());
-        } else {
-            preferencias.setESTADO("");
-        }
+//        if (spinner_Usuario_Estado.getSelectedItemPosition() > 0) {
+//            preferencias.setESTADO(Chaves.estados_usuario.get(spinner_Usuario_Estado.getSelectedItemPosition()).getNome());
+//        } else {
+//            preferencias.setESTADO("");
+//        }
 
 
         gravarImagemFireBase();
@@ -723,7 +724,7 @@ public class Usuario extends AppCompatActivity implements View.OnClickListener, 
                     case R.id.edit_Usuario_Telefone:
                         if (!edit_Usuario_Telefone.getText().toString().trim().isEmpty() &&
                                 Validacao.validateDDDPhoneNumber(edit_Usuario_Telefone, getString(R.string.ddd_invalid), getString(R.string.phone_invalid))) {
-                            spinner_Usuario_Estado.requestFocus();
+//                            spinner_Usuario_Estado.requestFocus();
                             return false;
                         }
                         break;

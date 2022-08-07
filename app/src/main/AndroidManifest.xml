@@ -24,7 +24,8 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".Activity.Login">
+        <activity android:name=".Activity.Login"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,7 +42,7 @@
             android:name=".Activity.Usuario"
             android:label="@string/title_activity_usuario"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Activity.Principal"></activity>
+        <activity android:name=".Activity.Principal" />
     </application>
 
 </manifest>

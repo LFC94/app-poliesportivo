@@ -7,21 +7,14 @@
     android:orientation="vertical"
     tools:context="com.lfcaplicativos.poliesportivo.Activity.Ginasio">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appBarLayout2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.NoActionBar.AppBarOverlay"
-        app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.NoActionBar.PopupOverlay" />
 
-    </android.support.design.widget.AppBarLayout>
 
     <include
         android:id="@+id/include"
@@ -34,16 +27,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout2" />
 
-    <devs.mulham.horizontalcalendar.HorizontalCalendarView
-        android:id="@+id/calendarGinasio"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        app:layout_constraintBottom_toTopOf="@+id/recyclerGinasioHoraio"
-        app:layout_constraintTop_toBottomOf="@+id/include"
-        app:textColorNormal="@color/c5"
-        app:textColorSelected="@color/c3"
-        tools:layout_editor_absoluteX="0dp" />
+<!--    <devs.mulham.horizontalcalendar.HorizontalCalendarView-->
+    <!--        android:id="@+id/calendarGinasio"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:background="@color/colorPrimary"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/recyclerGinasioHoraio"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/include"-->
+    <!--        app:textColorNormal="@color/c5"-->
+    <!--        app:textColorSelected="@color/c3"-->
+    <!--        tools:layout_editor_absoluteX="0dp" />-->
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -62,12 +55,12 @@
             android:textStyle="bold"
             app:fontFamily="serif" />
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerGinasioHoraio"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        </android.support.v7.widget.RecyclerView>
+        </androidx.recyclerview.widget.RecyclerView>
 
     </RelativeLayout>
 

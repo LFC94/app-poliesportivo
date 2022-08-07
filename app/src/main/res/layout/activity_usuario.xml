@@ -7,19 +7,13 @@
     android:orientation="vertical"
     tools:context="com.lfcaplicativos.poliesportivo.Activity.Usuario">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.NoActionBar.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
             app:popupTheme="@style/AppTheme.NoActionBar.PopupOverlay" />
-    </android.support.design.widget.AppBarLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -69,14 +63,14 @@
                 android:text="@string/state"
                 android:textSize="12sp" />
 
-            <com.toptoche.searchablespinnerlibrary.SearchableSpinner
-                android:id="@+id/spinner_Usuario_Estado"
-                style="@style/Platform.Widget.AppCompat.Spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/text_Usuario_Estado"
-                android:layout_marginLeft="16dp"
-                android:minWidth="250dp" />
+<!--            <com.toptoche.searchablespinnerlibrary.SearchableSpinner-->
+<!--                android:id="@+id/spinner_Usuario_Estado"-->
+<!--                style="@style/Platform.Widget.AppCompat.Spinner"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_below="@+id/text_Usuario_Estado"-->
+<!--                android:layout_marginLeft="16dp"-->
+<!--                android:minWidth="250dp" />-->
 
             <TextView
                 android:id="@+id/text_Usuario_Cidade"
@@ -88,14 +82,14 @@
                 android:text="@string/city"
                 android:textSize="12sp" />
 
-            <com.toptoche.searchablespinnerlibrary.SearchableSpinner
-                android:id="@+id/spinner_Usuario_Cidade"
-                style="@style/Platform.Widget.AppCompat.Spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/text_Usuario_Cidade"
-                android:layout_marginLeft="16dp"
-                android:minWidth="500dp" />
+<!--            <com.toptoche.searchablespinnerlibrary.SearchableSpinner-->
+<!--                android:id="@+id/spinner_Usuario_Cidade"-->
+<!--                style="@style/Platform.Widget.AppCompat.Spinner"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_below="@+id/text_Usuario_Cidade"-->
+<!--                android:layout_marginLeft="16dp"-->
+<!--                android:minWidth="500dp" />-->
 
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/button_Usuario_SingInGoogle"
@@ -122,7 +116,7 @@
                 android:textAllCaps="false"
                 android:theme="@style/MyDarkButton" />
 
-            <android.support.design.widget.FloatingActionButton
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_Usuario_Foto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -133,7 +127,8 @@
                 android:onClick="onClick"
                 app:backgroundTint="@color/colorButtonNormal"
                 app:srcCompat="@drawable/ic_add_a_photo"
-                tools:context="com.lfcaplicativos.poliesportivo.Activity.Principal" />
+                tools:context="com.lfcaplicativos.poliesportivo.Activity.Principal"
+                android:contentDescription="TODO" />
 
         </RelativeLayout>
     </ScrollView>

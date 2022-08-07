@@ -4,10 +4,12 @@ package com.lfcaplicativos.poliesportivo.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
+
+
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
@@ -35,9 +37,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import devs.mulham.horizontalcalendar.HorizontalCalendar;
-import devs.mulham.horizontalcalendar.HorizontalCalendarView;
-import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
+//import devs.mulham.horizontalcalendar.HorizontalCalendar;
+//import devs.mulham.horizontalcalendar.HorizontalCalendarView;
+//import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 
 public class Ginasio extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
 
@@ -78,27 +80,27 @@ public class Ginasio extends AppCompatActivity implements View.OnClickListener, 
             Calendar endDate = Calendar.getInstance();
             endDate.add(Calendar.DAY_OF_MONTH, 7);
 
-            HorizontalCalendar horizontalCalendar = new HorizontalCalendar.Builder(this, R.id.calendarGinasio)
-                    .range(startDate, endDate)
-                    .datesNumberOnScreen(5)
-                    .build();
-
-            horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
-                @Override
-                public void onDateSelected(Calendar date, int position) {
-                    carregarHorario(date);
-                }
-
-                @Override
-                public void onCalendarScroll(HorizontalCalendarView calendarView,
-                                             int dx, int dy) {
-                }
-
-                @Override
-                public boolean onDateLongClicked(Calendar date, int position) {
-                    return true;
-                }
-            });
+//            HorizontalCalendar horizontalCalendar = new HorizontalCalendar.Builder(this, R.id.calendarGinasio)
+//                    .range(startDate, endDate)
+//                    .datesNumberOnScreen(5)
+//                    .build();
+//
+//            horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
+//                @Override
+//                public void onDateSelected(Calendar date, int position) {
+//                    carregarHorario(date);
+//                }
+//
+//                @Override
+//                public void onCalendarScroll(HorizontalCalendarView calendarView,
+//                                             int dx, int dy) {
+//                }
+//
+//                @Override
+//                public boolean onDateLongClicked(Calendar date, int position) {
+//                    return true;
+//                }
+//            });
 
             carregarHorario(startDate);
 

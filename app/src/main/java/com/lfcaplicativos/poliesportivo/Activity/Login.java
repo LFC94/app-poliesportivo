@@ -13,10 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -39,10 +36,13 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
+import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -62,6 +62,11 @@ import java.util.concurrent.TimeUnit;
 import static com.lfcaplicativos.poliesportivo.Uteis.Validacao.formatacaoTelefone;
 import static com.lfcaplicativos.poliesportivo.Uteis.Validacao.validateDDDNumber;
 import static com.lfcaplicativos.poliesportivo.Uteis.Validacao.validatePhoneNumber;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 public class Login extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener {
     private static final String TAG = "PhoneAuthActivity";
@@ -174,7 +179,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
             @Override
             public void onCodeSent(String verificationId,
                                    PhoneAuthProvider.ForceResendingToken token) {
-                Log.d(TAG, "onCodeSent:" + verificationId + " Token: " + token);
+                Log.d(TAG, "onCodeSent:" + verificationId);
+
                 sVerificaId = verificationId;
                 mResendToken = token;
             }
@@ -365,24 +371,40 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
 
     private void startPhoneNumberVerification(String phoneNumber) {
 
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                phoneNumber,        // Phone number to verify
-                60,                 // Timeout duration
-                TimeUnit.SECONDS,   // Unit of timeout
-                this,               // Activity (for callback binding)
-                mCallbacks);        // OnVerificationStateChangedCallbacks
+//        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+//                phoneNumber,        // Phone number to verify
+//                60,                 // Timeout duration
+//                TimeUnit.SECONDS,   // Unit of timeout
+//                this,               // Activity (for callback binding)
+//                mCallbacks);        // OnVerificationStateChangedCallbacks
 
-
+        PhoneAuthOptions options =
+                PhoneAuthOptions.newBuilder(mAuth)
+                        .setPhoneNumber(phoneNumber)       // Phone number to verify
+                        .setTimeout(120L, TimeUnit.SECONDS) // Timeout and unit
+                        .setActivity(this)                 // Activity (for callback binding)
+                        .setCallbacks(mCallbacks)          // OnVerificationStateChangedCallbacks
+                        .build();
+        PhoneAuthProvider.verifyPhoneNumber(options);
     }
 
     private void resendVerificationCode(String phoneNumber, PhoneAuthProvider.ForceResendingToken token) {
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                phoneNumber,        // Phone number to verify
-                60,                 // Timeout duration
-                TimeUnit.SECONDS,   // Unit of timeout
-                this,               // Activity (for callback binding)
-                mCallbacks,         // OnVerificationStateChangedCallbacks
-                token);             // ForceResendingToken from callbacks
+//        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+//                phoneNumber,        // Phone number to verify
+//                60,                 // Timeout duration
+//                TimeUnit.SECONDS,   // Unit of timeout
+//                this,               // Activity (for callback binding)
+//                mCallbacks,         // OnVerificationStateChangedCallbacks
+//                token);             // ForceResendingToken from callbacks
+        PhoneAuthOptions options =
+                PhoneAuthOptions.newBuilder(mAuth)
+                        .setPhoneNumber(phoneNumber)       // Phone number to verify
+                        .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+                        .setActivity(this)                 // Activity (for callback binding)
+                        .setCallbacks(mCallbacks)          // OnVerificationStateChangedCallbacks
+                        .setForceResendingToken(token)
+                        .build();
+        PhoneAuthProvider.verifyPhoneNumber(options);
     }
 
     private void chamarTelaVerificacao() {
@@ -501,7 +523,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Vi
             return;
         }
 
-        for (int providers = 1; providers <= mUser.getProviders().size(); providers++) {
+        for (int providers = 1; providers <= mUser.getProviderData().size(); providers++) {
             String s = mUser.getProviderData().get(providers).getProviderId();
             if (s.toLowerCase().contains(("phone"))) {
                 preferencias.setPreferencias(Chaves.CHAVE_AUTENTC_PHONE, true);

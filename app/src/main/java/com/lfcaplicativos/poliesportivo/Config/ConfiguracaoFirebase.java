@@ -1,8 +1,9 @@
 package com.lfcaplicativos.poliesportivo.Config;
 
 
-import android.support.annotation.NonNull;
-import android.widget.Toast;
+import androidx.annotation.NonNull;
+
+import android.annotation.SuppressLint;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -43,9 +44,9 @@ public final class ConfiguracaoFirebase {
         if (mFirebaseRemoteConfig == null) {
             mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
             FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                    .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                    .setMinimumFetchIntervalInSeconds(3600)
                     .build();
-            mFirebaseRemoteConfig.setConfigSettings(configSettings);
+            mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
         }
         return mFirebaseRemoteConfig;
     }
@@ -59,7 +60,7 @@ public final class ConfiguracaoFirebase {
                         if (task.isSuccessful()) {
                             // After config data is successfully fetched, it must be activated before newly fetched
                             // values are returned.
-                            mFirebaseRemoteConfig.activateFetched();
+                            mFirebaseRemoteConfig.activate();
                         }
                         Chaves.atuServerCidade = mFirebaseRemoteConfig.getString(Chaves.CHAVE_ATU_CIDADE);
                         if(Chaves.atuServerCidade == null || Chaves.atuServerCidade.trim().isEmpty())
