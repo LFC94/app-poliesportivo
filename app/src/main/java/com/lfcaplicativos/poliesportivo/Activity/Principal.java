@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -55,12 +57,13 @@ public class Principal extends AppCompatActivity {
     private ProgressDialog mProgressDialog;
 
     private boolean novo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle args = new Bundle();
         preferencias = new Preferencias(this);
-        novo =  (preferencias.getNOME() == null || preferencias.getNOME().trim().isEmpty());
+        novo = (preferencias.getNOME() == null || preferencias.getNOME().trim().isEmpty());
         ConfiguracaoFirebase.buscarConfiguracoes(preferencias);
 
         setContentView(R.layout.activity_principal);
@@ -79,7 +82,7 @@ public class Principal extends AppCompatActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         recycler_Principal_Ginasio.setLayoutManager(mLayoutManager);
 
-        if(novo) {
+        if (novo) {
             chamaUsuario(true);
         }
     }
@@ -230,7 +233,7 @@ public class Principal extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void chamaUsuario(boolean userNovo){
+    private void chamaUsuario(boolean userNovo) {
         Intent intent;
         intent = new Intent(Principal.this, Usuario.class);
         intent.putExtra("novo", userNovo);

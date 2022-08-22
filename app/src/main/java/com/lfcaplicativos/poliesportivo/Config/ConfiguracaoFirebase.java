@@ -51,7 +51,7 @@ public final class ConfiguracaoFirebase {
         return mFirebaseRemoteConfig;
     }
 
-    public static void buscarConfiguracoes(final Preferencias preferencias){
+    public static void buscarConfiguracoes(final Preferencias preferencias) {
         getFirebaseRemoteConfig();
         mFirebaseRemoteConfig.fetch()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -63,15 +63,15 @@ public final class ConfiguracaoFirebase {
                             mFirebaseRemoteConfig.activate();
                         }
                         Chaves.atuServerCidade = mFirebaseRemoteConfig.getString(Chaves.CHAVE_ATU_CIDADE);
-                        if(Chaves.atuServerCidade == null || Chaves.atuServerCidade.trim().isEmpty())
+                        if (Chaves.atuServerCidade == null || Chaves.atuServerCidade.trim().isEmpty())
                             Chaves.atuServerCidade = preferencias.getSPreferencias(Chaves.CHAVE_ATU_CIDADE);
 
                         Chaves.atuServerEstado = mFirebaseRemoteConfig.getString(Chaves.CHAVE_ATU_ESTADO);
-                        if(Chaves.atuServerEstado == null || Chaves.atuServerEstado.trim().isEmpty())
+                        if (Chaves.atuServerEstado == null || Chaves.atuServerEstado.trim().isEmpty())
                             Chaves.atuServerEstado = preferencias.getSPreferencias(Chaves.CHAVE_ATU_ESTADO);
 
-                        preferencias.setPreferencias(Chaves.CHAVE_URL_ESTADO,mFirebaseRemoteConfig.getString(Chaves.CHAVE_URL_ESTADO));
-                        preferencias.setPreferencias(Chaves.CHAVE_URL_CIDADE,mFirebaseRemoteConfig.getString(Chaves.CHAVE_URL_CIDADE));
+                        preferencias.setPreferencias(Chaves.CHAVE_URL_ESTADO, mFirebaseRemoteConfig.getString(Chaves.CHAVE_URL_ESTADO));
+                        preferencias.setPreferencias(Chaves.CHAVE_URL_CIDADE, mFirebaseRemoteConfig.getString(Chaves.CHAVE_URL_CIDADE));
 
                     }
                 });
